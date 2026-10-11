@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProgressoRouteImport } from './routes/progresso'
 import { Route as RevisaoRouteImport } from './routes/revisao'
 import { Route as BibliotecaMaterialIdRouteImport } from './routes/biblioteca.$materialId'
+import { Route as PraticarIndexRouteImport } from './routes/praticar.index'
 import { Route as RelatorioSessionIdRouteImport } from './routes/relatorio.$sessionId'
 import { Route as SessaoSessionIdRouteImport } from './routes/sessao.$sessionId'
 
@@ -48,6 +49,11 @@ const BibliotecaMaterialIdRoute = BibliotecaMaterialIdRouteImport.update({
   path: '/$materialId',
   getParentRoute: () => BibliotecaRoute,
 } as any)
+const PraticarIndexRoute = PraticarIndexRouteImport.update({
+  id: '/praticar/',
+  path: '/praticar/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RelatorioSessionIdRoute = RelatorioSessionIdRouteImport.update({
   id: '/relatorio/$sessionId',
   path: '/relatorio/$sessionId',
@@ -68,6 +74,7 @@ export interface FileRoutesByFullPath {
   '/biblioteca/$materialId': typeof BibliotecaMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
+  '/praticar/': typeof PraticarIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/biblioteca/$materialId': typeof BibliotecaMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
+  '/praticar': typeof PraticarIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   '/biblioteca/$materialId': typeof BibliotecaMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
+  '/praticar/': typeof PraticarIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
     | '/biblioteca/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
+    | '/praticar/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
     | '/biblioteca/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
+    | '/praticar'
   id:
     | '__root__'
     | '/'
@@ -121,6 +132,7 @@ export interface FileRouteTypes {
     | '/biblioteca/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
+    | '/praticar/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -131,6 +143,7 @@ export interface RootRouteChildren {
   RevisaoRoute: typeof RevisaoRoute
   RelatorioSessionIdRoute: typeof RelatorioSessionIdRoute
   SessaoSessionIdRoute: typeof SessaoSessionIdRoute
+  PraticarIndexRoute: typeof PraticarIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -177,6 +190,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BibliotecaMaterialIdRouteImport
       parentRoute: typeof BibliotecaRoute
     }
+    '/praticar/': {
+      id: '/praticar/'
+      path: '/praticar'
+      fullPath: '/praticar/'
+      preLoaderRoute: typeof PraticarIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/relatorio/$sessionId': {
       id: '/relatorio/$sessionId'
       path: '/relatorio/$sessionId'
@@ -214,6 +234,7 @@ const rootRouteChildren: RootRouteChildren = {
   RevisaoRoute: RevisaoRoute,
   RelatorioSessionIdRoute: RelatorioSessionIdRoute,
   SessaoSessionIdRoute: SessaoSessionIdRoute,
+  PraticarIndexRoute: PraticarIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
