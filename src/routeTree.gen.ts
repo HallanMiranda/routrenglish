@@ -10,11 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as BibliotecaRouteImport } from './routes/biblioteca'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProgressoRouteImport } from './routes/progresso'
 import { Route as RevisaoRouteImport } from './routes/revisao'
-import { Route as BibliotecaMaterialIdRouteImport } from './routes/biblioteca.$materialId'
 import { Route as RelatorioSessionIdRouteImport } from './routes/relatorio.$sessionId'
 import { Route as SessaoSessionIdRouteImport } from './routes/sessao.$sessionId'
 import { Route as UberclassIndexRouteImport } from './routes/uberclass.index'
@@ -23,11 +21,6 @@ import { Route as UberclassPackIdRouteImport } from './routes/uberclass.$packId'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BibliotecaRoute = BibliotecaRouteImport.update({
-  id: '/biblioteca',
-  path: '/biblioteca',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -44,11 +37,6 @@ const RevisaoRoute = RevisaoRouteImport.update({
   id: '/revisao',
   path: '/revisao',
   getParentRoute: () => rootRouteImport,
-} as any)
-const BibliotecaMaterialIdRoute = BibliotecaMaterialIdRouteImport.update({
-  id: '/$materialId',
-  path: '/$materialId',
-  getParentRoute: () => BibliotecaRoute,
 } as any)
 const RelatorioSessionIdRoute = RelatorioSessionIdRouteImport.update({
   id: '/relatorio/$sessionId',
@@ -73,11 +61,9 @@ const UberclassPackIdRoute = UberclassPackIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/biblioteca': typeof BibliotecaRouteWithChildren
   '/login': typeof LoginRoute
   '/progresso': typeof ProgressoRoute
   '/revisao': typeof RevisaoRoute
-  '/biblioteca/$materialId': typeof BibliotecaMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
   '/uberclass/$packId': typeof UberclassPackIdRoute
@@ -85,11 +71,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/biblioteca': typeof BibliotecaRouteWithChildren
   '/login': typeof LoginRoute
   '/progresso': typeof ProgressoRoute
   '/revisao': typeof RevisaoRoute
-  '/biblioteca/$materialId': typeof BibliotecaMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
   '/uberclass/$packId': typeof UberclassPackIdRoute
@@ -98,11 +82,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/biblioteca': typeof BibliotecaRouteWithChildren
   '/login': typeof LoginRoute
   '/progresso': typeof ProgressoRoute
   '/revisao': typeof RevisaoRoute
-  '/biblioteca/$materialId': typeof BibliotecaMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
   '/uberclass/$packId': typeof UberclassPackIdRoute
@@ -112,11 +94,9 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/biblioteca'
     | '/login'
     | '/progresso'
     | '/revisao'
-    | '/biblioteca/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
     | '/uberclass/$packId'
@@ -124,11 +104,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/biblioteca'
     | '/login'
     | '/progresso'
     | '/revisao'
-    | '/biblioteca/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
     | '/uberclass/$packId'
@@ -136,11 +114,9 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/biblioteca'
     | '/login'
     | '/progresso'
     | '/revisao'
-    | '/biblioteca/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
     | '/uberclass/$packId'
@@ -149,7 +125,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  BibliotecaRoute: typeof BibliotecaRouteWithChildren
   LoginRoute: typeof LoginRoute
   ProgressoRoute: typeof ProgressoRoute
   RevisaoRoute: typeof RevisaoRoute
@@ -166,13 +141,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/biblioteca': {
-      id: '/biblioteca'
-      path: '/biblioteca'
-      fullPath: '/biblioteca'
-      preLoaderRoute: typeof BibliotecaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -195,13 +163,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/revisao'
       preLoaderRoute: typeof RevisaoRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/biblioteca/$materialId': {
-      id: '/biblioteca/$materialId'
-      path: '/$materialId'
-      fullPath: '/biblioteca/$materialId'
-      preLoaderRoute: typeof BibliotecaMaterialIdRouteImport
-      parentRoute: typeof BibliotecaRoute
     }
     '/relatorio/$sessionId': {
       id: '/relatorio/$sessionId'
@@ -234,21 +195,8 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface BibliotecaRouteChildren {
-  BibliotecaMaterialIdRoute: typeof BibliotecaMaterialIdRoute
-}
-
-const BibliotecaRouteChildren: BibliotecaRouteChildren = {
-  BibliotecaMaterialIdRoute: BibliotecaMaterialIdRoute,
-}
-
-const BibliotecaRouteWithChildren = BibliotecaRoute._addFileChildren(
-  BibliotecaRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  BibliotecaRoute: BibliotecaRouteWithChildren,
   LoginRoute: LoginRoute,
   ProgressoRoute: ProgressoRoute,
   RevisaoRoute: RevisaoRoute,
