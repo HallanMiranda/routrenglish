@@ -4,6 +4,8 @@ import missionsJson from "@/content/missions-phase1.json";
 import type { Repo } from "./repo";
 import type {
   AiSettings,
+  AiUsage,
+  MyName,
   Card,
   Checkpoint,
   ErrorItem,
@@ -31,6 +33,8 @@ const missions: Mission[] = (rawPhase.missions ?? []).map((m, i) => ({
   title: m.title_pt,
   situation: m.scenario,
   ...(m.goal ? { goal: m.goal } : {}),
+  ...(m.ai_role ? { ai_role: m.ai_role } : {}),
+  ...(m.ai_opening ? { ai_opening: m.ai_opening } : {}),
   key_phrases: m.key_phrases,
   model_dialogue: [],
 }));
@@ -239,7 +243,14 @@ export const localRepo: Repo = {
   },
   async getAiSettings() {
     const s = read<AiSettings>("ai_settings")[0];
-    return { api_key: s?.api_key ?? null, model: s?.model?.trim() || DEFAULT_MODEL };
+    return {
+      api_key: s?.api_key ?? null,
+      model: s?.model?.trim() || DEFAULT_MODEL,
+      transcribe_model: s?.transcribe_model?.trim() || "gpt-4o-mini-transcribe",
+      listen_ai: s?.listen_ai ?? true,
+      judge_ai: s?.judge_ai ?? true,
+      converse_ai: s?.converse_ai ?? true,
+    } satisfies AiSettings;
   },
   async saveAiSettings(p) {
     const next = { ...(await localRepo.getAiSettings()), ...p };
@@ -247,6 +258,27 @@ export const localRepo: Repo = {
     return next;
   },
 
+  async getMyName() {
+    return read<MyName>("my_name")[0] ?? { name: "Allan", aliases: ["Alan", "Allen", "Alen"] };
+  },
+  async saveMyName(n) {
+    write("my_name", [n]);
+  },
+  async logAiUsage(u) {
+    write("ai_usage", [...read<AiUsage>("ai_usage"), { ...u, created_at: now() }]);
+  },
+  async getAiSpendThisMonth() {
+    const month = now().slice(0, 7);
+    return read<AiUsage>("ai_usage").filter((u) => u.created_at.startsWith(month)).reduce((s, u) => s + u.cost_usd, 0);
+  },
+  async getLearnedAnswers() {
+    return read<Record<string, string[]>>("learned_answers")[0] ?? {};
+  },
+  async addLearnedAnswer(itemId, answer) {
+    const all = await localRepo.getLearnedAnswers();
+    const list = all[itemId] ?? [];
+    if (!list.includes(answer)) write("learned_answers", [{ ...all, [itemId]: [...list, answer] }]);
+  },
   async getStreak() {
     const days = new Set(
       read<Session>("sessions")

@@ -1,5 +1,7 @@
 import type {
   AiSettings,
+  AiUsage,
+  MyName,
   Card,
   CardRating,
   Checkpoint,
@@ -41,6 +43,14 @@ export interface Repo {
   getAiSettings(): Promise<AiSettings>;
   saveAiSettings(p: Partial<AiSettings>): Promise<AiSettings>;
   getStreak(): Promise<number>;
+  getMyName(): Promise<MyName>;
+  saveMyName(n: MyName): Promise<void>;
+  logAiUsage(u: Omit<AiUsage, "created_at">): Promise<void>;
+  /** Approximate USD spent with AI in the current calendar month. */
+  getAiSpendThisMonth(): Promise<number>;
+  /** Answers the AI judge accepted, per item id, so they pass locally next time. */
+  getLearnedAnswers(): Promise<Record<string, string[]>>;
+  addLearnedAnswer(itemId: string, answer: string): Promise<void>;
   listDrillPacks(): Promise<DrillPack[]>;
   getDrillPack(id: string): Promise<DrillPack | null>;
   saveDrillPack(p: Omit<DrillPack, "id"> & { id?: string }): Promise<DrillPack>;
