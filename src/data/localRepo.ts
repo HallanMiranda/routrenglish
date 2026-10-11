@@ -329,10 +329,9 @@ export const localRepo: Repo = {
   },
 
   async listDrillPacks() {
-    // A pack the user imported with the same id replaces the built-in one.
-    const mine = read<DrillPack>("drill_packs").map(withMode);
-    const ids = new Set(mine.map((p) => p.id));
-    return [...builtInPacks.filter((p) => !ids.has(p.id)), ...mine];
+    // The built-in course always wins over an older imported copy with the same id (progress is kept by id).
+    const builtInIds = new Set(builtInPacks.map((p) => p.id));
+    return [...builtInPacks, ...read<DrillPack>("drill_packs").map(withMode).filter((p) => !builtInIds.has(p.id))];
   },
   async getDrillPack(id) {
     return (await this.listDrillPacks()).find((p) => p.id === id) ?? null;
