@@ -312,7 +312,7 @@ function LessonPage() {
       let silent = 0;
       while (!stopRef.current) {
         setChunk(ch); setOps(null); setPulo(null);
-        await say(ch.patterns ? `${intro} ${ch.pt}` : `${intro} ${ch.pt}?`);
+        await say(ch.patterns ? `${intro} ${ch.pt}` : `${intro} ${ch.pt.replace(/[.!?…\s]+$/, "")}?`);
         const r = await listen(ch.accepted, spoken);
         if (stopRef.current) return;
         if (!r) { silent++; if (silent >= 3) { silent = 0; await doPause(); } else await say(L.notHeard); continue; }

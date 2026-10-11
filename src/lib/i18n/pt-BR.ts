@@ -154,7 +154,7 @@ export const t = {
     length: "Duração",
     minutes: (n: number) => `${n} min`,
     pack: "Pacote",
-    allAtLevel: (lvl: string) => `Todos · ${lvl}`,
+    allAtLevel: (lvl: string) => (lvl === "Todos" ? "Todos os pacotes" : `Todos · ${lvl}`),
     topic: "Tema",
     fromPrint: (title: string) => `Do meu print: ${title}`,
     topicPlaceholder: "Ou escreva: família, reuniões…",
