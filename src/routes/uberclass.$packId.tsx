@@ -312,6 +312,7 @@ function Hearts({ lives }: { lives: number }) {
       return () => window.clearTimeout(id);
     }
     prev.current = lives;
+    return undefined;
   }, [lives]);
   return (
     <span className="flex items-center gap-0.5" aria-label={d.lives(lives)} role="img">
