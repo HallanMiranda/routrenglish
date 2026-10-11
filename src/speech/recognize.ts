@@ -72,7 +72,7 @@ export interface LiveResult {
 }
 
 /** Like listen(), but streams interim text and reports confidence. */
-export function listenLive({ lang = "en-US", signal, onInterim }: ListenOptions & { onInterim?: (text: string) => void } = {}): Promise<LiveResult> {
+export function listenLive({ lang = "en-US", signal, onInterim, silenceMs = 1500 }: ListenOptions & { onInterim?: (text: string) => void; silenceMs?: number } = {}): Promise<LiveResult> {
   return new Promise((resolve, reject) => {
     const Ctor = getCtor();
     if (!Ctor) {
@@ -87,12 +87,16 @@ export function listenLive({ lang = "en-US", signal, onInterim }: ListenOptions 
     let transcript = "";
     let confidence: number | null = null;
     let failed = false;
+    let silence: number | undefined;
     rec.onresult = (e: any) => {
       const results = Array.from(e.results as ArrayLike<any>);
       transcript = results.map((r) => r[0]?.transcript ?? "").join(" ").trim();
       const finals = results.filter((r) => r.isFinal && typeof r[0]?.confidence === "number" && r[0].confidence > 0);
       if (finals.length) confidence = finals.reduce((s, r) => s + r[0].confidence, 0) / finals.length;
       onInterim?.(transcript);
+      // Stop after a pause once the learner has said something.
+      window.clearTimeout(silence);
+      if (transcript) silence = window.setTimeout(() => rec.stop(), silenceMs);
     };
     rec.onerror = (e: any) => {
       if (e.error === "aborted") return;
@@ -102,6 +106,7 @@ export function listenLive({ lang = "en-US", signal, onInterim }: ListenOptions 
       ));
     };
     rec.onend = () => {
+      window.clearTimeout(silence);
       if (!failed) resolve({ transcript, confidence });
     };
     signal?.addEventListener("abort", () => rec.stop(), { once: true });

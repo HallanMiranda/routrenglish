@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Heart, Lock, Volume2, VolumeX, Zap } from "lucide-react";
+import { Heart, Lock, Volume2, VolumeX, X, Zap } from "lucide-react";
 import { MicButton, type MicState } from "@/components/session/MicButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ import { listenLive } from "@/speech/recognize";
 import { speak, stopSpeaking } from "@/speech/speak";
 import { t } from "@/lib/i18n/pt-BR";
 import { cn } from "@/lib/utils";
+import { haptic } from "@/lib/haptics";
 
 const d = t.drills;
 const LIVES = 3;
@@ -177,6 +178,7 @@ function DrillPage() {
   const [runKey, setRunKey] = useState(0);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [muted, setMuted] = useState(false);
+  const [autoListen, setAutoListen] = useState(false);
 
   const buildExpress = useCallback(async () => {
     const all = (await repo.listDrillPacks()).filter((p) => nivel === "todos" || difficultyOf(p.level) === nivel);
@@ -192,6 +194,7 @@ function DrillPage() {
   const refresh = useCallback(async () => {
     setPulos(await repo.getPuloDoGato());
     setMuted(await repo.getSoundMuted());
+    setAutoListen(await repo.getAutoListen());
     if (express) {
       const items = await buildExpress();
       setPack({ id: EXPRESS_ID, title_pt: d.expressTitle, level: "", focus_pt: "", items });
@@ -261,27 +264,28 @@ function DrillPage() {
     );
 
   return (
-    <div className="flex h-dvh flex-col bg-background">
-      <header className="flex items-center gap-3 px-4 py-3">
-        <Button variant="ghost" size="icon" asChild aria-label={d.back}>
-          <Link to="/uberclass" onClick={() => stopSpeaking()}><ArrowLeft /></Link>
+    <div className="pt-safe pb-safe flex h-dvh flex-col bg-background">
+      <header className="mx-auto flex w-full max-w-md items-center gap-2 px-3 py-1">
+        <Button variant="ghost" size="icon" asChild aria-label={run ? d.close : d.back}>
+          <Link to="/uberclass" onClick={() => stopSpeaking()}><X /></Link>
         </Button>
         <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-1.5 truncate font-bold leading-tight">
-            {express && <Zap className="size-4 text-primary" />}{pack.title_pt}
-          </p>
-          {run && (
-            <p className="text-xs text-muted-foreground">
-              {d.roundOf(run.round)} · {d.rounds[run.round]} · {d.progress(Math.min(run.pos + 1, run.queue.length), run.queue.length)}
+          {run ? (
+            <p className="text-caption truncate text-muted-foreground">
+              {d.roundOf(run.round)} · {d.progress(Math.min(run.pos + 1, run.queue.length), run.queue.length)}
             </p>
+          ) : (
+            <p className="flex items-center gap-1.5 truncate font-semibold">{express && <Zap className="size-4 text-primary" />}{pack.title_pt}</p>
           )}
         </div>
+        {run && <Hearts lives={run.lives} />}
+        {run && <span className="font-display text-base font-bold tabular-nums">{d.points(run.score)}</span>}
         <Button variant="ghost" size="icon" onClick={toggleMute} aria-label={muted ? d.unmute : d.mute} aria-pressed={muted}>
           {muted ? <VolumeX /> : <Volume2 />}
         </Button>
       </header>
       {run ? (
-        <DrillRunner key={runKey} run={run} setRun={setRun} onFinish={finish} onRestart={restartErrors} pulos={pulos} muted={muted} />
+        <DrillRunner key={runKey} run={run} setRun={setRun} onFinish={finish} onRestart={restartErrors} pulos={pulos} muted={muted} autoListen={autoListen} />
       ) : summary ? (
         <SummaryView
           summary={summary}
@@ -297,10 +301,32 @@ function DrillPage() {
   );
 }
 
+function Hearts({ lives }: { lives: number }) {
+  const prev = useRef(lives);
+  const [lost, setLost] = useState<number | null>(null);
+  useEffect(() => {
+    if (lives < prev.current) {
+      setLost(lives);
+      prev.current = lives;
+      const id = window.setTimeout(() => setLost(null), 700);
+      return () => window.clearTimeout(id);
+    }
+    prev.current = lives;
+    return undefined;
+  }, [lives]);
+  return (
+    <span className="flex items-center gap-0.5" aria-label={d.lives(lives)} role="img">
+      {Array.from({ length: LIVES }, (_, i) => (
+        <Heart key={i} className={cn("size-5", i < lives ? "fill-primary text-primary" : "text-muted-foreground/40", lost === i && "animate-heart-out text-primary")} />
+      ))}
+    </span>
+  );
+}
+
 function RoundPicker({ best, onPick }: { best: DrillRound; onPick: (r: DrillRound) => void }) {
   return (
-    <main className="mx-auto w-full max-w-md flex-1 overflow-y-auto px-5 pb-8">
-      <h2 className="mb-4 text-2xl font-bold">{d.chooseRound}</h2>
+    <main className="mx-auto w-full max-w-md flex-1 overflow-y-auto px-5 pb-8 pt-4">
+      <h2 className="text-title mb-4">{d.chooseRound}</h2>
       <ul className="space-y-3">
         {([1, 2, 3, 4] as DrillRound[]).map((r) => {
           const locked = r > best;
@@ -310,12 +336,12 @@ function RoundPicker({ best, onPick }: { best: DrillRound; onPick: (r: DrillRoun
                 type="button"
                 disabled={locked}
                 onClick={() => onPick(r)}
-                className="flex w-full items-center gap-4 rounded-2xl border bg-card p-4 text-left transition-colors enabled:hover:border-primary disabled:opacity-55"
+                className="flex min-h-16 w-full items-center gap-4 rounded-[20px] border bg-card p-4 text-left transition-colors enabled:hover:border-primary disabled:opacity-55"
               >
                 <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary text-lg font-bold text-primary-foreground">{r}</span>
                 <span className="flex-1">
                   <span className="block font-semibold">{d.rounds[r]}</span>
-                  {locked && <span className="block text-xs text-muted-foreground">{d.locked}</span>}
+                  {locked && <span className="text-caption block text-muted-foreground">{d.locked}</span>}
                 </span>
                 {locked && <Lock className="size-4 text-muted-foreground" />}
               </button>
@@ -331,41 +357,41 @@ function SummaryView({ summary, express, onNext, onRepeat, onErrors }: { summary
   const passed = summary.accuracy >= 0.8;
   return (
     <main className="mx-auto w-full max-w-md flex-1 space-y-5 overflow-y-auto px-5 pb-8">
-      <h2 className="text-2xl font-bold">{d.endTitle}</h2>
+      <h2 className="text-title pt-4">{d.endTitle}</h2>
       <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-2xl border bg-card p-4 text-center">
-          <p className="text-sm text-muted-foreground">{d.endAccuracy}</p>
+        <div className="rounded-[20px] border bg-card p-4 text-center">
+          <p className="text-base text-muted-foreground">{d.endAccuracy}</p>
           <p className="font-display text-4xl font-bold">{Math.round(summary.accuracy * 100)}%</p>
         </div>
-        <div className="rounded-2xl border bg-card p-4 text-center">
-          <p className="text-sm text-muted-foreground">{d.endScore}</p>
+        <div className="rounded-[20px] border bg-card p-4 text-center">
+          <p className="text-base text-muted-foreground">{d.endScore}</p>
           <p className="font-display text-4xl font-bold">{summary.score}</p>
         </div>
       </div>
       {summary.counts && (
-        <p className="text-center text-sm font-medium">
+        <p className="text-center text-base font-medium">
           {passed ? (summary.round < 4 ? d.unlocked(summary.round + 1) : d.finished) : d.retryHint}
         </p>
       )}
       <div>
-        <h3 className="mb-2 font-semibold">{d.needHelp}</h3>
+        <h3 className="text-headline mb-2">{d.needHelp}</h3>
         {summary.helped.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{d.noHelp}</p>
+          <p className="text-base text-muted-foreground">{d.noHelp}</p>
         ) : (
           <ul className="space-y-2">
             {summary.helped.map((i) => (
-              <li key={i.id} className="rounded-xl border bg-card p-3 text-sm">
+              <li key={i.id} className="rounded-xl border bg-card p-3 text-base">
                 <p className="text-muted-foreground">{promptPtOf(i)}</p>
                 <p className="font-semibold" lang="en">{modelOf(i)}</p>
               </li>
             ))}
           </ul>
         )}
-        {summary.cards > 0 && <p className="mt-2 text-sm text-muted-foreground">{d.cardsCreated(summary.cards)}</p>}
+        {summary.cards > 0 && <p className="mt-2 text-base text-muted-foreground">{d.cardsCreated(summary.cards)}</p>}
       </div>
       {summary.pulos.length > 0 && (
         <div>
-          <h3 className="mb-2 font-semibold">{d.pulosTitle}</h3>
+          <h3 className="text-headline mb-2">{d.pulosTitle}</h3>
           <ul className="space-y-2">
             {summary.pulos.map((p) => (
               <li key={p.focus}><PuloCard text={p.text} /></li>
@@ -391,13 +417,14 @@ type Feedback =
   | { kind: "repeat"; text: string }
   | null;
 
-function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
+function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted, autoListen }: {
   run: Run;
   setRun: (r: Run) => void;
   onFinish: (r: Run) => void;
   onRestart: (r: Run) => void;
   pulos: PuloDoGato;
   muted: boolean;
+  autoListen: boolean;
 }) {
   const item = run.items[run.queue[run.pos]!]!;
   const isQa = item.mode === "qa";
@@ -414,7 +441,8 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
   const [showPt, setShowPt] = useState(false);
   const [fine, setFine] = useState<string | null>(null);
-  const [lostHeart, setLostHeart] = useState<number | null>(null);
+  const [sheet, setSheet] = useState(false);
+  const toggleRef = useRef<() => void>(() => {});
   const abortRef = useRef<AbortController | null>(null);
   const busyRef = useRef(false);
   const repeatMode = feedback?.kind === "repeat";
@@ -422,40 +450,35 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
   const stepKey = `${run.pos}-${run.queue[run.pos]}`;
   const sfx = (ok: boolean) => { if (!muted) (ok ? playSuccess : playError)(); };
 
-  const sayPrompt = useCallback((rate = 1) => {
-    if (meta) void speak(item.mode === "qa" ? item.q_pt : item.pt, { lang: "pt-BR", rate }).catch(() => {});
-    else if (item.mode === "qa") void speak(item.q_en, { lang: "en-US", rate }).catch(() => {});
-    else if (run.round === 1) void speak(item.en[0]!, { lang: "en-US", rate: 0.9 * rate }).catch(() => {});
-    else void speak(item.pt, { lang: "pt-BR", rate }).catch(() => {});
+  const sayPrompt = useCallback((rate = 1): Promise<void> => {
+    const go = meta ? speak(item.mode === "qa" ? item.q_pt : item.pt, { lang: "pt-BR", rate })
+      : item.mode === "qa" ? speak(item.q_en, { lang: "en-US", rate })
+      : run.round === 1 ? speak(item.en[0]!, { lang: "en-US", rate: 0.9 * rate })
+      : speak(item.pt, { lang: "pt-BR", rate });
+    return go.then(() => undefined, () => undefined);
   }, [item, run.round, meta]);
 
   // New challenge: reset and let the tutor speak.
   useEffect(() => {
-    setHeard(""); setFeedback(null); setTyped(""); setMicError(null); setShowPt(false); setShowNew(false);
+    setHeard(""); setFeedback(null); setSheet(false); setFine(null); setTyped(""); setMicError(null); setShowPt(false); setShowNew(false);
     busyRef.current = false;
-    const timer = window.setTimeout(() => sayPrompt(), 300);
+    let alive = true;
+    const timer = window.setTimeout(() => { void sayPrompt().then(() => { if (alive && autoListen) toggleRef.current(); }); }, 300);
     // Ladder round 1: highlight the new words after 3 s if the learner hasn't started.
     const hl = meta && run.round === 1 ? window.setTimeout(() => setShowNew(true), 3000) : undefined;
-    return () => { window.clearTimeout(timer); window.clearTimeout(hl); abortRef.current?.abort(); };
+    return () => { alive = false; window.clearTimeout(timer); window.clearTimeout(hl); abortRef.current?.abort(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stepKey]);
-
-  // Fine toast auto-hide.
-  useEffect(() => {
-    if (!fine) return;
-    const id = window.setTimeout(() => { setFine(null); setLostHeart(null); }, 2200);
-    return () => window.clearTimeout(id);
-  }, [fine]);
 
   // Round 4 countdown: 6 s translate, 8 s QA.
   useEffect(() => {
     const timed = run.round === 4 || meta?.fast === true;
-    if (!timed || repeatMode || praised || run.out || review) { setSecondsLeft(null); return; }
+    if (!timed || sheet || repeatMode || praised || run.out || review) { setSecondsLeft(null); return; }
     setSecondsLeft(meta && !meta.free ? LADDER_SECONDS : isQa ? 8 : 6);
     const id = window.setInterval(() => setSecondsLeft((s) => (s === null ? s : s - 1)), 1000);
     return () => window.clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stepKey, run.tries, run.round, repeatMode, praised, run.out, review]);
+  }, [stepKey, run.tries, run.round, sheet, repeatMode, praised, run.out, review]);
   useEffect(() => {
     if (secondsLeft === 0 && mic !== "processing") {
       abortRef.current?.abort();
@@ -509,6 +532,7 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
     if (res.correct) {
       busyRef.current = true;
       sfx(true);
+      haptic(10);
       const firstTry = new Set(run.firstTry);
       if (firstPresentation && run.tries === 0) firstTry.add(item.id);
       const queue = [...run.queue];
@@ -537,6 +561,8 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
       const otherWay = isQa && !repeatMode ? pick(item.model_answers) : null;
       const grows = !!meta?.nextId;
       setFeedback({ kind: "praise", text: pick(d.praise), clear, otherWay, grows });
+      setFine(null);
+      setSheet(true);
       setRun(next);
       if (!otherWay) window.setTimeout(() => proceed(next), grows ? 1500 : 1100);
       return;
@@ -550,14 +576,15 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
     let { lives, score } = run;
     const multa = !timeUp && !repeatMode && (res.trap !== null || res.slip);
     if (multa) {
-      setLostHeart(lives - 1);
+      haptic([30, 40, 30]);
       lives -= 1;
       score = Math.max(0, score - 5);
-      setFine(pick(d.fines));
     }
     const out = lives <= 0;
+    setFine(multa ? pick(d.fines) : null);
     setRun({ ...run, attempted, tries, helped, maxTries, missedFocus, lives, score, out });
     if (out) { stopSpeaking(); return; }
+    setSheet(true);
 
     if (tries >= 3 || repeatMode) {
       setFeedback({ kind: "repeat", text: model });
@@ -574,7 +601,7 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
   async function toggleMic() {
     if (mic === "recording") { abortRef.current?.abort(); return; }
     stopSpeaking();
-    setMicError(null); setHeard("");
+    setMicError(null); setHeard(""); setSheet(false);
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     setMic("recording");
@@ -591,6 +618,8 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
       setTyping(true);
     }
   }
+
+  toggleRef.current = () => { if (!praised && !run.out) void toggleMic(); };
 
   function submitTyped() {
     if (!typed.trim()) return;
@@ -612,135 +641,113 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
       </div>
     );
 
+  const verdict = feedback?.kind === "praise"
+    ? `${feedback.text}${feedback.clear ? ` ${d.clear}` : ""}${feedback.grows ? ` ${d.ladderGrows}` : ""}`
+    : feedback?.kind === "almost" ? feedback.text
+    : feedback?.kind === "half" ? d.half
+    : feedback?.kind === "repeat" ? d.repeatWithMe : "";
+
   return (
-    <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col gap-3 px-4 pb-4">
-      {/* Tutor panel */}
-      <section className="relative flex flex-1 flex-col overflow-hidden rounded-3xl bg-card p-5 shadow-sm ring-1 ring-border">
-        <div className="flex items-center justify-between gap-2">
-          <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-bold text-secondary-foreground">
-            {meta ? d.badgeLadder : isQa ? d.badgeAnswer : d.badgeTranslate}
-          </span>
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-0.5" aria-label={d.lives(run.lives)}>
-              {Array.from({ length: LIVES }, (_, i) => (
-                <Heart
-                  key={i}
-                  className={cn(
-                    "size-5",
-                    i < run.lives ? "fill-primary text-primary" : "text-muted-foreground/40",
-                    lostHeart === i && "animate-heart-out text-primary",
-                  )}
-                />
-              ))}
+    <div className="relative mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col px-5">
+      {/* Tutor: the challenge is the biggest thing on screen. */}
+      <section className="relative flex min-h-[18rem] flex-1 flex-col">
+        <div className="flex items-center gap-3 pt-2">
+          <CoachAvatar talking={!feedback || feedback.kind === "repeat"} />
+          <p className="text-caption min-w-0 flex-1 font-medium text-muted-foreground">
+            <span className="mr-1.5 rounded-full bg-secondary px-2 py-0.5 font-semibold text-secondary-foreground">{meta ? d.badgeLadder : isQa ? d.badgeAnswer : d.badgeTranslate}</span>
+            {bubble}
+          </p>
+          {secondsLeft !== null && (
+            <span className={cn("shrink-0 rounded-full px-3 py-1 font-display text-base font-bold tabular-nums", secondsLeft <= 2 ? "bg-destructive text-destructive-foreground" : "bg-accent text-accent-foreground")}>
+              {d.timeLeft(Math.max(0, secondsLeft))}
             </span>
-            <span className="font-display text-sm font-bold tabular-nums">{d.points(run.score)}</span>
-          </div>
+          )}
         </div>
-
-        {fine && (
-          <div role="status" className="absolute inset-x-4 top-12 z-10 rounded-xl bg-destructive px-3 py-2 text-center text-sm font-semibold text-destructive-foreground shadow animate-in fade-in slide-in-from-top-2">
-            {fine}
-          </div>
-        )}
-
-        <div key={stepKey} className="flex flex-1 flex-col animate-story">
-          <div className="mt-3 flex items-center gap-3">
-            <CoachAvatar talking={!feedback || feedback.kind === "repeat"} />
-            <div className="rounded-2xl rounded-tl-sm bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground">
-              {feedback?.kind === "praise" ? <span>{feedback.text}{feedback.clear && ` ${d.clear}`}{feedback.grows && ` ${d.ladderGrows}`}</span>
-                : feedback?.kind === "almost" ? feedback.text
-                : feedback?.kind === "half" ? d.half
-                : bubble}
-            </div>
-            {secondsLeft !== null && (
-              <span className={cn("ml-auto rounded-full px-2.5 py-1 font-display text-sm font-bold tabular-nums", secondsLeft <= 2 ? "bg-destructive text-destructive-foreground" : "bg-accent text-accent-foreground")}>
-                {d.timeLeft(Math.max(0, secondsLeft))}
-              </span>
-            )}
-          </div>
-
-          <div className="flex flex-1 flex-col justify-center gap-3 py-4 text-center">
-            {meta && !repeatMode ? (
-              <LadderChallenge item={item} meta={meta} round={run.round} showNew={showNew && mic === "idle" && !heard} />
-            ) : (
-              <Challenge item={item} round={run.round} repeatMode={repeatMode} showPt={showPt} onShowPt={() => setShowPt(true)} onReplay={sayPrompt} />
-            )}
-            {feedback?.kind === "half" && <p lang="en" className="text-lg font-semibold text-primary">{feedback.text}</p>}
-            {feedback?.kind === "almost" && feedback.pulo && <PuloCard text={feedback.pulo} />}
-            {feedback?.kind === "praise" && feedback.otherWay && (
-              <div className="space-y-3">
-                <div className="rounded-xl bg-muted p-3 text-left">
-                  <p className="text-xs font-semibold text-muted-foreground">{d.otherWay}</p>
-                  <div className="mt-1 flex items-center gap-2">
-                    <p lang="en" className="flex-1 font-semibold">{feedback.otherWay}</p>
-                    <Button size="icon" variant="ghost" aria-label={d.play} onClick={() => void speak(feedback.otherWay!, { lang: "en-US" }).catch(() => {})}>
-                      <Volume2 />
-                    </Button>
-                  </div>
-                </div>
-                <Button className="w-full" onClick={() => { stopSpeaking(); proceed(run); }}>{d.next}</Button>
-              </div>
-            )}
-          </div>
+        <div key={stepKey} className="flex flex-1 flex-col justify-center gap-3 py-6 text-center animate-story">
+          {meta && !repeatMode ? (
+            <LadderChallenge item={item} meta={meta} round={run.round} showNew={showNew && mic === "idle" && !heard} onReplay={() => void sayPrompt()} />
+          ) : (
+            <Challenge item={item} round={run.round} repeatMode={repeatMode} showPt={showPt} onShowPt={() => setShowPt(true)} onReplay={(r) => void sayPrompt(r)} />
+          )}
+          {!sheet && feedback?.kind === "half" && <p lang="en" className="text-headline text-primary">{feedback.text}</p>}
         </div>
-
         {run.out && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-card/95 p-6 text-center">
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-background/95 p-6 text-center">
             <Heart className="size-10 text-muted-foreground" />
-            <p className="font-display text-xl font-bold">{d.noLives}</p>
+            <p className="text-title">{d.noLives}</p>
             <Button size="lg" onClick={() => onRestart(run)}>{d.restart}</Button>
           </div>
         )}
       </section>
 
-      {/* Learner panel */}
-      <section className="flex flex-1 flex-col items-center justify-center gap-3 rounded-3xl bg-muted/60 p-5 ring-1 ring-border">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{d.you}</p>
-        <div className="min-h-[3.5rem] w-full text-center">
-          {(feedback?.kind === "almost" || feedback?.kind === "half") && feedback.ops ? (
-            <DiffLine ops={feedback.ops} />
-          ) : heard ? (
-            <p lang="en" className="text-lg font-medium">{heard}</p>
-          ) : (
-            <p className="text-sm text-muted-foreground">{mic === "recording" ? d.listening : d.tapToSpeak}</p>
-          )}
+      {/* Learner: mic in the thumb zone. */}
+      <section className="flex shrink-0 flex-col items-center gap-3 pb-4">
+        <div className="flex min-h-14 w-full items-center justify-center text-center">
+          {heard ? <p lang="en" className="text-headline">{heard}</p> : <p className="text-base text-muted-foreground">{mic === "recording" ? d.listening : d.tapToSpeak}</p>}
         </div>
         <MicButton state={mic} onClick={toggleMic} disabled={praised || run.out} />
-        {micError && <p className="text-center text-sm text-destructive">{micError}</p>}
+        <p role="status" aria-live="polite" className="text-caption h-5 font-semibold text-muted-foreground">{t.mic.states[mic]}</p>
+        {micError && <p className="text-center text-base text-destructive">{micError}</p>}
         {typing ? (
           <form className="flex w-full gap-2" onSubmit={(e) => { e.preventDefault(); submitTyped(); }}>
-            <Input lang="en" autoCapitalize="off" value={typed} onChange={(e) => setTyped(e.target.value)} placeholder={d.typePlaceholder} disabled={praised || run.out} />
+            <Input lang="en" autoCapitalize="off" className="h-11 rounded-full px-4 text-base" value={typed} onChange={(e) => setTyped(e.target.value)} placeholder={d.typePlaceholder} disabled={praised || run.out} />
             <Button type="submit" disabled={praised || run.out}>{d.send}</Button>
           </form>
         ) : (
-          <button type="button" className="text-sm font-medium text-muted-foreground underline underline-offset-4" onClick={() => setTyping(true)}>
+          <button type="button" className="min-h-11 px-4 text-base font-medium text-muted-foreground underline underline-offset-4" onClick={() => setTyping(true)}>
             {d.type}
           </button>
         )}
       </section>
+
+      {/* Feedback sheet: the one place results appear. */}
+      {sheet && feedback && !run.out && (
+        <div role="status" aria-live="polite" className="absolute inset-x-0 bottom-0 z-30 space-y-3 rounded-t-[20px] border-t bg-card p-5 shadow-card animate-sheet">
+          {fine && <p className="text-caption font-semibold text-destructive">{fine}</p>}
+          <p className={cn("text-headline", praised ? "text-foreground" : "text-destructive")}>{verdict}</p>
+          {(feedback.kind === "almost" || feedback.kind === "half") && feedback.ops && <DiffLine ops={feedback.ops} />}
+          {feedback.kind === "half" && <p lang="en" className="text-headline text-primary">{feedback.text}</p>}
+          {feedback.kind === "repeat" && <p lang="en" className="text-headline">{feedback.text}</p>}
+          {feedback.kind === "almost" && feedback.pulo && <PuloCard text={feedback.pulo} />}
+          {feedback.kind === "praise" && feedback.otherWay && (
+            <div className="rounded-xl bg-muted p-3 text-left">
+              <p className="text-caption font-semibold text-muted-foreground">{d.otherWay}</p>
+              <div className="mt-1 flex items-center gap-2">
+                <p lang="en" className="flex-1 text-base font-semibold">{feedback.otherWay}</p>
+                <Button size="icon" variant="ghost" aria-label={d.play} onClick={() => void speak(feedback.otherWay!, { lang: "en-US" }).catch(() => {})}><Volume2 /></Button>
+              </div>
+            </div>
+          )}
+          {feedback.kind === "praise" ? (
+            feedback.otherWay && <Button size="lg" className="w-full" onClick={() => { stopSpeaking(); proceed(run); }}>{d.next}</Button>
+          ) : (
+            <Button size="lg" className="w-full" onClick={() => void toggleMic()}>{d.tryAgain}</Button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
-function LadderChallenge({ item, meta, round, showNew }: { item: Playable; meta: LadderMeta; round: DrillRound; showNew: boolean }) {
+function LadderChallenge({ item, meta, round, showNew, onReplay }: { item: Playable; meta: LadderMeta; round: DrillRound; showNew: boolean; onReplay: () => void }) {
   const pt = item.mode === "qa" ? item.q_pt : item.pt;
   const showPrev = (round <= 2 || meta.free) && meta.prevEn;
   return (
     <div className="flex items-stretch gap-3 text-left">
       <LadderRail index={meta.index} total={meta.total} />
       <div className="flex min-w-0 flex-1 flex-col justify-center gap-2">
-        <p className="text-xs font-semibold text-muted-foreground">
+        <p className="text-caption font-semibold text-muted-foreground">
           {meta.free ? d.ladderFree : d.ladderStep(meta.index + 1, meta.total)}
         </p>
         {showPrev && (
-          <p lang="en" className="text-sm text-muted-foreground"><span className="font-semibold">{d.previous}</span> {meta.prevEn}</p>
+          <p lang="en" className="text-caption text-muted-foreground"><span className="font-semibold">{d.previous}:</span> {meta.prevEn}</p>
         )}
         {meta.change && (
-          <span className="w-fit rounded-full bg-live px-2.5 py-0.5 text-xs font-bold text-live-foreground">{meta.change}</span>
+          <span className="text-caption w-fit rounded-full bg-live px-2.5 py-0.5 font-semibold text-live-foreground">{meta.change}</span>
         )}
-        <p className="font-display text-2xl font-bold leading-tight">{pt}</p>
+        <button type="button" onClick={onReplay} aria-label={d.tapReplay} className="text-left font-display text-3xl font-bold leading-tight text-balance">{pt}</button>
         {round === 1 && showNew && meta.newWords.length > 0 && (
-          <p className="text-sm text-muted-foreground animate-in fade-in">
+          <p className="text-caption text-muted-foreground animate-in fade-in">
             {d.ladderNewWords}{" "}
             {meta.newWords.map((w, i) => (
               <mark key={i} lang="en" className="mr-1 rounded bg-live/40 px-1 font-semibold text-foreground">{w}</mark>
@@ -770,12 +777,12 @@ function LadderRail({ index, total }: { index: number; total: number }) {
 
 function LadderReview({ ladder, onFast, onContinue }: { ladder: LadderItem; onFast: () => void; onContinue: () => void }) {
   return (
-    <div className="flex flex-col gap-3 rounded-3xl bg-card p-5 shadow-sm ring-1 ring-border animate-story">
-      <p className="font-display text-xl font-bold">{d.ladderDone}</p>
-      <p className="text-sm text-muted-foreground">{ladder.title_pt}</p>
+    <div className="flex flex-col gap-3 rounded-[20px] bg-card p-5 shadow-card ring-1 ring-border animate-story">
+      <p className="text-title">{d.ladderDone}</p>
+      <p className="text-base text-muted-foreground">{ladder.title_pt}</p>
       <ol className="space-y-2">
         {ladder.steps.map((st, k) => (
-          <li key={k} className="rounded-xl bg-muted p-2.5 text-sm">
+          <li key={k} className="rounded-xl bg-muted p-3 text-base">
             <p className="text-muted-foreground">{st.pt}</p>
             <div className="flex items-center gap-2">
               <p lang="en" className="flex-1 font-semibold">{st.en[0]}</p>
@@ -787,8 +794,8 @@ function LadderReview({ ladder, onFast, onContinue }: { ladder: LadderItem; onFa
         ))}
       </ol>
       <div className="mt-auto space-y-2 pt-2">
-        <Button className="w-full" onClick={onFast}><Zap /> {d.ladderAgain}</Button>
-        <Button variant="outline" className="w-full" onClick={onContinue}>{d.ladderContinue}</Button>
+        <Button size="lg" className="w-full" onClick={onFast}><Zap /> {d.ladderAgain}</Button>
+        <Button size="lg" variant="ghost" className="w-full" onClick={onContinue}>{d.ladderContinue}</Button>
       </div>
     </div>
   );
@@ -806,8 +813,8 @@ function Challenge({ item, round, repeatMode, showPt, onShowPt, onReplay }: {
   if (repeatMode)
     return (
       <>
-        <p lang="en" className="font-display text-3xl font-bold leading-tight">{model}</p>
-        <p className="text-sm text-muted-foreground">{promptPtOf(item)}</p>
+        <button type="button" onClick={() => onReplay(1)} aria-label={d.tapReplay} lang="en" className="font-display text-3xl font-bold leading-tight text-balance">{model}</button>
+        <p className="text-base text-muted-foreground">{promptPtOf(item)}</p>
       </>
     );
 
@@ -815,15 +822,15 @@ function Challenge({ item, round, repeatMode, showPt, onShowPt, onReplay }: {
     if (round === 1)
       return (
         <>
-          <p lang="en" className="font-display text-3xl font-bold leading-tight">{model}</p>
-          <p className="text-sm text-muted-foreground">{item.pt}</p>
+          <button type="button" onClick={() => onReplay(1)} aria-label={d.tapReplay} lang="en" className="font-display text-3xl font-bold leading-tight text-balance">{model}</button>
+          <p className="text-base text-muted-foreground">{item.pt}</p>
         </>
       );
     return (
       <>
-        <p className="font-display text-3xl font-bold leading-tight">{item.pt}</p>
+        <button type="button" onClick={() => onReplay(1)} aria-label={d.tapReplay} className="font-display text-3xl font-bold leading-tight text-balance">{item.pt}</button>
         {round === 2 && (
-          <p className="text-sm text-muted-foreground">{d.hintStart} <span lang="en" className="font-semibold text-foreground">{firstWords(model, 1)} …</span></p>
+          <p className="text-base text-muted-foreground">{d.hintStart} <span lang="en" className="font-semibold text-foreground">{firstWords(model, 1)} …</span></p>
         )}
       </>
     );
@@ -832,8 +839,8 @@ function Challenge({ item, round, repeatMode, showPt, onShowPt, onReplay }: {
   // QA
   const replayButtons = (
     <div className="flex justify-center gap-2">
-      <Button size="sm" variant="outline" onClick={() => onReplay(1)}><Volume2 /> {d.hearAgain}</Button>
-      <Button size="sm" variant="outline" onClick={() => onReplay(0.75)}>{d.slower}</Button>
+      <Button size="sm" variant="secondary" onClick={() => onReplay(1)}><Volume2 /> {d.hearAgain}</Button>
+      <Button size="sm" variant="secondary" onClick={() => onReplay(0.75)}>{d.slower}</Button>
     </div>
   );
   if (round === 4)
@@ -846,22 +853,22 @@ function Challenge({ item, round, repeatMode, showPt, onShowPt, onReplay }: {
     );
   return (
     <>
-      <p lang="en" className="font-display text-3xl font-bold leading-tight">{item.q_en}</p>
+      <button type="button" onClick={() => onReplay(1)} aria-label={d.tapReplay} lang="en" className="font-display text-3xl font-bold leading-tight text-balance">{item.q_en}</button>
       {round === 1 && (
         <>
-          <p className="text-sm text-muted-foreground">{item.q_pt}</p>
-          <p className="text-sm text-muted-foreground">{d.modelAnswer} <span lang="en" className="font-semibold text-foreground">{model}</span></p>
+          <p className="text-base text-muted-foreground">{item.q_pt}</p>
+          <p className="text-base text-muted-foreground">{d.modelAnswer} <span lang="en" className="font-semibold text-foreground">{model}</span></p>
         </>
       )}
       {round === 2 && (
-        <p className="text-sm text-muted-foreground">{d.hintStart} <span lang="en" className="font-semibold text-foreground">{firstWords(model, 2)} …</span></p>
+        <p className="text-base text-muted-foreground">{d.hintStart} <span lang="en" className="font-semibold text-foreground">{firstWords(model, 2)} …</span></p>
       )}
       {round === 3 && (
         <>
           {showPt ? (
-            <p className="text-sm text-muted-foreground">{item.q_pt}</p>
+            <p className="text-base text-muted-foreground">{item.q_pt}</p>
           ) : (
-            <button type="button" className="text-sm font-medium text-muted-foreground underline underline-offset-4" onClick={onShowPt}>{d.showPt}</button>
+            <button type="button" className="min-h-11 text-base font-medium text-muted-foreground underline underline-offset-4" onClick={onShowPt}>{d.showPt}</button>
           )}
           {replayButtons}
         </>
@@ -872,9 +879,9 @@ function Challenge({ item, round, repeatMode, showPt, onShowPt, onReplay }: {
 
 function PuloCard({ text }: { text: string }) {
   return (
-    <div className="rounded-xl border-l-4 border-live bg-live/15 p-3 text-left text-sm">
-      <p className="text-xs font-bold uppercase tracking-wide">🐈 {d.pulo}</p>
-      <p className="mt-1">{text}</p>
+    <div className="rounded-xl border-l-4 border-live bg-live/15 p-3 text-left">
+      <p className="text-caption font-bold">🐈 {d.pulo}</p>
+      <p className="mt-1 text-base">{text}</p>
     </div>
   );
 }
@@ -895,7 +902,7 @@ function DiffLine({ ops }: { ops: DiffOp[] }) {
 function CoachAvatar({ talking }: { talking: boolean }) {
   return (
     <div className="flex shrink-0 flex-col items-center">
-      <svg viewBox="0 0 64 64" className="size-14" role="img" aria-label={d.coach}>
+      <svg viewBox="0 0 64 64" className="size-11" role="img" aria-label={d.coach}>
         <circle cx="32" cy="32" r="31" className="fill-primary" />
         <circle cx="32" cy="36" r="18" className="fill-background" />
         <path d="M14 30c2-12 10-18 18-18s16 6 18 18c-6-6-12-8-18-8s-12 2-18 8z" className="fill-foreground" />
@@ -903,7 +910,7 @@ function CoachAvatar({ talking }: { talking: boolean }) {
         <circle cx="39" cy="35" r="2.4" className="fill-foreground" />
         <rect x="27" y="42" width="10" height={talking ? 5 : 2} rx="2.5" className={cn("fill-primary", talking && "motion-safe:animate-pulse")} />
       </svg>
-      <span className="text-[10px] font-semibold">{d.coach}</span>
+      
     </div>
   );
 }

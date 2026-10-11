@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Flame, Mic } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { ChevronRight, Clock, Flame, Layers, Mic, Play } from "lucide-react";
 import { AppShell, EmptyState } from "@/components/layout/AppShell";
+import { Button } from "@/components/ui/button";
 import { repo } from "@/data/repo";
-import type { Mission } from "@/data/types";
+import type { DrillPack, Mission } from "@/data/types";
 import { t } from "@/lib/i18n/pt-BR";
 
 export const Route = createFileRoute("/")({
@@ -20,74 +21,88 @@ export const Route = createFileRoute("/")({
   component: Today,
 });
 
+interface State {
+  loading: boolean;
+  mission: Mission | null;
+  streak: number;
+  due: number;
+  drill: { pack: DrillPack; round: number } | null;
+}
+
 function Today() {
   const navigate = useNavigate();
-  const [state, setState] = useState<{ loading: boolean; mission: Mission | null; streak: number }>({
-    loading: true,
-    mission: null,
-    streak: 0,
-  });
+  const [s, setS] = useState<State>({ loading: true, mission: null, streak: 0, due: 0, drill: null });
   const [starting, setStarting] = useState(false);
 
   useEffect(() => {
     let alive = true;
-    Promise.all([repo.getTodayMission(), repo.getStreak()]).then(([mission, streak]) => {
-      if (alive) setState({ loading: false, mission, streak });
-    });
+    (async () => {
+      const [mission, streak, cards, last] = await Promise.all([repo.getTodayMission(), repo.getStreak(), repo.listDueCards(), repo.getLastDrillAttempt()]);
+      const pack = last ? await repo.getDrillPack(last.pack_id) : null;
+      const round = pack ? (await repo.getPackProgress(pack.id)).best_round : 1;
+      if (alive) setS({ loading: false, mission, streak, due: cards.length, drill: pack ? { pack, round } : null });
+    })();
     return () => {
       alive = false;
     };
   }, []);
 
   async function start() {
-    if (!state.mission) return;
+    if (!s.mission) return;
     setStarting(true);
-    const session = await repo.startOrResumeSession(state.mission.id);
+    const session = await repo.startOrResumeSession(s.mission.id);
     navigate({ to: "/sessao/$sessionId", params: { sessionId: session.id } });
   }
 
-  const { mission, streak, loading } = state;
+  const { mission, streak, loading, due, drill } = s;
 
   return (
     <AppShell title={t.nav.today}>
-      <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-sm font-semibold text-accent-foreground">
-        <Flame className="size-4" /> {streak} {t.today.streak}
-      </div>
+      <p className="text-caption -mt-4 flex items-center gap-1.5 text-muted-foreground">
+        <Flame className="size-4 shrink-0 text-primary" aria-hidden="true" />
+        <span>{t.today.streakLabel}: <span className="font-semibold text-foreground">{streak} {t.today.streak}</span></span>
+      </p>
 
       {loading ? (
-        <div className="h-64 animate-pulse rounded-3xl bg-muted" aria-label={t.today.loading} />
-      ) : !mission ? (
-        <EmptyState>
-          <p className="font-semibold text-foreground">{t.today.noMissionTitle}</p>
-          <p className="mt-1">{t.today.noMissionBody}</p>
-        </EmptyState>
-      ) : (
-        <section className="rounded-3xl bg-ink p-6 text-ink-foreground shadow-card">
-          <p className="text-xs font-semibold uppercase tracking-widest text-live">
+        <div className="h-80 animate-pulse rounded-[20px] bg-muted" aria-label={t.today.loading} />
+      ) : mission ? (
+        <section className="flex min-h-80 flex-col rounded-[20px] bg-ink p-6 text-ink-foreground shadow-card">
+          <p className="text-caption flex items-center gap-2 font-semibold text-live">
             {t.today.greeting} · {t.today.day} {mission.day}
           </p>
-          <h2 className="mt-3 text-3xl font-bold" lang="en">
-            {mission.title}
-          </h2>
-          <p className="mt-2 text-sm opacity-80" lang="en">
-            {mission.situation}
+          <h2 className="text-title mt-3" lang="en">{mission.title}</h2>
+          <p className="mt-2 text-base text-ink-foreground/80" lang="en">{mission.situation}</p>
+          <p className="text-caption mt-4 flex items-center gap-1.5 text-ink-foreground/80">
+            <Clock className="size-4" aria-hidden="true" /> {t.today.estimate}
           </p>
-
-          <ol className="mt-6 grid grid-cols-6 gap-1.5">
-            {t.session.steps.map((s) => (
-              <li key={s} title={s} className="h-1.5 rounded-full bg-ink-foreground/20" />
-            ))}
-          </ol>
-
-          <button
-            type="button"
-            onClick={start}
-            disabled={starting}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-bold text-primary-foreground transition-transform active:translate-y-0.5 disabled:opacity-70"
-          >
-            <Mic className="size-5" /> {t.today.start}
-          </button>
+          <div className="flex-1" />
+          <Button size="lg" className="mt-8 w-full" onClick={start} disabled={starting}>
+            <Mic /> {t.today.start}
+          </Button>
         </section>
+      ) : drill ? (
+        <section className="flex min-h-56 flex-col rounded-[20px] bg-ink p-6 text-ink-foreground shadow-card">
+          <p className="text-caption font-semibold text-live">{t.drills.title}</p>
+          <h2 className="text-title mt-3">{drill.pack.title_pt}</h2>
+          <p className="mt-1 text-base text-ink-foreground/80">{t.drills.continueHelp(drill.round)}</p>
+          <div className="flex-1" />
+          <Button size="lg" className="mt-8 w-full" asChild>
+            <Link to="/uberclass/$packId" params={{ packId: drill.pack.id }} search={{ nivel: "todos" }}><Play /> {t.today.continueDrill}</Link>
+          </Button>
+        </section>
+      ) : (
+        <EmptyState action={<Button asChild><Link to="/uberclass">{t.today.toDrills}</Link></Button>}>
+          <p className="text-headline text-foreground">{t.today.noMissionTitle}</p>
+          <p className="mt-1">{t.today.noMissionBody}</p>
+        </EmptyState>
+      )}
+
+      {due > 0 && (
+        <Link to="/revisao" className="flex min-h-14 items-center gap-3 rounded-[20px] border bg-card px-4 py-3">
+          <Layers className="size-5 shrink-0 text-primary" aria-hidden="true" />
+          <span className="flex-1 font-semibold">{t.today.dueCards(due)}</span>
+          <ChevronRight className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+        </Link>
       )}
     </AppShell>
   );

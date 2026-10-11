@@ -5,6 +5,8 @@ import { Moon } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { ApiKeyForm } from "@/components/prints/ApiKeyForm";
+import { useEffect, useState } from "react";
+import { repo } from "@/data/repo";
 
 export const Route = createFileRoute("/progresso")({
   head: () => ({
@@ -22,22 +24,34 @@ export const Route = createFileRoute("/progresso")({
 
 function Progress() {
   const { dark, theme, setTheme } = useTheme();
+  const [auto, setAuto] = useState(false);
+  useEffect(() => { void repo.getAutoListen().then(setAuto); }, []);
   return (
     <AppShell title={t.progress.title}>
       <EmptyState>{t.progress.empty}</EmptyState>
-      <section className="mt-8 border-t pt-6">
-        <h2 className="mb-4 text-lg font-semibold">{t.theme.title}</h2>
-        <div className="flex items-center justify-between gap-4 py-3">
-          <label htmlFor="theme-dark" className="flex items-center gap-2 text-sm"><Moon className="size-4" />{t.theme.dark}</label>
+      <section className="border-t pt-6">
+        <h2 className="text-headline mb-2">{t.theme.title}</h2>
+        <div className="flex min-h-11 items-center justify-between gap-4 py-2">
+          <label htmlFor="theme-dark" className="flex items-center gap-2 text-base"><Moon className="size-4" />{t.theme.dark}</label>
           <Switch id="theme-dark" checked={dark} onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")} />
         </div>
-        <div className="flex items-center justify-between gap-4 py-3">
-          <label htmlFor="theme-system" className="text-sm text-muted-foreground">{t.theme.system}</label>
+        <div className="flex min-h-11 items-center justify-between gap-4 py-2">
+          <label htmlFor="theme-system" className="text-base text-muted-foreground">{t.theme.system}</label>
           <Switch id="theme-system" checked={theme === "system"} onCheckedChange={(checked) => setTheme(checked ? "system" : dark ? "dark" : "light")} />
         </div>
       </section>
-      <section className="mt-8 border-t pt-6">
-        <h2 className="mb-4 text-lg font-semibold">{t.apiKey.section}</h2>
+      <section className="border-t pt-6">
+        <h2 className="text-headline mb-2">{t.progress.practice}</h2>
+        <div className="flex min-h-11 items-center justify-between gap-4 py-2">
+          <label htmlFor="auto-listen" className="text-base">
+            {t.drills.autoListen}
+            <span className="text-caption block text-muted-foreground">{t.drills.autoListenHelp}</span>
+          </label>
+          <Switch id="auto-listen" checked={auto} onCheckedChange={(c) => { setAuto(c); void repo.setAutoListen(c); }} />
+        </div>
+      </section>
+      <section className="border-t pt-6">
+        <h2 className="text-headline mb-4">{t.apiKey.section}</h2>
         <ApiKeyForm />
       </section>
     </AppShell>

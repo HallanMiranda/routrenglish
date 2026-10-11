@@ -298,6 +298,15 @@ export const localRepo: Repo = {
     write("drill_packs", read<DrillPack>("drill_packs").filter((x) => x.id !== id));
     write("drill_attempts", read<DrillAttempt>("drill_attempts").filter((a) => a.pack_id !== id));
   },
+  async getLastDrillAttempt() {
+    return read<DrillAttempt>("drill_attempts").at(-1) ?? null;
+  },
+  async getAutoListen() {
+    return read<boolean>("auto_listen")[0] === true;
+  },
+  async setAutoListen(on) {
+    write("auto_listen", [on]);
+  },
   async getSoundMuted() {
     return read<boolean>("sound_muted")[0] === true;
   },

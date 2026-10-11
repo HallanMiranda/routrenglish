@@ -26,9 +26,9 @@ function Session() {
     return () => window.clearTimeout(timer);
   }, [micState]);
   return (
-    <div className="flex min-h-screen flex-col bg-ink text-ink-foreground">
-      <header className="flex items-center gap-4 px-5 pt-6">
-        <Link to="/" aria-label={t.session.exit} className="rounded-full p-2 hover:bg-ink-foreground/10">
+    <div className="pt-safe pb-safe flex min-h-dvh flex-col bg-ink text-ink-foreground">
+      <header className="flex items-center gap-4 px-5 pt-2">
+        <Link to="/" aria-label={t.session.exit} className="grid size-11 place-items-center rounded-full hover:bg-ink-foreground/10">
           <X className="size-5" />
         </Link>
         <ol className="grid flex-1 grid-cols-6 gap-1.5">
@@ -37,14 +37,14 @@ function Session() {
           ))}
         </ol>
       </header>
-      <main className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-        <p className="text-xs font-semibold uppercase tracking-widest text-live">1 / 6</p>
-        <h1 className="mt-2 text-3xl font-bold">{t.session.steps[0]}</h1>
-        <p className="mt-3 text-sm opacity-70">{t.common.comingSoon}</p>
+      <main className="flex flex-1 flex-col items-center justify-end px-5 pb-10 text-center">
+        <p className="text-caption font-semibold text-live">{t.session.stepOf(1, 6)}</p>
+        <h1 className="text-large-title mt-2">{t.session.steps[0]}</h1>
+        <p className="mt-3 text-base text-ink-foreground/80">{t.common.comingSoon}</p>
         <div className="mt-10 flex flex-col items-center gap-5">
           <MicButton state={micState} onClick={() => setMicState(micState === "idle" ? "recording" : "processing")} />
-          <p role="status" aria-live="polite" className="h-6 text-sm font-semibold">{t.mic.states[micState]}</p>
-          <p className="text-xs text-ink-foreground/70">{t.mic.demo}</p>
+          <p role="status" aria-live="polite" className="h-6 text-base font-semibold">{t.mic.states[micState]}</p>
+          <p className="text-caption text-ink-foreground/80">{t.mic.demo}</p>
         </div>
       </main>
     </div>

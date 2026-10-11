@@ -25,3 +25,4 @@
 - [x] UberClass Escada (ladder) mode + JSON pack import/delete
 - [x] drill-packs.json v2 pasted (5 packs, pulo_do_gato)
 - [x] Prints tab (replaces Biblioteca): own OpenAI key, images/PDF/text → UberClass pack
+- [x] Design polish pass (type scale, radii, touch targets, focus drill screen, feedback sheet, Prints grid)
