@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Layers, Sparkles } from "lucide-react";
+import { Layers, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ApiKeyForm } from "@/components/prints/ApiKeyForm";
@@ -43,7 +43,7 @@ export function LessonHero({ packs, nivel }: { packs: DrillPack[]; nivel: Diffic
         </div>
       </div>
       <div className="grid grid-cols-2 gap-2">
-        {([["pacotes", L.fromPacks, L.fromPacksHelp, Layers], ["livre", L.free, L.freeHelp, Sparkles]] as const).map(([m, label, help, Icon]) => (
+        {([["pacotes", L.fromPacks, L.fromPacksHelp, Layers], ["livre", L.free, L.freeHelp, Wand2]] as const).map(([m, label, help, Icon]) => (
           <button key={m} type="button" aria-pressed={mode === m} onClick={() => setMode(m)}
             className={cn("flex min-h-24 flex-col items-start gap-1 rounded-xl border p-3 text-left transition-colors", mode === m ? "border-live bg-live text-live-foreground" : "border-ink-foreground/20")}>
             <Icon className="size-5" />

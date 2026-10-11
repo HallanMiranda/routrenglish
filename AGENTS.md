@@ -18,3 +18,4 @@
 - MicButton is a controlled presentation component; demo timers belong to the session — keeps microphone visuals reusable and separate from future audio capture.
 - UI reads/writes app data only through `repo` from `src/data/repo.ts` (currently localStorage-backed `localRepo`) — lets the storage be swapped for a cloud backend without touching screens.
 - Speech uses browser APIs in `src/speech/`, and `src/ai/converse.ts` is a scripted mock with the final signature — free local testing before any API keys.
+- Hands-free lessons (`/aula`) run one async loop in the route with refs for stop/pause/button commands; listening goes through `src/lesson/hear.ts` and judging reuses `src/ai/judge.ts` + `src/drills/check.ts` — one judging path for every screen.
