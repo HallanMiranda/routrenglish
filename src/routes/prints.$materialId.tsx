@@ -1,10 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Sparkles, Trash2 } from "lucide-react";
+import { ArrowLeft, Layers, Play, Sparkles, Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { AppShell, EmptyState } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/button";
 import { repo } from "@/data/repo";
-import type { AiSettings, DrillItem, DrillPack, Material } from "@/data/types";
+import type { AiSettings, DrillItem, DrillPack, Material, PrintProgress } from "@/data/types";
 import { generateMore } from "@/materials/study";
 import { GenerationStatus, useGeneration } from "./prints";
 import { t } from "@/lib/i18n/pt-BR";
@@ -36,6 +37,8 @@ function MaterialPage() {
   const [settings, setSettings] = useState<AiSettings | null>(null);
   const [confirm, setConfirm] = useState(false);
   const [added, setAdded] = useState<number | null>(null);
+  const [min, setMin] = useState(10);
+  const [prog, setProg] = useState<PrintProgress | null>(null);
   const g = useGeneration();
   const navigate = useNavigate();
 
@@ -44,6 +47,7 @@ function MaterialPage() {
     setM(mat);
     setPack(mat?.pack_id ? await repo.getDrillPack(mat.pack_id) : null);
     setSettings(await repo.getAiSettings());
+    setProg(await repo.getPrintProgress(materialId));
   }
   useEffect(() => {
     void load();
@@ -67,9 +71,23 @@ function MaterialPage() {
       {m.tokens_in !== undefined && (
         <p className="mb-4 text-xs text-muted-foreground">{p.cost((m.tokens_in ?? 0) + (m.tokens_out ?? 0), m.cost_usd ?? 0)}</p>
       )}
+      <div className="mb-2 grid grid-cols-3 gap-1 rounded-xl bg-muted p-1" role="radiogroup" aria-label={t.lesson.length}>
+        {[5, 10, 15].map((n) => (
+          <button key={n} type="button" role="radio" aria-checked={min === n} onClick={() => setMin(n)}
+            className={cn("min-h-11 rounded-lg text-sm font-semibold", min === n ? "bg-card text-foreground shadow-sm" : "text-muted-foreground")}>
+            {t.lesson.minutes(n)}
+          </button>
+        ))}
+      </div>
+      <Button asChild size="lg" className="mb-2 w-full">
+        <Link to="/aula" search={{ modo: "print", mat: m.id, pack: "", tema: "", min, nivel: "todos" }}><Play /> {p.coachLesson}</Link>
+      </Button>
+      {m.key_items?.length ? (
+        <p className="text-caption mb-3 text-center text-muted-foreground">{t.lesson.mastered(prog?.mastered.filter((k) => m.key_items!.includes(k)).length ?? 0, m.key_items.length)}</p>
+      ) : null}
       {pack && (
-        <Button asChild size="lg" className="mb-3 w-full">
-          <Link to="/aplicabilidade/$packId" params={{ packId: pack.id }} search={{ nivel: "todos" }}>{p.studyThis}</Link>
+        <Button asChild variant="outline" className="mb-3 w-full">
+          <Link to="/aplicabilidade/$packId" params={{ packId: pack.id }} search={{ nivel: "todos" }}><Layers /> {p.cardsTraining}</Link>
         </Button>
       )}
       <div className="mb-4 flex gap-2">
