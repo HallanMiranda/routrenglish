@@ -21,27 +21,33 @@ export function detectCommand(text: string): VoiceCommand | null {
 export interface Heard {
   transcript: string;
   seconds: number;
+  /** The recorded answer, when recording was on. */
+  audio: Blob | null;
 }
 
 /** Listens once; stops after 1.5 s of silence or when `signal` aborts. Throws the recognizer's Portuguese errors. */
-export async function hearOnce(expected: string[], signal: AbortSignal, onInterim: (t: string) => void, onProcessing: () => void): Promise<Heard> {
+export async function hearOnce(expected: string[], signal: AbortSignal, onInterim: (t: string) => void, onProcessing: () => void, keepAudio = false): Promise<Heard> {
   const ai = await aiFor("listen");
   let rec: Recording | null = null;
-  if (ai && canRecord()) rec = await startRecording().catch(() => null);
+  if ((ai || keepAudio) && canRecord()) rec = await startRecording().catch(() => null);
   const t0 = Date.now();
   try {
     const r = await listenLive({ lang: "en-US", signal, onInterim });
     const seconds = (Date.now() - t0) / 1000;
     let transcript = r.transcript;
-    if (rec && ai && transcript && !signal.aborted && !detectCommand(transcript)) {
-      onProcessing();
+    let blob: Blob | null = null;
+    if (rec && transcript && !signal.aborted && !detectCommand(transcript)) {
       const audio = await rec.stop();
       rec = null;
-      const name = (await repo.getMyName()).name;
-      const text = await transcribe(ai, audio.blob, audio.seconds, `${expected.slice(0, 3).join(" ")} My name is ${name}.`).catch(() => "");
-      if (text) transcript = text;
+      blob = audio.blob;
+      if (ai) {
+        onProcessing();
+        const name = (await repo.getMyName()).name;
+        const text = await transcribe(ai, audio.blob, audio.seconds, `${expected.slice(0, 3).join(" ")} My name is ${name}.`).catch(() => "");
+        if (text) transcript = text;
+      }
     }
-    return { transcript, seconds };
+    return { transcript, seconds, audio: blob };
   } finally {
     void rec?.stop();
   }
