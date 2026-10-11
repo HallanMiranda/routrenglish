@@ -31,6 +31,7 @@ export const t = {
   },
   session: {
     title: "Sessão",
+    stepOf: (i: number, n: number) => `Etapa ${i} de ${n}`,
     exit: "Sair",
     steps: [
       "Escuta",

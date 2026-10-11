@@ -38,7 +38,7 @@ function Session() {
         </ol>
       </header>
       <main className="flex flex-1 flex-col items-center justify-end px-5 pb-10 text-center">
-        <p className="text-caption font-semibold text-live">Etapa 1 de 6</p>
+        <p className="text-caption font-semibold text-live">{t.session.stepOf(1, 6)}</p>
         <h1 className="text-large-title mt-2">{t.session.steps[0]}</h1>
         <p className="mt-3 text-base text-ink-foreground/80">{t.common.comingSoon}</p>
         <div className="mt-10 flex flex-col items-center gap-5">
