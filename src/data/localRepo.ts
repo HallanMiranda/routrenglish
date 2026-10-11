@@ -37,7 +37,7 @@ const rawPacks = drillPacksJson as unknown as { pulo_do_gato?: PuloDoGato; packs
 /** Items without a mode are translate items. */
 const withMode = (p: DrillPack): DrillPack => ({
   ...p,
-  items: p.items.map((i) => ({ ...i, mode: (i as { mode?: string }).mode === "qa" ? "qa" : "translate" }) as DrillItem),
+  items: p.items.map((i) => ({ ...i, mode: (["qa", "ladder"] as const).find((m) => m === (i as { mode?: string }).mode) ?? "translate" }) as DrillItem),
 });
 const builtInPacks = (rawPacks.packs ?? []).map(withMode);
 const puloDoGato: PuloDoGato = rawPacks.pulo_do_gato ?? {};
@@ -262,7 +262,14 @@ export const localRepo: Repo = {
     return { pack_id: packId, best_round: best as PackProgress["best_round"], accuracy };
   },
   async getPuloDoGato() {
-    return puloDoGato;
+    return { ...puloDoGato, ...(read<PuloDoGato>("pulo_do_gato")[0] ?? {}) };
+  },
+  async mergePuloDoGato(p) {
+    write("pulo_do_gato", [{ ...(read<PuloDoGato>("pulo_do_gato")[0] ?? {}), ...p }]);
+  },
+  async deleteDrillPack(id) {
+    write("drill_packs", read<DrillPack>("drill_packs").filter((x) => x.id !== id));
+    write("drill_attempts", read<DrillAttempt>("drill_attempts").filter((a) => a.pack_id !== id));
   },
   async getSoundMuted() {
     return read<boolean>("sound_muted")[0] === true;
