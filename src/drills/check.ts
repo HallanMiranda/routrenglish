@@ -80,11 +80,61 @@ export interface CheckResult {
   trap: DrillTrap | null;
 }
 
+/** Words where one letter matters: the attention errors the method trains. */
+const STRICT = new Set(["his", "her", "their", "he", "she", "they", "is", "are", "am", "was", "were", "do", "does", "did", "dont", "doesnt", "not", "a", "an", "the", "in", "on", "at", "for", "to", "from", "of"]);
+
+export function levenshtein(a: string, b: string) {
+  if (a === b) return 0;
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= b.length; j++)
+      cur[j] = Math.min(prev[j]! + 1, cur[j - 1]! + 1, prev[j - 1]! + (a[i - 1] === b[j - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return prev[b.length]!;
+}
+
+/** Lowercased tokens of words capitalized mid-sentence in the accepted answer (names, places). */
+function properNouns(text: string) {
+  const out = new Set<string>();
+  text.split(/\s+/).forEach((w, i) => {
+    if (i > 0 && /^[A-Z]/.test(w) && w !== "I") for (const t of normalizeTokens(w)) out.add(t);
+  });
+  return out;
+}
+
+/** Replaces recognizer misspellings with the accepted word: 1 letter for 5+ letter words, 2 for proper nouns. */
+export function snapTokens(got: string[], want: string[], proper: Set<string> = new Set()) {
+  return got.map((g) => {
+    if (want.includes(g) || STRICT.has(g)) return g;
+    for (const w of want) {
+      if (STRICT.has(w)) continue;
+      const d = levenshtein(g, w);
+      if (proper.has(w) && d <= 2) return w;
+      if (g.length >= 5 && w.length >= 5 && d === 1) return w;
+    }
+    return g;
+  });
+}
+
+/** Swaps the recognizer's spellings of the learner's name for the real one. */
+export function applyMyName(text: string, name: string, aliases: string[]) {
+  let out = text;
+  for (const a of aliases.map((x) => x.trim()).filter(Boolean)) {
+    const esc = a.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    out = out.replace(new RegExp(`\\b${esc}\\b`, "gi"), name);
+  }
+  return out;
+}
+
 export function checkAnswer(answer: string, accepted: string[], traps: DrillTrap[] = []): CheckResult {
-  const got = normalizeTokens(answer);
+  const raw = normalizeTokens(answer);
+  const got = raw;
   let best = { idx: 0, distance: Infinity, ops: [] as DiffOp[], tokens: [] as string[] };
   for (let k = 0; k < accepted.length; k++) {
     const want = normalizeTokens(accepted[k]!);
+    const got = snapTokens(raw, want, properNouns(accepted[k]!));
     if (want.join(" ") === got.join(" ")) return { correct: true, closest: accepted[k]!, ops: want.map((w) => ({ type: "equal", word: w })), trap: null };
     const r = wordDiff(got, want);
     if (r.distance < best.distance) best = { idx: k, distance: r.distance, ops: r.ops, tokens: want };
