@@ -1,5 +1,6 @@
 import drillPacksJson from "@/content/drill-packs.json";
 import headwayStarterJson from "@/content/headway-starter.json";
+import puloDoGatoJson from "@/content/pulo-do-gato.json";
 import { parsePacksJson } from "@/drills/importPack";
 import type { DrillAttempt, DrillItem, DrillPack, PackProgress, PrintProgress, PuloDoGato } from "./types";
 import missionsJson from "@/content/missions-phase1.json";
@@ -17,6 +18,7 @@ import type {
   MaterialItem,
   Mission,
   Session,
+  TalkSession,
   Utterance,
 } from "./types";
 
@@ -51,11 +53,14 @@ const withMode = (p: DrillPack): DrillPack => ({
 // Built-in course (American Headway Starter): validated like an import, so it shows in Aulas with no setup.
 const builtInCourse = parsePacksJson(JSON.stringify(headwayStarterJson));
 const builtInCourses: Course[] = builtInCourse.course ? [builtInCourse.course] : [];
+// Pulo do Gato: the 10 key verbs (do, does, have, has, will, did, need, can, could, I'd like).
+const builtInPulo = parsePacksJson(JSON.stringify(puloDoGatoJson));
 const builtInPacks = [
   ...(rawPacks.packs ?? []),
   ...builtInCourse.packs.map((p, i) => ({ ...p, id: p.id ?? `${builtInCourse.course?.id ?? "course"}-${i + 1}` }) as DrillPack),
+  ...builtInPulo.packs.map((p, i) => ({ ...p, id: p.id ?? `pulo-do-gato-u${i + 1}` }) as DrillPack),
 ].map(withMode);
-const puloDoGato: PuloDoGato = { ...builtInCourse.pulo, ...(rawPacks.pulo_do_gato ?? {}) };
+const puloDoGato: PuloDoGato = { ...builtInCourse.pulo, ...builtInPulo.pulo, ...(rawPacks.pulo_do_gato ?? {}) };
 const PREFIX = "speak-lab:";
 const DEFAULT_MODEL = "gpt-5.4-mini";
 const DAY = 86_400_000;
@@ -104,6 +109,14 @@ export const localRepo: Repo = {
     return list.find((m) => !done.has(m.id)) ?? null;
   },
 
+  async listTalks() {
+    return read<TalkSession>("talks");
+  },
+  async saveTalk(t) {
+    const row: TalkSession = { ...t, id: uid(), created_at: now() };
+    write("talks", [...read<TalkSession>("talks"), row]);
+    return row;
+  },
   async getSession(id) {
     return read<Session>("sessions").find((s) => s.id === id) ?? null;
   },

@@ -19,9 +19,9 @@ export const Route = createFileRoute("/aulas/$packId")({
   },
   head: () => ({
     meta: [
-      { title: "Unidade — Aulas — Speak Lab" },
+      { title: "Unidade — Tête-à-tête — Speak Lab" },
       { name: "description", content: "Uma unidade da apostila em 5 etapas: o que aprender, aula com o Coach, perguntas, livro e desafio." },
-      { property: "og:title", content: "Unidade — Aulas — Speak Lab" },
+      { property: "og:title", content: "Unidade — Tête-à-tête — Speak Lab" },
       { property: "og:description", content: "Uma unidade da apostila em 5 etapas: o que aprender, aula com o Coach, perguntas, livro e desafio." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

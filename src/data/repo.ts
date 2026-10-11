@@ -17,6 +17,7 @@ import type {
   Mission,
   Session,
   StepIndex,
+  TalkSession,
   Utterance,
 } from "./types";
 import { localRepo } from "./localRepo";
@@ -27,6 +28,8 @@ export interface Repo {
   listMissions(): Promise<Mission[]>;
   startOrResumeSession(missionId: string): Promise<Session>;
   getSession(id: string): Promise<Session | null>;
+  listTalks(): Promise<TalkSession[]>;
+  saveTalk(t: Omit<TalkSession, "id" | "created_at">): Promise<TalkSession>;
   completeStep(sessionId: string, step: StepIndex): Promise<Session>;
   finishSession(sessionId: string): Promise<Session>;
   saveUtterance(u: Omit<Utterance, "id" | "created_at">): Promise<Utterance>;

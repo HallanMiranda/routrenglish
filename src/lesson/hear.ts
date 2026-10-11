@@ -25,14 +25,14 @@ export interface Heard {
   audio: Blob | null;
 }
 
-/** Listens once; stops after 1.5 s of silence or when `signal` aborts. Throws the recognizer's Portuguese errors. */
-export async function hearOnce(expected: string[], signal: AbortSignal, onInterim: (t: string) => void, onProcessing: () => void, keepAudio = false): Promise<Heard> {
+/** Listens once; stops after `silenceMs` (1.5 s) of silence or when `signal` aborts. Throws the recognizer's Portuguese errors. */
+export async function hearOnce(expected: string[], signal: AbortSignal, onInterim: (t: string) => void, onProcessing: () => void, keepAudio = false, silenceMs = 1500): Promise<Heard> {
   const ai = await aiFor("listen");
   let rec: Recording | null = null;
   if ((ai || keepAudio) && canRecord()) rec = await startRecording().catch(() => null);
   const t0 = Date.now();
   try {
-    const r = await listenLive({ lang: "en-US", signal, onInterim });
+    const r = await listenLive({ lang: "en-US", signal, onInterim, silenceMs });
     const seconds = (Date.now() - t0) / 1000;
     let transcript = r.transcript;
     let blob: Blob | null = null;

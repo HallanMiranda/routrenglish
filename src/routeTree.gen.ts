@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AulaRouteImport } from './routes/aula'
+import { Route as ConversaRouteImport } from './routes/conversa'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PrintsRouteImport } from './routes/prints'
 import { Route as ProgressoRouteImport } from './routes/progresso'
@@ -34,6 +35,11 @@ const IndexRoute = IndexRouteImport.update({
 const AulaRoute = AulaRouteImport.update({
   id: '/aula',
   path: '/aula',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConversaRoute = ConversaRouteImport.update({
+  id: '/conversa',
+  path: '/conversa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -110,6 +116,7 @@ const UberclassSplatRoute = UberclassSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/aula': typeof AulaRoute
+  '/conversa': typeof ConversaRoute
   '/login': typeof LoginRoute
   '/prints': typeof PrintsRouteWithChildren
   '/progresso': typeof ProgressoRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/aula': typeof AulaRoute
+  '/conversa': typeof ConversaRoute
   '/login': typeof LoginRoute
   '/prints': typeof PrintsRouteWithChildren
   '/progresso': typeof ProgressoRoute
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/aula': typeof AulaRoute
+  '/conversa': typeof ConversaRoute
   '/login': typeof LoginRoute
   '/prints': typeof PrintsRouteWithChildren
   '/progresso': typeof ProgressoRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/aula'
+    | '/conversa'
     | '/login'
     | '/prints'
     | '/progresso'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/aula'
+    | '/conversa'
     | '/login'
     | '/prints'
     | '/progresso'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/aula'
+    | '/conversa'
     | '/login'
     | '/prints'
     | '/progresso'
@@ -222,6 +234,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AulaRoute: typeof AulaRoute
+  ConversaRoute: typeof ConversaRoute
   LoginRoute: typeof LoginRoute
   PrintsRoute: typeof PrintsRouteWithChildren
   ProgressoRoute: typeof ProgressoRoute
@@ -250,6 +263,13 @@ declare module '@tanstack/react-router' {
       path: '/aula'
       fullPath: '/aula'
       preLoaderRoute: typeof AulaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conversa': {
+      id: '/conversa'
+      path: '/conversa'
+      fullPath: '/conversa'
+      preLoaderRoute: typeof ConversaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -379,6 +399,7 @@ const UberclassRouteWithChildren = UberclassRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AulaRoute: AulaRoute,
+  ConversaRoute: ConversaRoute,
   LoginRoute: LoginRoute,
   PrintsRoute: PrintsRouteWithChildren,
   ProgressoRoute: ProgressoRoute,

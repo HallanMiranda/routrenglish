@@ -1,10 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { BarChart3, BookOpen, Camera, MessageSquareText, Sun } from "lucide-react";
+import { BarChart3, BookOpen, Camera, Cat, Sun } from "lucide-react";
 import { t } from "@/lib/i18n/pt-BR";
 
 const items = [
   { to: "/", label: t.nav.today, icon: Sun },
-  { to: "/aplicabilidade", label: t.nav.practice, icon: MessageSquareText },
+  { to: "/aplicabilidade", label: t.nav.practice, icon: Cat },
   { to: "/aulas", label: t.nav.lessons, icon: BookOpen },
   { to: "/prints", label: t.nav.prints, icon: Camera },
   { to: "/progresso", label: t.nav.progress, icon: BarChart3 },
@@ -19,7 +19,7 @@ export function BottomNav() {
             <Link
               to={to}
               activeOptions={{ exact: to === "/" }}
-              className="flex flex-col items-center gap-1 min-h-14 justify-center py-2 text-[13px] font-medium text-muted-foreground transition-colors data-[status=active]:text-primary"
+              className="flex flex-col items-center gap-1 min-h-14 justify-center py-2 text-[12px] leading-tight tracking-tight whitespace-nowrap font-medium text-muted-foreground transition-colors data-[status=active]:text-primary"
             >
               <Icon className="size-5" strokeWidth={2.2} />
               {label}

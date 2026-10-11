@@ -156,6 +156,20 @@ export interface BrError {
   tags?: string[];
 }
 
+/** One "Conversa" (Hoje) practice: how long the learner spoke against the goal. */
+export interface TalkSession {
+  id: string;
+  topic: string;
+  /** Seconds the learner spoke (sum of answers). */
+  seconds: number;
+  goal_seconds: number;
+  turns: number;
+  /** Longest answer, in words. */
+  longest: number;
+  reached: boolean;
+  created_at: ISODate;
+}
+
 export interface ConverseTurn {
   role: "user" | "ai";
   text: string;

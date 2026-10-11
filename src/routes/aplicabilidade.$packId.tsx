@@ -32,9 +32,9 @@ export const Route = createFileRoute("/aplicabilidade/$packId")({
   }),
   head: () => ({
     meta: [
-      { title: "Desafio Aplicabilidade — Speak Lab" },
+      { title: "Desafio Pulo do Gato — Speak Lab" },
       { name: "description", content: "Traduza e responda em inglês falando com o Coach, com vidas e pontos." },
-      { property: "og:title", content: "Desafio Aplicabilidade — Speak Lab" },
+      { property: "og:title", content: "Desafio Pulo do Gato — Speak Lab" },
       { property: "og:description", content: "Traduza e responda em inglês falando com o Coach, com vidas e pontos." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -13,9 +13,9 @@ const A = t.aulas;
 export const Route = createFileRoute("/aulas/")({
   head: () => ({
     meta: [
-      { title: "Aulas — Speak Lab" },
+      { title: "Tête-à-tête — Speak Lab" },
       { name: "description", content: "Estude sua apostila unidade por unidade, com aula falada, perguntas, desafio e revisão." },
-      { property: "og:title", content: "Aulas — Speak Lab" },
+      { property: "og:title", content: "Tête-à-tête — Speak Lab" },
       { property: "og:description", content: "Estude sua apostila unidade por unidade, com aula falada, perguntas, desafio e revisão." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

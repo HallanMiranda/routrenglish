@@ -146,6 +146,11 @@ function unitChunks(pack: DrillPack, parte: NonNullable<LessonSearch["parte"]>, 
 
 function LessonPage() {
   const search = Route.useSearch();
+  const [packTitle, setPackTitle] = useState("");
+  useEffect(() => {
+    if (search.modo !== "pacotes" || !search.pack || search.pack.startsWith("col:")) return;
+    void repo.getDrillPack(search.pack).then((p) => p && setPackTitle(p.title_pt));
+  }, [search.modo, search.pack]);
   const [phase, setPhase] = useState<"ready" | "live" | "summary">("ready");
   const [coach, setCoach] = useState("");
   const [talking, setTalking] = useState(false);
@@ -329,6 +334,7 @@ function LessonPage() {
       const packs = colKey ? units : search.pack ? all.filter((p) => p.id === search.pack) : all.filter((p) => search.nivel === "todos" || difficultyOf(p.level) === search.nivel);
       chains = chainsOf(packs);
       if (!chains.length) { setBlocked(L.noLadders); return; }
+      if (!colKey && search.pack && packs[0]) setPackTitle(packs[0].title_pt);
     }
 
     setPhase("live");
@@ -548,6 +554,9 @@ function LessonPage() {
         unitResult = { passed: null, pct: Math.round(pct * 100) };
       }
     }
+    // A single pack run hands-free (e.g. a Pulo do Gato verb) counts as practice for that pack.
+    if (search.modo === "pacotes" && search.pack && !search.pack.startsWith("col:") && stats.attempted)
+      await repo.saveDrillAttempt({ pack_id: search.pack, round: 1, accuracy: pct, helped_item_ids: [] });
     let masteredLabel: string | null = null;
     if (mat && source) {
       const prevM = new Set(printProg?.mastered ?? []);
@@ -583,7 +592,7 @@ function LessonPage() {
     resumeRef.current?.();
   }
 
-  const title = search.modo === "unidade" ? t.aulas.steps[search.parte === "perguntas" ? 2 : search.parte === "desafio" ? 4 : 1]! : search.modo === "livre" ? L.free : search.modo === "print" ? L.printTitle(material?.title ?? "") : L.fromPacks;
+  const title = search.modo === "unidade" ? t.aulas.steps[search.parte === "perguntas" ? 2 : search.parte === "desafio" ? 4 : 1]! : search.modo === "livre" ? L.free : search.modo === "print" ? L.printTitle(material?.title ?? "") : packTitle || L.fromPacks;
   const toPrint = search.modo === "print" && !!search.mat;
   const backUnit = search.modo === "unidade" ? search.pack : material?.unit_pack_id;
   const Back = ({ children, ...rest }: { children: ReactNode; onClick?: () => void; className?: string }) =>

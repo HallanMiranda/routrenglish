@@ -11,3 +11,12 @@ describe("built-in Headway Starter course", () => {
     expect(r.packs.every((p) => p.course_id === "headway-starter" && p.unit && p.lesson_intro)).toBe(true);
   });
 });
+
+import pulo from "./pulo-do-gato.json";
+describe("built-in Pulo do Gato", () => {
+  it("imports the 10 key-verb packs with no errors", () => {
+    const r = parsePacksJson(JSON.stringify(pulo));
+    expect(r.errors).toEqual([]);
+    expect(r.packs.map((p) => p.id)).toHaveLength(10);
+  });
+});

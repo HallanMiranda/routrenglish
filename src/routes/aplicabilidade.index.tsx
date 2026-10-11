@@ -13,17 +13,64 @@ import { LessonHero } from "@/components/lesson/LessonHero";
 import { parseDrillLines } from "@/drills/check";
 import { parsePacksJson } from "@/drills/importPack";
 import { groupCollections, unitDone } from "@/drills/collections";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Mic } from "lucide-react";
 import { t } from "@/lib/i18n/pt-BR";
 
 const d = t.drills;
+const P = t.pulo;
+const PULO_PREFIX = "pulo-do-gato-";
+const verbLesson = (pack: string) => ({ modo: "pacotes" as const, pack, mat: "", tema: "", min: 10, nivel: "todos" as const });
+const verbOf = (p: DrillPack) => p.title_pt.split(" · ").slice(1).join(" · ") || p.title_pt;
+
+/** Alan Brites' "pulo do gato": the 10 key verbs, each a hands-free lesson with the Coach. */
+function VerbsSection({ verbs, progress }: { verbs: DrillPack[]; progress: Record<string, PackProgress> }) {
+  const sorted = [...verbs].sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
+  const done = (p: DrillPack) => progress[p.id]?.accuracy != null;
+  const next = sorted.find((p) => !done(p));
+  const target = next ?? sorted[0]!;
+  const label = !sorted.some(done) ? P.start : next ? P.next(verbOf(next)) : P.allDone;
+  return (
+    <section className="space-y-4 rounded-[24px] bg-ink p-5 text-ink-foreground shadow-card">
+      <div>
+        <p className="text-caption font-semibold text-live">🐈 {d.title}</p>
+        <h2 className="text-title mt-1">{P.title}</h2>
+        <p className="mt-1 text-base text-ink-foreground/80">{P.help}</p>
+      </div>
+      <Button asChild size="lg" className="w-full">
+        <Link to="/aula" search={verbLesson(target.id)}><Mic /> {label}</Link>
+      </Button>
+      <ul className="grid grid-cols-2 gap-2">
+        {sorted.map((p) => {
+          const pr = progress[p.id];
+          const ok = pr?.accuracy != null;
+          return (
+            <li key={p.id}>
+              <Link
+                to="/aula"
+                search={verbLesson(p.id)}
+                className={cn("flex h-full min-h-24 flex-col rounded-2xl border border-ink-foreground/15 p-3 transition-colors hover:border-live", p.id === next?.id && "border-live")}
+              >
+                <span className="flex items-start justify-between gap-2">
+                  <span lang="en" className="font-display text-2xl font-bold leading-none">{verbOf(p)}</span>
+                  {ok ? <span className="text-caption font-semibold text-live">✓</span> : <span className="text-caption rounded-full bg-live px-2 py-0.5 font-semibold text-live-foreground">{P.isNew}</span>}
+                </span>
+                <span className="text-caption mt-2 line-clamp-2 text-ink-foreground/75">{p.focus_pt}</span>
+                {ok && <span className="text-caption mt-auto pt-1 font-semibold text-ink-foreground/90">{P.practiced(Math.round((pr.accuracy ?? 0) * 100))}</span>}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
 
 export const Route = createFileRoute("/aplicabilidade/")({
   head: () => ({
     meta: [
-      { title: "Aplicabilidade — Speak Lab" },
+      { title: "Pulo do Gato — Speak Lab" },
       { name: "description", content: "Treino rápido de fala: traduza do português e responda perguntas em inglês." },
-      { property: "og:title", content: "Aplicabilidade — Speak Lab" },
+      { property: "og:title", content: "Pulo do Gato — Speak Lab" },
       { property: "og:description", content: "Treino rápido de fala: traduza do português e responda perguntas em inglês." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -39,8 +86,10 @@ function PracticePage() {
   const [creating, setCreating] = useState(false);
   const [filter, setFilter] = useState<Difficulty | "todos">("todos");
   const [confirmId, setConfirmId] = useState<string | null>(null);
-  const shown = packs?.filter((p) => filter === "todos" || difficultyOf(p.level) === filter);
-  const last = packs?.find((p) => p.id === lastId) ?? null;
+  const verbs = packs?.filter((p) => p.id.startsWith(PULO_PREFIX)) ?? [];
+  const others = packs?.filter((p) => !p.id.startsWith(PULO_PREFIX)) ?? null;
+  const shown = others?.filter((p) => filter === "todos" || difficultyOf(p.level) === filter);
+  const last = others?.find((p) => p.id === lastId) ?? null;
   const [notice, setNotice] = useState("");
   const grouped = shown ? groupCollections(shown) : { collections: [], singles: [] };
   const singles = grouped.singles;
@@ -66,7 +115,12 @@ function PracticePage() {
   return (
     <AppShell title={d.title}>
       <p className="-mt-4 text-base text-muted-foreground">{d.subtitle}</p>
-      <LessonHero packs={packs ?? []} nivel={filter} />
+      {verbs.length > 0 && <VerbsSection verbs={verbs} progress={progress} />}
+      <div className="pt-2">
+        <h2 className="text-title">{P.more}</h2>
+        <p className="text-base text-muted-foreground">{P.moreHelp}</p>
+      </div>
+      <LessonHero packs={others ?? []} nivel={filter} />
       {last && (
         <Link
           to="/aplicabilidade/$packId"
