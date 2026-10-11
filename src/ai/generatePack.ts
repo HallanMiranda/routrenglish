@@ -3,6 +3,7 @@ import { AiError, chatJson, type ChatMessage, type ChatPart } from "./openai";
 import { parsePackJson } from "@/drills/importPack";
 import type { DrillItem, DrillPack, PuloDoGato } from "@/data/types";
 import { t } from "@/lib/i18n/pt-BR";
+import { repo } from "@/data/repo";
 
 export interface GenerateInput {
   apiKey: string;
@@ -56,6 +57,7 @@ export async function generatePack(input: GenerateInput): Promise<GenerateResult
     const r = await chatJson(input.apiKey, input.model, messages, input.signal);
     tokensIn += r.tokensIn;
     tokensOut += r.tokensOut;
+    void repo.logAiUsage({ kind: "prints", cost_usd: estimateCost(r.tokensIn, r.tokensOut) });
     const parsed = parsePackJson(r.content);
     if (parsed.ok) return { pack: parsed.pack, pulo: parsed.pulo, tokensIn, tokensOut };
     if (attempt === 1) throw new AiError(t.ai.invalid, parsed.errors);
