@@ -18,9 +18,9 @@ const d = t.drills;
 export const Route = createFileRoute("/uberclass/")({
   head: () => ({
     meta: [
-      { title: "UberClass — Speak Lab" },
+      { title: "Aplicabilidade — Speak Lab" },
       { name: "description", content: "Treino rápido de fala: traduza do português e responda perguntas em inglês." },
-      { property: "og:title", content: "UberClass — Speak Lab" },
+      { property: "og:title", content: "Aplicabilidade — Speak Lab" },
       { property: "og:description", content: "Treino rápido de fala: traduza do português e responda perguntas em inglês." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
