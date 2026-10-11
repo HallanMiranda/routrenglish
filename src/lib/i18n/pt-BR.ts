@@ -3,7 +3,7 @@ export const t = {
   app: { name: "Speak Lab", tagline: "Fale inglês todo dia." },
   nav: {
     today: "Hoje",
-    practice: "UberClass",
+    practice: "Aplicabilidade",
     review: "Revisão",
     prints: "Prints",
     progress: "Progresso",
@@ -12,7 +12,7 @@ export const t = {
     greeting: "Missão de hoje",
     start: "Começar",
     estimate: "~10 min",
-    continueDrill: "Continuar UberClass",
+    continueDrill: "Continuar Aplicabilidade",
     continueDrillHelp: (pack: string, r: number) => `${pack} · Rodada ${r}`,
     dueCards: (n: number) => (n === 1 ? "1 cartão para revisar" : `${n} cartões para revisar`),
     streak: "dias seguidos",
@@ -20,8 +20,8 @@ export const t = {
     day: "Dia",
     loading: "Carregando missão",
     noMissionTitle: "Nenhuma missão disponível",
-    noMissionBody: "Você concluiu todas as missões. Que tal um treino no UberClass?",
-    toDrills: "Abrir UberClass",
+    noMissionBody: "Você concluiu todas as missões. Que tal um treino de Aplicabilidade?",
+    toDrills: "Abrir Aplicabilidade",
   },
   speech: {
     unsupported: "Seu navegador não reconhece fala. Tente o Chrome no Android ou o Safari no iPhone.",
@@ -43,7 +43,7 @@ export const t = {
     ],
   },
   report: { title: "Relatório", empty: "O relatório aparecerá aqui ao fim da sessão." },
-  review: { title: "Revisão", empty: "Nenhum cartão para revisar hoje. Erre à vontade no UberClass: os erros viram cartões." },
+  review: { title: "Revisão", empty: "Nenhum cartão para revisar hoje. Erre à vontade na Aplicabilidade: os erros viram cartões." },
   progress: { title: "Progresso", empty: "Seu progresso aparece aqui depois do primeiro treino.", practice: "Treino" },
   theme: { title: "Aparência", dark: "Tema escuro", system: "Seguir o sistema" },
   mic: {
@@ -144,7 +144,7 @@ export const t = {
     fromMaterial: "Do meu material",
   },
   drills: {
-    title: "UberClass",
+    title: "Aplicabilidade",
     subtitle: "Treino rápido de fala: traduza e responda em inglês.",
     empty: "Nenhum pacote neste nível. Escolha outro nível acima.",
     continue: "Continuar",

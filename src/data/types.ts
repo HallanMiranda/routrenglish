@@ -142,7 +142,7 @@ export interface ConverseTurn {
   text: string;
 }
 
-// ---- UberClass drills ----
+// ---- Aplicabilidade drills ----
 export interface DrillTrap {
   word: string;
   hint_pt: string;

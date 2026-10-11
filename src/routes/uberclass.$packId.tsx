@@ -32,9 +32,9 @@ export const Route = createFileRoute("/uberclass/$packId")({
   }),
   head: () => ({
     meta: [
-      { title: "Desafio UberClass — Speak Lab" },
+      { title: "Desafio Aplicabilidade — Speak Lab" },
       { name: "description", content: "Traduza e responda em inglês falando com o Coach, com vidas e pontos." },
-      { property: "og:title", content: "Desafio UberClass — Speak Lab" },
+      { property: "og:title", content: "Desafio Aplicabilidade — Speak Lab" },
       { property: "og:description", content: "Traduza e responda em inglês falando com o Coach, com vidas e pontos." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

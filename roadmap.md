@@ -21,10 +21,10 @@
 - [ ] 16. Progress
 - [ ] 17. api_usage + polish
 - [x] Praticar tab: guided translation drills (local, 4 rounds, checker, cards)
-- [x] UberClass tab (replaces Praticar): QA items, lives/multas/score, variations, sounds, Simulação Expressa
-- [x] UberClass Escada (ladder) mode + JSON pack import/delete
+- [x] Aplicabilidade tab (replaces Praticar): QA items, lives/multas/score, variations, sounds, Simulação Expressa
+- [x] Aplicabilidade Escada (ladder) mode + JSON pack import/delete
 - [x] drill-packs.json v2 pasted (5 packs, pulo_do_gato)
-- [x] Prints tab (replaces Biblioteca): own OpenAI key, images/PDF/text → UberClass pack
+- [x] Prints tab (replaces Biblioteca): own OpenAI key, images/PDF/text → Aplicabilidade pack
 - [x] Design polish pass (type scale, radii, touch targets, focus drill screen, feedback sheet, Prints grid)
 - [x] Shared AI layer (own key): Ouvir/Corrigir/Conversa com IA, Meu nome, lenient check
 - [ ] Wire AI judge into Revisão card practice (waits for step 14 Review screen)
