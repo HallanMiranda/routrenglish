@@ -501,9 +501,9 @@ function LessonPage() {
 
   const title = search.modo === "livre" ? L.free : search.modo === "print" ? L.printTitle(material?.title ?? "") : L.fromPacks;
   const toPrint = search.modo === "print" && !!search.mat;
-  const Back = ({ children, onClick }: { children: ReactNode; onClick?: () => void }) =>
-    toPrint ? <Link to="/prints/$materialId" params={{ materialId: search.mat }} onClick={onClick}>{children}</Link>
-    : <Link to="/aplicabilidade" onClick={onClick}>{children}</Link>;
+  const Back = ({ children, ...rest }: { children: ReactNode; onClick?: () => void; className?: string }) =>
+    toPrint ? <Link to="/prints/$materialId" params={{ materialId: search.mat }} {...rest}>{children}</Link>
+    : <Link to="/aplicabilidade" {...rest}>{children}</Link>;
   const printImg = material?.images?.[0] ?? material?.thumbnail;
 
   return (
