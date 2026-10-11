@@ -765,7 +765,7 @@ function LadderRail({ index, total }: { index: number; total: number }) {
 
 function LadderReview({ ladder, onFast, onContinue }: { ladder: LadderItem; onFast: () => void; onContinue: () => void }) {
   return (
-    <div className="absolute inset-0 z-20 flex flex-col gap-3 overflow-y-auto bg-card p-5">
+    <div className="absolute inset-0 z-20 flex flex-col gap-3 overflow-y-auto bg-card p-5 [&>*]:shrink-0">
       <p className="font-display text-xl font-bold">{d.ladderDone}</p>
       <p className="text-sm text-muted-foreground">{ladder.title_pt}</p>
       <ol className="space-y-2">
