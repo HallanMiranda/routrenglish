@@ -20,3 +20,4 @@
 - [ ] 15. Library + ingest
 - [ ] 16. Progress
 - [ ] 17. api_usage + polish
+- [x] Praticar tab: guided translation drills (local, 4 rounds, checker, cards)

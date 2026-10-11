@@ -106,3 +106,42 @@ export interface ConverseTurn {
   role: "user" | "ai";
   text: string;
 }
+
+// ---- Guided translation drills (Praticar) ----
+export interface DrillTrap {
+  word: string;
+  hint_pt: string;
+}
+export interface DrillItem {
+  id: string;
+  pt: string;
+  /** Accepted answers; the first is the model answer. */
+  en: string[];
+  focus: string;
+  traps: DrillTrap[];
+}
+export interface DrillPack {
+  id: string;
+  title_pt: string;
+  level: string;
+  focus_pt: string;
+  items: DrillItem[];
+  user_created?: boolean;
+}
+export type DrillRound = 1 | 2 | 3 | 4;
+export interface DrillAttempt {
+  id: string;
+  pack_id: string;
+  round: DrillRound;
+  /** Share of items correct on first try (0..1). */
+  accuracy: number;
+  helped_item_ids: string[];
+  created_at: ISODate;
+}
+export interface PackProgress {
+  pack_id: string;
+  /** Highest round unlocked (1..4). */
+  best_round: DrillRound;
+  /** Best accuracy in the best round, 0..1, or null if never played. */
+  accuracy: number | null;
+}

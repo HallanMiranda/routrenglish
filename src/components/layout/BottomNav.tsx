@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { BarChart3, BookOpen, Layers, Sun } from "lucide-react";
+import { BarChart3, BookOpen, Layers, MessageSquareText, Sun } from "lucide-react";
 import { t } from "@/lib/i18n/pt-BR";
 
 const items = [
   { to: "/", label: t.nav.today, icon: Sun },
+  { to: "/praticar", label: t.nav.practice, icon: MessageSquareText },
   { to: "/revisao", label: t.nav.review, icon: Layers },
   { to: "/biblioteca", label: t.nav.library, icon: BookOpen },
   { to: "/progresso", label: t.nav.progress, icon: BarChart3 },
@@ -12,7 +13,7 @@ const items = [
 export function BottomNav() {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 backdrop-blur pb-safe">
-      <ul className="mx-auto grid max-w-md grid-cols-4">
+      <ul className="mx-auto grid max-w-md grid-cols-5">
         {items.map(({ to, label, icon: Icon }) => (
           <li key={to}>
             <Link

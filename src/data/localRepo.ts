@@ -1,3 +1,5 @@
+import drillPacksJson from "@/content/drill-packs.json";
+import type { DrillAttempt, DrillPack, PackProgress } from "./types";
 import missionsJson from "@/content/missions-phase1.json";
 import type { Repo } from "./repo";
 import type {
@@ -12,6 +14,7 @@ import type {
 } from "./types";
 
 const missions = missionsJson as Mission[];
+const builtInPacks = (drillPacksJson as unknown as { packs: DrillPack[] }).packs ?? [];
 const PREFIX = "speak-lab:";
 const DAY = 86_400_000;
 
@@ -205,5 +208,31 @@ export const localRepo: Repo = {
       cursor = new Date(cursor.getTime() - DAY);
     }
     return streak;
+  },
+
+  async listDrillPacks() {
+    return [...builtInPacks, ...read<DrillPack>("drill_packs")];
+  },
+  async getDrillPack(id) {
+    return (await this.listDrillPacks()).find((p) => p.id === id) ?? null;
+  },
+  async saveDrillPack(p) {
+    const row: DrillPack = { ...p, id: p.id ?? uid(), user_created: true };
+    write("drill_packs", [...read<DrillPack>("drill_packs").filter((x) => x.id !== row.id), row]);
+    return row;
+  },
+  async saveDrillAttempt(a) {
+    const row: DrillAttempt = { ...a, id: uid(), created_at: now() };
+    write("drill_attempts", [...read<DrillAttempt>("drill_attempts"), row]);
+    return row;
+  },
+  async getPackProgress(packId) {
+    const atts = read<DrillAttempt>("drill_attempts").filter((a) => a.pack_id === packId);
+    if (!atts.length) return { pack_id: packId, best_round: 1, accuracy: null } satisfies PackProgress;
+    let best = 1;
+    for (const a of atts) best = Math.max(best, a.accuracy >= 0.8 ? Math.min(4, a.round + 1) : a.round);
+    const inRound = atts.filter((a) => a.round === best);
+    const accuracy = inRound.length ? Math.max(...inRound.map((a) => a.accuracy)) : Math.max(...atts.map((a) => a.accuracy));
+    return { pack_id: packId, best_round: best as PackProgress["best_round"], accuracy };
   },
 };
