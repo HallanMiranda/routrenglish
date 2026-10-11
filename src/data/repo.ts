@@ -1,4 +1,5 @@
 import type {
+  AiSettings,
   Card,
   CardRating,
   Checkpoint,
@@ -34,6 +35,11 @@ export interface Repo {
   listCheckpoints(): Promise<Checkpoint[]>;
   listMaterials(): Promise<Material[]>;
   saveMaterial(m: Omit<Material, "id" | "created_at"> & { id?: string }): Promise<Material>;
+  getMaterial(id: string): Promise<Material | null>;
+  /** Also deletes the pack generated from it. */
+  deleteMaterial(id: string): Promise<void>;
+  getAiSettings(): Promise<AiSettings>;
+  saveAiSettings(p: Partial<AiSettings>): Promise<AiSettings>;
   getStreak(): Promise<number>;
   listDrillPacks(): Promise<DrillPack[]>;
   getDrillPack(id: string): Promise<DrillPack | null>;

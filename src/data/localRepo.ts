@@ -3,6 +3,7 @@ import type { DrillAttempt, DrillItem, DrillPack, PackProgress, PuloDoGato } fro
 import missionsJson from "@/content/missions-phase1.json";
 import type { Repo } from "./repo";
 import type {
+  AiSettings,
   Card,
   Checkpoint,
   ErrorItem,
@@ -42,6 +43,7 @@ const withMode = (p: DrillPack): DrillPack => ({
 const builtInPacks = (rawPacks.packs ?? []).map(withMode);
 const puloDoGato: PuloDoGato = rawPacks.pulo_do_gato ?? {};
 const PREFIX = "speak-lab:";
+const DEFAULT_MODEL = "gpt-5.4-mini";
 const DAY = 86_400_000;
 
 function read<T>(key: string): T[] {
@@ -216,8 +218,33 @@ export const localRepo: Repo = {
     }));
     const existing = rows.find((r) => r.id === id);
     const row: Material = { ...m, id, items, created_at: existing?.created_at ?? now() };
-    write("materials", existing ? rows.map((r) => (r.id === id ? row : r)) : [...rows, row]);
+    const put = (r: Material) => write("materials", existing ? rows.map((x) => (x.id === id ? r : x)) : [...rows, r]);
+    try {
+      put(row);
+    } catch {
+      // Storage full: keep the thumbnail, drop the full-size images.
+      const slim: Material = { ...row, images: undefined };
+      put(slim);
+      return slim;
+    }
     return row;
+  },
+  async getMaterial(id) {
+    return read<Material>("materials").find((m) => m.id === id) ?? null;
+  },
+  async deleteMaterial(id) {
+    const m = read<Material>("materials").find((x) => x.id === id);
+    write("materials", read<Material>("materials").filter((x) => x.id !== id));
+    if (m?.pack_id) await localRepo.deleteDrillPack(m.pack_id);
+  },
+  async getAiSettings() {
+    const s = read<AiSettings>("ai_settings")[0];
+    return { api_key: s?.api_key ?? null, model: s?.model?.trim() || DEFAULT_MODEL };
+  },
+  async saveAiSettings(p) {
+    const next = { ...(await localRepo.getAiSettings()), ...p };
+    write("ai_settings", [next]);
+    return next;
   },
 
   async getStreak() {

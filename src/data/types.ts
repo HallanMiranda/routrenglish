@@ -92,6 +92,24 @@ export interface Material {
   source?: string;
   created_at: ISODate;
   items: MaterialItem[];
+  /** Prints tab: what was uploaded and the pack generated from it. */
+  kind?: "image" | "pdf" | "text";
+  thumbnail?: string;
+  /** Compressed JPEG data URLs sent to the model (dropped if storage is full). */
+  images?: string[];
+  text?: string;
+  truncated?: boolean;
+  pack_id?: string;
+  level?: string;
+  focus?: string;
+  tokens_in?: number;
+  tokens_out?: number;
+  cost_usd?: number;
+}
+
+export interface AiSettings {
+  api_key: string | null;
+  model: string;
 }
 
 export interface BrError {
@@ -156,6 +174,8 @@ export interface DrillPack {
   focus_pt: string;
   items: DrillItem[];
   user_created?: boolean;
+  /** Set when the pack was generated from a Prints material. */
+  material_id?: string;
 }
 export type Difficulty = "iniciante" | "intermediario" | "avancado";
 /** One mental shortcut per focus. */
