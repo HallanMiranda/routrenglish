@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { Eye, EyeOff, KeyRound } from "lucide-react";
+import { Eye, EyeOff, KeyRound, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { repo } from "@/data/repo";
 import type { AiSettings } from "@/data/types";
 import { testModels } from "@/ai/client";
+import { previewVoice, VOICES } from "@/ai/tts";
+import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n/pt-BR";
 
 const k = t.apiKey;
@@ -21,14 +23,21 @@ export function ApiKeyForm({ onChange, full = false }: { onChange?: (s: AiSettin
   const [status, setStatus] = useState<{ ok: boolean; text: string } | null>(null);
   const [testing, setTesting] = useState(false);
   const [spend, setSpend] = useState(0);
+  const [byKind, setByKind] = useState<Partial<Record<string, number>>>({});
+  const [ttsModel, setTtsModel] = useState("");
+  const [audioModel, setAudioModel] = useState("");
+  const [previewing, setPreviewing] = useState(false);
 
   useEffect(() => {
     void repo.getAiSettings().then((s) => {
       setSettings(s);
       setModel(s.model);
       setTModel(s.transcribe_model);
+      setTtsModel(s.tts_model);
+      setAudioModel(s.audio_model);
     });
     void repo.getAiSpendThisMonth().then(setSpend);
+    void repo.getAiSpendByKind().then(setByKind);
   }, []);
 
   async function update(p: Partial<AiSettings>) {
@@ -99,6 +108,42 @@ export function ApiKeyForm({ onChange, full = false }: { onChange?: (s: AiSettin
             <Input id="ai-tmodel" className="h-11 text-base" value={tModel} onChange={(e) => setTModel(e.target.value)} onBlur={() => void update({ transcribe_model: tModel.trim() })} />
           </div>
         )}
+        {full && (
+          <>
+            <div>
+              <label htmlFor="ai-ttsmodel" className="text-caption mb-1 block font-semibold">{k.ttsModel}</label>
+              <Input id="ai-ttsmodel" className="h-11 text-base" value={ttsModel} onChange={(e) => setTtsModel(e.target.value)} onBlur={() => void update({ tts_model: ttsModel.trim() })} />
+            </div>
+            <div>
+              <label htmlFor="ai-voice" className="text-caption mb-1 block font-semibold">{k.ttsVoice}</label>
+              <div className="flex gap-2">
+                <select id="ai-voice" className="h-11 flex-1 rounded-md border bg-background px-3 text-base" value={settings.tts_voice} onChange={(e) => void update({ tts_voice: e.target.value })}>
+                  {VOICES.map((v) => <option key={v} value={v}>{v}</option>)}
+                </select>
+                <Button variant="outline" disabled={!settings.api_key || previewing} onClick={async () => {
+                  setPreviewing(true); setStatus(null);
+                  try { await previewVoice(settings, settings.tts_voice); } catch (e) { setStatus({ ok: false, text: (e as Error).message }); } finally { setPreviewing(false); }
+                }}><Volume2 /> {k.preview}</Button>
+              </div>
+            </div>
+            <div>
+              <label htmlFor="ai-audiomodel" className="text-caption mb-1 block font-semibold">{k.audioModel}</label>
+              <Input id="ai-audiomodel" className="h-11 text-base" value={audioModel} onChange={(e) => setAudioModel(e.target.value)} onBlur={() => void update({ audio_model: audioModel.trim() })} />
+            </div>
+            <div>
+              <p className="text-caption mb-1 font-semibold">{k.pronMode}</p>
+              <div className="grid grid-cols-3 gap-1 rounded-xl bg-muted p-1" role="radiogroup" aria-label={k.pronMode}>
+                {(["always", "final", "ask"] as const).map((m) => (
+                  <button key={m} type="button" role="radio" aria-checked={settings.pron_mode === m} onClick={() => void update({ pron_mode: m })}
+                    className={cn("min-h-11 rounded-lg px-2 text-sm font-semibold", settings.pron_mode === m ? "bg-card text-foreground shadow-sm" : "text-muted-foreground")}>
+                    {k.pronModes[m]}
+                  </button>
+                ))}
+              </div>
+              <p className="text-caption mt-1 text-muted-foreground">{k.pronModeHelp}</p>
+            </div>
+          </>
+        )}
       </div>
 
       {settings.api_key && (
@@ -109,10 +154,10 @@ export function ApiKeyForm({ onChange, full = false }: { onChange?: (s: AiSettin
             onClick={async () => {
               setTesting(true);
               setStatus(null);
-              const s = await update({ model: model.trim(), ...(full ? { transcribe_model: tModel.trim() } : {}) });
+              const s = await update({ model: model.trim(), ...(full ? { transcribe_model: tModel.trim(), tts_model: ttsModel.trim(), audio_model: audioModel.trim() } : {}) });
               try {
                 await testModels(s);
-                setStatus({ ok: true, text: k.testOkBoth(s.model, s.transcribe_model) });
+                setStatus({ ok: true, text: k.testOkAll });
               } catch (e) {
                 setStatus({ ok: false, text: (e as Error).message });
               } finally {
@@ -131,6 +176,7 @@ export function ApiKeyForm({ onChange, full = false }: { onChange?: (s: AiSettin
       {full && (
         <p className="text-caption text-muted-foreground">
           <span className="font-semibold text-foreground">{k.spend(spend)}</span> · {k.noKeyNote}
+          <span className="mt-1 block">{k.spendSplit(byKind["voice"] ?? 0, byKind["listen"] ?? 0, byKind["judge"] ?? 0, byKind["pronunciation"] ?? 0, (byKind["prints"] ?? 0) + (byKind["converse"] ?? 0) + (byKind["report"] ?? 0) + (byKind["test"] ?? 0))}</span>
         </p>
       )}
     </div>
