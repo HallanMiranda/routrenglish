@@ -29,7 +29,7 @@ interface LessonSearch {
   modo: "pacotes" | "livre" | "print" | "unidade";
   pack: string;
   /** Unit lesson part (modo "unidade"). */
-  parte: "aula" | "perguntas" | "desafio" | "erros";
+  parte?: "aula" | "perguntas" | "desafio" | "erros";
   mat: string;
   tema: string;
   min: number;
@@ -125,7 +125,7 @@ function chainsOf(packs: DrillPack[]): Chunk[][] {
 const shuffle = <T,>(a: T[]) => [...a].sort(() => Math.random() - 0.5);
 
 /** Unit parts: ladders in order, QA questions, a 10-chunk mixed challenge, or the missed chunks. */
-function unitChunks(pack: DrillPack, parte: LessonSearch["parte"], missed: { pt: string; en: string[] }[]): Chunk[] {
+function unitChunks(pack: DrillPack, parte: NonNullable<LessonSearch["parte"]>, missed: { pt: string; en: string[] }[]): Chunk[] {
   const qa = pack.items.flatMap((it) => (it.mode === "qa" ? [{ pt: it.q_pt, askEn: it.q_en, accepted: it.model_answers, patterns: it.accept_patterns, focus: it.focus, traps: it.traps, change: "", prevEn: null, first: true, last: true } satisfies Chunk] : []));
   if (parte === "perguntas") return qa;
   if (parte === "erros") return missed.map((m) => ({ pt: m.pt, accepted: m.en, focus: "", traps: [], change: "", prevEn: null, first: true, last: true }));
@@ -299,7 +299,7 @@ function LessonPage() {
     if (search.modo === "unidade") {
       if (!unitPack) { setBlocked(L.noLadders); return; }
       const up = await repo.getUnitProgress(unitPack.id);
-      queue = unitChunks(unitPack, search.parte, up.missed);
+      queue = unitChunks(unitPack, search.parte ?? "aula", up.missed);
       if (!queue.length) { setBlocked(L.noLadders); return; }
     } else if (search.modo === "print") {
       if (!mat) { setBlocked(t.prints.notFound); return; }
