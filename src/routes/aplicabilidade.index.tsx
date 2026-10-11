@@ -9,6 +9,7 @@ import { repo } from "@/data/repo";
 import type { Difficulty, DrillPack, PackProgress } from "@/data/types";
 import { difficultyOf } from "@/drills/difficulty";
 import { cn } from "@/lib/utils";
+import { LessonHero } from "@/components/lesson/LessonHero";
 import { parseDrillLines } from "@/drills/check";
 import { parsePackJson } from "@/drills/importPack";
 import { t } from "@/lib/i18n/pt-BR";
@@ -60,6 +61,7 @@ function PracticePage() {
   return (
     <AppShell title={d.title}>
       <p className="-mt-4 text-base text-muted-foreground">{d.subtitle}</p>
+      <LessonHero packs={packs ?? []} nivel={filter} />
       {last && (
         <Link
           to="/aplicabilidade/$packId"

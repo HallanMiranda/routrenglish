@@ -11,7 +11,7 @@ import { difficultyOf } from "@/drills/difficulty";
 import { aiJudge, withMyName } from "@/ai/judge";
 import { aiFor } from "@/ai/client";
 import { liveLessonTurn, type LessonTurn, type LiveLessonReply } from "@/ai/liveLesson";
-import { hearOnce, type VoiceCommand } from "@/lesson/hear";
+import { detectCommand, hearOnce, type VoiceCommand } from "@/lesson/hear";
 import { speak, stopSpeaking } from "@/speech/speak";
 import { haptic } from "@/lib/haptics";
 import { t } from "@/lib/i18n/pt-BR";
@@ -181,7 +181,6 @@ function LessonPage() {
       if (btnCmd.current) { const c = btnCmd.current; btnCmd.current = null; return { cmd: c }; }
       spoken.s += h.seconds;
       if (!h.transcript) return null;
-      const { detectCommand } = await import("@/lesson/hear");
       const cmd = detectCommand(h.transcript);
       return cmd ? { cmd } : { text: h.transcript };
     } catch (e) {
