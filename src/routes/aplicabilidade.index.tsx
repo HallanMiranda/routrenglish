@@ -11,7 +11,9 @@ import { difficultyOf } from "@/drills/difficulty";
 import { cn } from "@/lib/utils";
 import { LessonHero } from "@/components/lesson/LessonHero";
 import { parseDrillLines } from "@/drills/check";
-import { parsePackJson } from "@/drills/importPack";
+import { parsePacksJson } from "@/drills/importPack";
+import { groupCollections, unitDone } from "@/drills/collections";
+import { ChevronDown } from "lucide-react";
 import { t } from "@/lib/i18n/pt-BR";
 
 const d = t.drills;
@@ -39,11 +41,14 @@ function PracticePage() {
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const shown = packs?.filter((p) => filter === "todos" || difficultyOf(p.level) === filter);
   const last = packs?.find((p) => p.id === lastId) ?? null;
+  const [notice, setNotice] = useState("");
+  const grouped = shown ? groupCollections(shown) : { collections: [], singles: [] };
+  const singles = grouped.singles;
   const groups = shown
     ? ([
-        [d.groups.material, shown.filter((p) => p.material_id)],
-        [d.groups.themes, shown.filter((p) => !p.material_id && !p.user_created)],
-        [d.groups.other, shown.filter((p) => !p.material_id && p.user_created)],
+        [d.groups.material, singles.filter((p) => p.material_id)],
+        [d.groups.themes, singles.filter((p) => !p.material_id && !p.user_created)],
+        [d.groups.other, singles.filter((p) => !p.material_id && p.user_created)],
       ] as const).filter(([, list]) => list.length > 0)
     : [];
 
@@ -105,6 +110,41 @@ function PracticePage() {
       </div>
       {!packs && <ListSkeleton />}
       {shown && shown.length === 0 && <EmptyState>{d.empty}</EmptyState>}
+      {notice && <p role="status" className="rounded-xl bg-live/20 p-3 text-base font-semibold">{notice}</p>}
+      {grouped.collections.map((c) => {
+        const doneN = c.units.filter((u) => unitDone(progress[u.id])).length;
+        const next = c.units.find((u) => !unitDone(progress[u.id])) ?? c.units[0]!;
+        return (
+          <details key={c.key} className="group rounded-[20px] border bg-card p-4">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3">
+              <span className="min-w-0 flex-1">
+                <span className="text-headline block font-display">{c.title}</span>
+                <span className="text-caption block text-muted-foreground">{d.unitsDone(doneN, c.units.length)}</span>
+              </span>
+              <ChevronDown className="size-5 shrink-0 transition-transform group-open:rotate-180" />
+            </summary>
+            <Button asChild className="mt-3 w-full">
+              <Link to="/aplicabilidade/$packId" params={{ packId: next.id }} search={{ nivel: "todos" }}><Play /> {d.continue}</Link>
+            </Button>
+            <ul className="mt-3 space-y-2">
+              {c.units.map((u) => {
+                const pr = progress[u.id];
+                const r = !pr || pr.accuracy === null ? 0 : pr.best_round;
+                return (
+                  <li key={u.id}>
+                    <Link to="/aplicabilidade/$packId" params={{ packId: u.id }} search={{ nivel: "todos" }} className="block rounded-xl border p-3 hover:border-primary">
+                      <span className="block text-base font-semibold">{u.title_pt.split(" · ").slice(1).join(" · ") || u.title_pt}</span>
+                      <ol className="mt-2 grid grid-cols-4 gap-1">
+                        {[1, 2, 3, 4].map((k) => <li key={k} className={cn("h-1 rounded-full", k <= r ? "bg-primary" : "bg-muted")} />)}
+                      </ol>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </details>
+        );
+      })}
       {groups.map(([label, list]) => (
         <section key={label}>
           <h2 className="text-headline mb-3">{label}</h2>
@@ -168,7 +208,7 @@ function PracticePage() {
         </section>
       ))}
       {creating ? (
-        <NewPackForm onDone={() => { setCreating(false); void load(); }} />
+        <NewPackForm onDone={(msg) => { setCreating(false); setNotice(msg ?? ""); void load(); }} />
       ) : (
         <Button className="w-full" variant="outline" onClick={() => setCreating(true)}>
           <Plus /> {d.newPack}
@@ -178,7 +218,7 @@ function PracticePage() {
   );
 }
 
-function NewPackForm({ onDone }: { onDone: () => void }) {
+function NewPackForm({ onDone }: { onDone: (msg?: string) => void }) {
   const [mode, setMode] = useState<"lines" | "json">("lines");
   const [title, setTitle] = useState("");
   const [lines, setLines] = useState("");
@@ -192,11 +232,11 @@ function NewPackForm({ onDone }: { onDone: () => void }) {
       await repo.saveDrillPack({ title_pt: title.trim() || d.newPack, level: d.userLevel, focus_pt: d.userFocus, items });
       return onDone();
     }
-    const r = parsePackJson(json);
-    if (!r.ok) return setErrors(r.errors);
+    const r = parsePacksJson(json);
     if (Object.keys(r.pulo).length) await repo.mergePuloDoGato(r.pulo);
-    await repo.saveDrillPack(r.pack);
-    onDone();
+    for (const p of r.packs) await repo.saveDrillPack(p);
+    if (r.errors.length) return setErrors(r.packs.length ? [d.imported(r.packs.length), ...r.errors] : r.errors);
+    onDone(d.imported(r.packs.length));
   }
 
   return (
@@ -247,7 +287,7 @@ function NewPackForm({ onDone }: { onDone: () => void }) {
         </div>
       )}
       <div className="flex gap-2">
-        <Button variant="ghost" className="flex-1" onClick={onDone}>{d.cancel}</Button>
+        <Button variant="ghost" className="flex-1" onClick={() => onDone()}>{d.cancel}</Button>
         <Button className="flex-1" onClick={save}>{mode === "json" ? d.import : d.save}</Button>
       </div>
     </div>
