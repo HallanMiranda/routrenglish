@@ -9,6 +9,7 @@ import type {
   DrillPack,
   PackProgress,
   PuloDoGato,
+  PrintProgress,
   ErrorItem,
   Material,
   Mission,
@@ -30,7 +31,7 @@ export interface Repo {
     e: Pick<ErrorItem, "original" | "correction"> & Partial<Omit<ErrorItem, "id">>,
   ): Promise<ErrorItem>;
   listActiveErrors(): Promise<ErrorItem[]>;
-  createCard(c: Pick<Card, "front" | "back"> & { error_id?: string | null }): Promise<Card>;
+  createCard(c: Pick<Card, "front" | "back"> & { error_id?: string | null; tag?: string | undefined }): Promise<Card>;
   listDueCards(now?: Date): Promise<Card[]>;
   rateCard(cardId: string, rating: CardRating): Promise<Card>;
   saveCheckpoint(c: Omit<Checkpoint, "id" | "created_at">): Promise<Checkpoint>;
@@ -48,6 +49,10 @@ export interface Repo {
   logAiUsage(u: Omit<AiUsage, "created_at">): Promise<void>;
   /** Approximate USD spent with AI in the current calendar month. */
   getAiSpendThisMonth(): Promise<number>;
+  /** Same, split by usage kind. */
+  getAiSpendByKind(): Promise<Partial<Record<AiUsage["kind"], number>>>;
+  getPrintProgress(materialId: string): Promise<PrintProgress>;
+  savePrintProgress(materialId: string, p: PrintProgress): Promise<void>;
   /** Answers the AI judge accepted, per item id, so they pass locally next time. */
   getLearnedAnswers(): Promise<Record<string, string[]>>;
   addLearnedAnswer(itemId: string, answer: string): Promise<void>;
