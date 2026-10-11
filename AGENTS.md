@@ -16,3 +16,5 @@
 - Offline app-shell support uses vite-plugin-pwa generateSW after explicit public-root prerendering; NetworkFirst navigations exclude API/OAuth and the sole registration wrapper refuses dev, previews, iframes, and sw=off — avoids stale previews and private-data caching. Remove root prerendering before Hoje gains authenticated data.
 - Theme preference is browser-local and applied after hydration with CSS system fallback — follows device settings without SSR mismatches or Cloud dependencies.
 - MicButton is a controlled presentation component; demo timers belong to the session — keeps microphone visuals reusable and separate from future audio capture.
+- UI reads/writes app data only through `repo` from `src/data/repo.ts` (currently localStorage-backed `localRepo`) — lets the storage be swapped for a cloud backend without touching screens.
+- Speech uses browser APIs in `src/speech/`, and `src/ai/converse.ts` is a scripted mock with the final signature — free local testing before any API keys.
