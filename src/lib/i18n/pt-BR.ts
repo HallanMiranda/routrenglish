@@ -3,7 +3,7 @@ export const t = {
   app: { name: "Speak Lab", tagline: "Fale inglês todo dia." },
   nav: {
     today: "Hoje",
-    practice: "Praticar",
+    practice: "UberClass",
     review: "Revisão",
     library: "Biblioteca",
     progress: "Progresso",
