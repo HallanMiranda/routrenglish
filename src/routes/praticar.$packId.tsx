@@ -96,7 +96,7 @@ function DrillPage() {
     const accuracy = r.items.length ? r.firstTry.size / r.items.length : 0;
     const helped = r.items.filter((i) => r.helped.has(i.id));
     const hard = r.items.filter((i) => (r.maxTries[i.id] ?? 0) >= 3);
-    for (const i of hard) await repo.createCard({ front: i.pt, back: i.en[0] });
+    for (const i of hard) await repo.createCard({ front: i.pt, back: i.en[0]! });
     if (r.counts) await repo.saveDrillAttempt({ pack_id: pack.id, round: r.round, accuracy, helped_item_ids: helped.map((i) => i.id) });
     setRun(null);
     setSummary({ round: r.round, accuracy, helped, cards: hard.length, counts: r.counts });
@@ -180,7 +180,7 @@ function SummaryView({ summary, onNext, onRepeat, onErrors }: { summary: Summary
       <h2 className="text-2xl font-bold">{d.endTitle}</h2>
       <div className="rounded-2xl border bg-card p-5 text-center">
         <p className="text-sm text-muted-foreground">{d.endAccuracy}</p>
-        <p className="font-heading text-5xl font-bold">{Math.round(summary.accuracy * 100)}%</p>
+        <p className="font-display text-5xl font-bold">{Math.round(summary.accuracy * 100)}%</p>
         {summary.counts && (
           <p className="mt-2 text-sm font-medium">
             {passed ? (summary.round < 4 ? d.unlocked(summary.round + 1) : d.finished) : d.retryHint}
@@ -232,7 +232,7 @@ function DrillRunner({ run, setRun, onFinish }: { run: Run; setRun: (r: Run) => 
     setHeard(""); setFeedback(null); setTyped(""); setMicError(null);
     busyRef.current = false;
     const timer = window.setTimeout(() => {
-      if (run.round === 1) void speak(item.en[0], { lang: "en-US", rate: 0.9 }).catch(() => {});
+      if (run.round === 1) void speak(item.en[0]!, { lang: "en-US", rate: 0.9 }).catch(() => {});
       else void speak(item.pt, { lang: "pt-BR" }).catch(() => {});
     }, 250);
     return () => { window.clearTimeout(timer); abortRef.current?.abort(); };
@@ -262,7 +262,7 @@ function DrillRunner({ run, setRun, onFinish }: { run: Run; setRun: (r: Run) => 
 
   function handleAnswer(answer: string, confidence: number | null, timeUp = false) {
     if (busyRef.current) return;
-    const result = repeatMode ? checkAnswer(answer, [item.en[0]]) : checkItem(answer, item);
+    const result = repeatMode ? checkAnswer(answer, [item.en[0]!]) : checkItem(answer, item);
     const firstPresentation = !run.seen.has(item.id);
     if (result.correct && !timeUp) {
       busyRef.current = true;
@@ -284,7 +284,7 @@ function DrillRunner({ run, setRun, onFinish }: { run: Run; setRun: (r: Run) => 
     const helped = new Set(run.helped).add(item.id);
     const maxTries = { ...run.maxTries, [item.id]: Math.max(run.maxTries[item.id] ?? 0, tries) };
     setRun({ ...run, tries, helped, maxTries });
-    const model = item.en[0];
+    const model = item.en[0]!;
     if (tries >= 3 || repeatMode) {
       setFeedback({ kind: "repeat", text: model });
       void speak(model, { lang: "en-US", rate: 0.85 }).catch(() => {});
@@ -324,7 +324,7 @@ function DrillRunner({ run, setRun, onFinish }: { run: Run; setRun: (r: Run) => 
     setTyped("");
   }
 
-  const firstWord = item.en[0].split(/\s+/)[0];
+  const firstWord = item.en[0]!.split(/\s+/)[0];
   const bubble = repeatMode ? d.repeatWithMe : run.round === 1 ? d.promptRepeat : d.promptTranslate;
 
   return (
@@ -341,7 +341,7 @@ function DrillRunner({ run, setRun, onFinish }: { run: Run; setRun: (r: Run) => 
               : bubble}
           </div>
           {secondsLeft !== null && (
-            <span className={cn("ml-auto rounded-full px-2.5 py-1 font-heading text-sm font-bold tabular-nums", secondsLeft <= 2 ? "bg-destructive text-destructive-foreground" : "bg-accent text-accent-foreground")}>
+            <span className={cn("ml-auto rounded-full px-2.5 py-1 font-display text-sm font-bold tabular-nums", secondsLeft <= 2 ? "bg-destructive text-destructive-foreground" : "bg-accent text-accent-foreground")}>
               {d.timeLeft(Math.max(0, secondsLeft))}
             </span>
           )}
@@ -349,12 +349,12 @@ function DrillRunner({ run, setRun, onFinish }: { run: Run; setRun: (r: Run) => 
         <div className="flex flex-1 flex-col justify-center gap-3 py-4 text-center">
           {run.round === 1 || repeatMode ? (
             <>
-              <p lang="en" className="font-heading text-3xl font-bold leading-tight">{item.en[0]}</p>
+              <p lang="en" className="font-display text-3xl font-bold leading-tight">{item.en[0]!}</p>
               <p className="text-sm text-muted-foreground">{item.pt}</p>
             </>
           ) : (
             <>
-              <p className="font-heading text-3xl font-bold leading-tight">{item.pt}</p>
+              <p className="font-display text-3xl font-bold leading-tight">{item.pt}</p>
               {run.round === 2 && (
                 <p className="text-sm text-muted-foreground">{d.hintStart} <span lang="en" className="font-semibold text-foreground">{firstWord} …</span></p>
               )}

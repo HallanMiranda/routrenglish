@@ -101,5 +101,5 @@ export const checkItem = (answer: string, item: DrillItem) => checkAnswer(answer
 /** Parses "português | english | alt" lines into drill items (no traps). */
 export function parseDrillLines(text: string): DrillItem[] {
   return text.split(/\r?\n/).map((l) => l.split("|").map((p) => p.trim())).filter((p) => p.length >= 2 && p[0] && p[1])
-    .map((p, i) => ({ id: `u-${Date.now().toString(36)}-${i}`, pt: p[0], en: p.slice(1).filter(Boolean), focus: "custom", traps: [] }));
+    .map((p, i) => ({ id: `u-${Date.now().toString(36)}-${i}`, pt: p[0]!, en: p.slice(1).filter(Boolean), focus: "custom", traps: [] }));
 }
