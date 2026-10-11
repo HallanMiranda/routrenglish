@@ -259,7 +259,8 @@ export const localRepo: Repo = {
   },
 
   async getMyName() {
-    return read<MyName>("my_name")[0] ?? { name: "Allan", aliases: ["Alan", "Allen", "Alen"] };
+    const n = read<Partial<MyName>>("my_name")[0];
+    return { name: n?.name ?? "Allan", aliases: n?.aliases ?? ["Alan", "Allen", "Alen"], city: n?.city ?? "São Paulo" };
   },
   async saveMyName(n) {
     write("my_name", [n]);

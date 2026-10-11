@@ -10,19 +10,27 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AulaRouteImport } from './routes/aula'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PrintsRouteImport } from './routes/prints'
 import { Route as ProgressoRouteImport } from './routes/progresso'
 import { Route as RevisaoRouteImport } from './routes/revisao'
+import { Route as UberclassRouteImport } from './routes/uberclass'
+import { Route as AplicabilidadeIndexRouteImport } from './routes/aplicabilidade.index'
+import { Route as AplicabilidadePackIdRouteImport } from './routes/aplicabilidade.$packId'
 import { Route as PrintsMaterialIdRouteImport } from './routes/prints.$materialId'
 import { Route as RelatorioSessionIdRouteImport } from './routes/relatorio.$sessionId'
 import { Route as SessaoSessionIdRouteImport } from './routes/sessao.$sessionId'
-import { Route as UberclassIndexRouteImport } from './routes/uberclass.index'
-import { Route as UberclassPackIdRouteImport } from './routes/uberclass.$packId'
+import { Route as UberclassSplatRouteImport } from './routes/uberclass.$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AulaRoute = AulaRouteImport.update({
+  id: '/aula',
+  path: '/aula',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -45,6 +53,21 @@ const RevisaoRoute = RevisaoRouteImport.update({
   path: '/revisao',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UberclassRoute = UberclassRouteImport.update({
+  id: '/uberclass',
+  path: '/uberclass',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AplicabilidadeIndexRoute = AplicabilidadeIndexRouteImport.update({
+  id: '/aplicabilidade/',
+  path: '/aplicabilidade/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AplicabilidadePackIdRoute = AplicabilidadePackIdRouteImport.update({
+  id: '/aplicabilidade/$packId',
+  path: '/aplicabilidade/$packId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrintsMaterialIdRoute = PrintsMaterialIdRouteImport.update({
   id: '/$materialId',
   path: '/$materialId',
@@ -60,103 +83,118 @@ const SessaoSessionIdRoute = SessaoSessionIdRouteImport.update({
   path: '/sessao/$sessionId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const UberclassIndexRoute = UberclassIndexRouteImport.update({
-  id: '/uberclass/',
-  path: '/uberclass/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const UberclassPackIdRoute = UberclassPackIdRouteImport.update({
-  id: '/uberclass/$packId',
-  path: '/uberclass/$packId',
-  getParentRoute: () => rootRouteImport,
+const UberclassSplatRoute = UberclassSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => UberclassRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/aula': typeof AulaRoute
   '/login': typeof LoginRoute
   '/prints': typeof PrintsRouteWithChildren
   '/progresso': typeof ProgressoRoute
   '/revisao': typeof RevisaoRoute
+  '/uberclass': typeof UberclassRouteWithChildren
+  '/aplicabilidade/$packId': typeof AplicabilidadePackIdRoute
   '/prints/$materialId': typeof PrintsMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
-  '/uberclass/$packId': typeof UberclassPackIdRoute
-  '/uberclass/': typeof UberclassIndexRoute
+  '/uberclass/$': typeof UberclassSplatRoute
+  '/aplicabilidade/': typeof AplicabilidadeIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/aula': typeof AulaRoute
   '/login': typeof LoginRoute
   '/prints': typeof PrintsRouteWithChildren
   '/progresso': typeof ProgressoRoute
   '/revisao': typeof RevisaoRoute
+  '/uberclass': typeof UberclassRouteWithChildren
+  '/aplicabilidade/$packId': typeof AplicabilidadePackIdRoute
   '/prints/$materialId': typeof PrintsMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
-  '/uberclass/$packId': typeof UberclassPackIdRoute
-  '/uberclass': typeof UberclassIndexRoute
+  '/uberclass/$': typeof UberclassSplatRoute
+  '/aplicabilidade': typeof AplicabilidadeIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/aula': typeof AulaRoute
   '/login': typeof LoginRoute
   '/prints': typeof PrintsRouteWithChildren
   '/progresso': typeof ProgressoRoute
   '/revisao': typeof RevisaoRoute
+  '/uberclass': typeof UberclassRouteWithChildren
+  '/aplicabilidade/$packId': typeof AplicabilidadePackIdRoute
   '/prints/$materialId': typeof PrintsMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
-  '/uberclass/$packId': typeof UberclassPackIdRoute
-  '/uberclass/': typeof UberclassIndexRoute
+  '/uberclass/$': typeof UberclassSplatRoute
+  '/aplicabilidade/': typeof AplicabilidadeIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/aula'
     | '/login'
     | '/prints'
     | '/progresso'
     | '/revisao'
+    | '/uberclass'
+    | '/aplicabilidade/$packId'
     | '/prints/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
-    | '/uberclass/$packId'
-    | '/uberclass/'
+    | '/uberclass/$'
+    | '/aplicabilidade/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/aula'
     | '/login'
     | '/prints'
     | '/progresso'
     | '/revisao'
+    | '/uberclass'
+    | '/aplicabilidade/$packId'
     | '/prints/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
-    | '/uberclass/$packId'
-    | '/uberclass'
+    | '/uberclass/$'
+    | '/aplicabilidade'
   id:
     | '__root__'
     | '/'
+    | '/aula'
     | '/login'
     | '/prints'
     | '/progresso'
     | '/revisao'
+    | '/uberclass'
+    | '/aplicabilidade/$packId'
     | '/prints/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
-    | '/uberclass/$packId'
-    | '/uberclass/'
+    | '/uberclass/$'
+    | '/aplicabilidade/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AulaRoute: typeof AulaRoute
   LoginRoute: typeof LoginRoute
   PrintsRoute: typeof PrintsRouteWithChildren
   ProgressoRoute: typeof ProgressoRoute
   RevisaoRoute: typeof RevisaoRoute
+  UberclassRoute: typeof UberclassRouteWithChildren
+  AplicabilidadePackIdRoute: typeof AplicabilidadePackIdRoute
   RelatorioSessionIdRoute: typeof RelatorioSessionIdRoute
   SessaoSessionIdRoute: typeof SessaoSessionIdRoute
-  UberclassPackIdRoute: typeof UberclassPackIdRoute
-  UberclassIndexRoute: typeof UberclassIndexRoute
+  AplicabilidadeIndexRoute: typeof AplicabilidadeIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -166,6 +204,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aula': {
+      id: '/aula'
+      path: '/aula'
+      fullPath: '/aula'
+      preLoaderRoute: typeof AulaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -196,6 +241,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RevisaoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/uberclass': {
+      id: '/uberclass'
+      path: '/uberclass'
+      fullPath: '/uberclass'
+      preLoaderRoute: typeof UberclassRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aplicabilidade/': {
+      id: '/aplicabilidade/'
+      path: '/aplicabilidade'
+      fullPath: '/aplicabilidade/'
+      preLoaderRoute: typeof AplicabilidadeIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aplicabilidade/$packId': {
+      id: '/aplicabilidade/$packId'
+      path: '/aplicabilidade/$packId'
+      fullPath: '/aplicabilidade/$packId'
+      preLoaderRoute: typeof AplicabilidadePackIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/prints/$materialId': {
       id: '/prints/$materialId'
       path: '/$materialId'
@@ -217,19 +283,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SessaoSessionIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/uberclass/': {
-      id: '/uberclass/'
-      path: '/uberclass'
-      fullPath: '/uberclass/'
-      preLoaderRoute: typeof UberclassIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/uberclass/$packId': {
-      id: '/uberclass/$packId'
-      path: '/uberclass/$packId'
-      fullPath: '/uberclass/$packId'
-      preLoaderRoute: typeof UberclassPackIdRouteImport
-      parentRoute: typeof rootRouteImport
+    '/uberclass/$': {
+      id: '/uberclass/$'
+      path: '/$'
+      fullPath: '/uberclass/$'
+      preLoaderRoute: typeof UberclassSplatRouteImport
+      parentRoute: typeof UberclassRoute
     }
   }
 }
@@ -245,16 +304,30 @@ const PrintsRouteChildren: PrintsRouteChildren = {
 const PrintsRouteWithChildren =
   PrintsRoute._addFileChildren(PrintsRouteChildren)
 
+interface UberclassRouteChildren {
+  UberclassSplatRoute: typeof UberclassSplatRoute
+}
+
+const UberclassRouteChildren: UberclassRouteChildren = {
+  UberclassSplatRoute: UberclassSplatRoute,
+}
+
+const UberclassRouteWithChildren = UberclassRoute._addFileChildren(
+  UberclassRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AulaRoute: AulaRoute,
   LoginRoute: LoginRoute,
   PrintsRoute: PrintsRouteWithChildren,
   ProgressoRoute: ProgressoRoute,
   RevisaoRoute: RevisaoRoute,
+  UberclassRoute: UberclassRouteWithChildren,
+  AplicabilidadePackIdRoute: AplicabilidadePackIdRoute,
   RelatorioSessionIdRoute: RelatorioSessionIdRoute,
   SessaoSessionIdRoute: SessaoSessionIdRoute,
-  UberclassPackIdRoute: UberclassPackIdRoute,
-  UberclassIndexRoute: UberclassIndexRoute,
+  AplicabilidadeIndexRoute: AplicabilidadeIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

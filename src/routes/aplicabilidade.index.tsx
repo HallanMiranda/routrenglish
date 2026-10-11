@@ -9,13 +9,14 @@ import { repo } from "@/data/repo";
 import type { Difficulty, DrillPack, PackProgress } from "@/data/types";
 import { difficultyOf } from "@/drills/difficulty";
 import { cn } from "@/lib/utils";
+import { LessonHero } from "@/components/lesson/LessonHero";
 import { parseDrillLines } from "@/drills/check";
 import { parsePackJson } from "@/drills/importPack";
 import { t } from "@/lib/i18n/pt-BR";
 
 const d = t.drills;
 
-export const Route = createFileRoute("/uberclass/")({
+export const Route = createFileRoute("/aplicabilidade/")({
   head: () => ({
     meta: [
       { title: "Aplicabilidade — Speak Lab" },
@@ -60,9 +61,10 @@ function PracticePage() {
   return (
     <AppShell title={d.title}>
       <p className="-mt-4 text-base text-muted-foreground">{d.subtitle}</p>
+      <LessonHero packs={packs ?? []} nivel={filter} />
       {last && (
         <Link
-          to="/uberclass/$packId"
+          to="/aplicabilidade/$packId"
           params={{ packId: last.id }}
           search={{ nivel: "todos" }}
           className="flex min-h-20 items-center gap-4 rounded-[20px] bg-ink p-4 text-ink-foreground shadow-card"
@@ -76,7 +78,7 @@ function PracticePage() {
         </Link>
       )}
       <Link
-        to="/uberclass/$packId"
+        to="/aplicabilidade/$packId"
         params={{ packId: "expressa" }}
         search={{ nivel: filter }}
         className={cn("flex min-h-16 items-center gap-4 rounded-[20px] p-4", last ? "border bg-card" : "bg-ink text-ink-foreground shadow-card")}
@@ -115,7 +117,7 @@ function PracticePage() {
               return (
                 <li key={p.id} className="relative">
                   <Link
-                    to="/uberclass/$packId"
+                    to="/aplicabilidade/$packId"
                     params={{ packId: p.id }}
                     search={{ nivel: "todos" }}
                     className="block rounded-[20px] border bg-card p-4 pr-12 transition-colors hover:border-primary"

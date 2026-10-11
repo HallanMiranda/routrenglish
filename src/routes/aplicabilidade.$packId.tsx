@@ -14,19 +14,19 @@ import { speak, stopSpeaking } from "@/speech/speak";
 import { t } from "@/lib/i18n/pt-BR";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
+import { CoachAvatar, DiffLine, Hearts, LIVES, PuloCard } from "@/components/drill/CoachParts";
 import { aiJudge, withMyName, type AiVerdict } from "@/ai/judge";
 import { aiFor, transcribe } from "@/ai/client";
 import { canRecord, startRecording, type Recording } from "@/speech/record";
 
 const d = t.drills;
-const LIVES = 3;
 const EXPRESS_ID = "expressa";
 const EXPRESS_SIZE = 10;
 
 type Nivel = Difficulty | "todos";
 const NIVEIS: Nivel[] = ["todos", "iniciante", "intermediario", "avancado"];
 
-export const Route = createFileRoute("/uberclass/$packId")({
+export const Route = createFileRoute("/aplicabilidade/$packId")({
   validateSearch: (s: Record<string, unknown>): { nivel: Nivel } => ({
     nivel: NIVEIS.includes(s["nivel"] as Nivel) ? (s["nivel"] as Nivel) : "todos",
   }),
@@ -265,7 +265,7 @@ function DrillPage() {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center gap-4 p-6 text-center">
         <p>{express ? d.empty : d.notFound}</p>
-        <Button asChild><Link to="/uberclass">{d.toPacks}</Link></Button>
+        <Button asChild><Link to="/aplicabilidade">{d.toPacks}</Link></Button>
       </div>
     );
 
@@ -273,7 +273,7 @@ function DrillPage() {
     <div className="pt-safe pb-safe flex h-dvh flex-col bg-background">
       <header className="mx-auto flex w-full max-w-md items-center gap-2 px-3 py-1">
         <Button variant="ghost" size="icon" asChild aria-label={run ? d.close : d.back}>
-          <Link to="/uberclass" onClick={() => stopSpeaking()}><X /></Link>
+          <Link to="/aplicabilidade" onClick={() => stopSpeaking()}><X /></Link>
         </Button>
         <div className="min-w-0 flex-1">
           {run ? (
@@ -307,27 +307,6 @@ function DrillPage() {
   );
 }
 
-function Hearts({ lives }: { lives: number }) {
-  const prev = useRef(lives);
-  const [lost, setLost] = useState<number | null>(null);
-  useEffect(() => {
-    if (lives < prev.current) {
-      setLost(lives);
-      prev.current = lives;
-      const id = window.setTimeout(() => setLost(null), 700);
-      return () => window.clearTimeout(id);
-    }
-    prev.current = lives;
-    return undefined;
-  }, [lives]);
-  return (
-    <span className="flex items-center gap-0.5" aria-label={d.lives(lives)} role="img">
-      {Array.from({ length: LIVES }, (_, i) => (
-        <Heart key={i} className={cn("size-5", i < lives ? "fill-primary text-primary" : "text-muted-foreground/40", lost === i && "animate-heart-out text-primary")} />
-      ))}
-    </span>
-  );
-}
 
 function RoundPicker({ best, onPick }: { best: DrillRound; onPick: (r: DrillRound) => void }) {
   return (
@@ -409,7 +388,7 @@ function SummaryView({ summary, express, onNext, onRepeat, onErrors }: { summary
         {passed && summary.counts && summary.round < 4 && <Button size="lg" className="w-full" onClick={onNext}>{d.nextRound}</Button>}
         {summary.helped.length > 0 && <Button size="lg" variant="secondary" className="w-full" onClick={onErrors}>{d.onlyErrors}</Button>}
         <Button size="lg" variant="outline" className="w-full" onClick={onRepeat}>{express ? d.express : d.repeatRound}</Button>
-        <Button variant="ghost" className="w-full" asChild><Link to="/uberclass">{d.toPacks}</Link></Button>
+        <Button variant="ghost" className="w-full" asChild><Link to="/aplicabilidade">{d.toPacks}</Link></Button>
       </div>
     </main>
   );
@@ -927,40 +906,5 @@ function Challenge({ item, round, repeatMode, showPt, onShowPt, onReplay }: {
   );
 }
 
-function PuloCard({ text }: { text: string }) {
-  return (
-    <div className="rounded-xl border-l-4 border-live bg-live/15 p-3 text-left">
-      <p className="text-caption font-bold">🐈 {d.pulo}</p>
-      <p className="mt-1 text-base">{text}</p>
-    </div>
-  );
-}
 
-function DiffLine({ ops }: { ops: DiffOp[] }) {
-  return (
-    <p lang="en" className="flex flex-wrap justify-center gap-x-1.5 gap-y-1 text-lg font-medium">
-      {ops.map((o, i) =>
-        o.type === "equal" ? <span key={i}>{o.word}</span>
-        : o.type === "wrong" ? <mark key={i} className="rounded bg-destructive/15 px-1 text-destructive">{o.word}</mark>
-        : o.type === "extra" ? <del key={i} className="rounded px-1 text-destructive" title={d.extra}>{o.word}</del>
-        : <span key={i} className="rounded border border-dashed border-destructive px-1.5 text-destructive" title={d.missing}>?</span>,
-      )}
-    </p>
-  );
-}
 
-function CoachAvatar({ talking }: { talking: boolean }) {
-  return (
-    <div className="flex shrink-0 flex-col items-center">
-      <svg viewBox="0 0 64 64" className="size-11" role="img" aria-label={d.coach}>
-        <circle cx="32" cy="32" r="31" className="fill-primary" />
-        <circle cx="32" cy="36" r="18" className="fill-background" />
-        <path d="M14 30c2-12 10-18 18-18s16 6 18 18c-6-6-12-8-18-8s-12 2-18 8z" className="fill-foreground" />
-        <circle cx="25" cy="35" r="2.4" className="fill-foreground" />
-        <circle cx="39" cy="35" r="2.4" className="fill-foreground" />
-        <rect x="27" y="42" width="10" height={talking ? 5 : 2} rx="2.5" className={cn("fill-primary", talking && "motion-safe:animate-pulse")} />
-      </svg>
-      
-    </div>
-  );
-}

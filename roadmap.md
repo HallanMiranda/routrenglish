@@ -29,3 +29,5 @@
 - [x] Shared AI layer (own key): Ouvir/Corrigir/Conversa com IA, Meu nome, lenient check
 - [ ] Wire AI judge into Revisão card practice (waits for step 14 Review screen)
 - [ ] Wire AI conversation + report into Hoje session (waits for steps 11 and 13)
+- [x] Rename UberClass → Aplicabilidade (/aplicabilidade, /uberclass redirects)
+- [x] Aula com o Coach (pacotes + livre com IA), hands-free spoken loop

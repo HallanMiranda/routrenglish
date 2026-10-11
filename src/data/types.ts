@@ -122,6 +122,7 @@ export interface MyName {
   name: string;
   /** Spellings the speech recognizer may use instead. */
   aliases: string[];
+  city: string;
 }
 export interface AiUsage {
   kind: "prints" | "judge" | "listen" | "converse" | "report" | "test";

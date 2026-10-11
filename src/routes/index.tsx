@@ -87,11 +87,11 @@ function Today() {
           <p className="mt-1 text-base text-ink-foreground/80">{t.drills.continueHelp(drill.round)}</p>
           <div className="flex-1" />
           <Button size="lg" className="mt-8 w-full" asChild>
-            <Link to="/uberclass/$packId" params={{ packId: drill.pack.id }} search={{ nivel: "todos" }}><Play /> {t.today.continueDrill}</Link>
+            <Link to="/aplicabilidade/$packId" params={{ packId: drill.pack.id }} search={{ nivel: "todos" }}><Play /> {t.today.continueDrill}</Link>
           </Button>
         </section>
       ) : (
-        <EmptyState action={<Button asChild><Link to="/uberclass">{t.today.toDrills}</Link></Button>}>
+        <EmptyState action={<Button asChild><Link to="/aplicabilidade">{t.today.toDrills}</Link></Button>}>
           <p className="text-headline text-foreground">{t.today.noMissionTitle}</p>
           <p className="mt-1">{t.today.noMissionBody}</p>
         </EmptyState>
