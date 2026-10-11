@@ -12,7 +12,7 @@ import { t } from "@/lib/i18n/pt-BR";
 
 const d = t.drills;
 
-export const Route = createFileRoute("/praticar/")({
+export const Route = createFileRoute("/uberclass/")({
   head: () => ({
     meta: [
       { title: "Praticar — Speak Lab" },

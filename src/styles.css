@@ -188,3 +188,8 @@
 @utility pb-safe {
   padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
 }
+
+@keyframes slide-in-story { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes heart-out { to { transform: scale(1.6) translateY(-8px); opacity: 0; } }
+@utility animate-story { animation: slide-in-story 260ms ease-out both; }
+@utility animate-heart-out { animation: heart-out 600ms ease-in both; }
