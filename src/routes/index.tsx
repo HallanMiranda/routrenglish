@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Flame, Mic } from "lucide-react";
-import { AppShell } from "@/components/layout/AppShell";
-import { EmptyState } from "@/components/layout/AppShell";
+import { AppShell, EmptyState } from "@/components/layout/AppShell";
 import { repo } from "@/data/repo";
 import type { Mission } from "@/data/types";
 import { t } from "@/lib/i18n/pt-BR";
@@ -58,7 +57,10 @@ function Today() {
       {loading ? (
         <div className="h-64 animate-pulse rounded-3xl bg-muted" aria-label={t.today.loading} />
       ) : !mission ? (
-        <EmptyState title={t.today.noMissionTitle} body={t.today.noMissionBody} />
+        <EmptyState>
+          <p className="font-semibold text-foreground">{t.today.noMissionTitle}</p>
+          <p className="mt-1">{t.today.noMissionBody}</p>
+        </EmptyState>
       ) : (
         <section className="rounded-3xl bg-ink p-6 text-ink-foreground shadow-card">
           <p className="text-xs font-semibold uppercase tracking-widest text-live">

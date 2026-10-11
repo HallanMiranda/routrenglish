@@ -6,7 +6,8 @@
 - [x] 2b. Reusable MicButton and step 1 session demo (no real audio)
 - [ ] 3. Cloud + login (move pages under auth gate)
 - [ ] 4. Schema migration + seed missions
-- [ ] 5. Hoje
+- [x] 5a. Local data layer, speech helpers, mock converse (no Cloud for now)
+- [x] 5. Hoje (wired to local repo)
 - [ ] 6. Session shell
 - [ ] 7. Audio core
 - [ ] 8. TTS + Step 1 Listening

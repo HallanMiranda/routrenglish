@@ -38,9 +38,10 @@ function updateSession(id: string, fn: (s: Session) => Session): Session {
   const rows = read<Session>("sessions");
   const i = rows.findIndex((s) => s.id === id);
   if (i < 0) throw new Error(`Session ${id} not found`);
-  rows[i] = fn(rows[i]);
+  const next = fn(rows[i]!);
+  rows[i] = next;
   write("sessions", rows);
-  return rows[i];
+  return next;
 }
 
 export const localRepo: Repo = {
@@ -96,9 +97,11 @@ export const localRepo: Repo = {
     const key = e.original.trim().toLowerCase();
     const i = rows.findIndex((r) => r.original.trim().toLowerCase() === key);
     if (i >= 0) {
-      rows[i] = { ...rows[i], ...e, occurrences: rows[i].occurrences + 1, active: true, updated_at: now() };
+      const prev = rows[i]!;
+      const next: ErrorItem = { ...prev, ...e, id: prev.id, occurrences: prev.occurrences + 1, active: true, updated_at: now() } as ErrorItem;
+      rows[i] = next;
       write("errors", rows);
-      return rows[i];
+      return next;
     }
     const row: ErrorItem = {
       id: uid(),
@@ -109,7 +112,7 @@ export const localRepo: Repo = {
       created_at: now(),
       updated_at: now(),
       ...e,
-    };
+    } as ErrorItem;
     write("errors", [...rows, row]);
     return row;
   },
@@ -141,7 +144,7 @@ export const localRepo: Repo = {
     const rows = read<Card>("cards");
     const i = rows.findIndex((c) => c.id === cardId);
     if (i < 0) throw new Error(`Card ${cardId} not found`);
-    const c = rows[i];
+    const c = rows[i]!;
     let { ease, interval_days, reps } = c;
     if (rating === "again") {
       reps = 0;
@@ -155,9 +158,10 @@ export const localRepo: Repo = {
       if (rating === "easy") ease += 0.15;
     }
     const due = rating === "again" ? Date.now() + 10 * 60_000 : Date.now() + interval_days * DAY;
-    rows[i] = { ...c, ease, interval_days, reps, due_at: new Date(due).toISOString() };
+    const next: Card = { ...c, ease, interval_days, reps, due_at: new Date(due).toISOString() };
+    rows[i] = next;
     write("cards", rows);
-    return rows[i];
+    return next;
   },
 
   async saveCheckpoint(c) {
