@@ -13,7 +13,26 @@ import type {
   Utterance,
 } from "./types";
 
-const missions = missionsJson as Mission[];
+interface RawMission {
+  id: string;
+  title_pt: string;
+  scenario: string;
+  goal?: string;
+  ai_role?: string;
+  ai_opening?: string;
+  key_phrases: string[];
+}
+const rawPhase = missionsJson as unknown as { phase?: number; missions?: RawMission[] };
+const missions: Mission[] = (rawPhase.missions ?? []).map((m, i) => ({
+  id: m.id,
+  phase: rawPhase.phase ?? 1,
+  day: i + 1,
+  title: m.title_pt,
+  situation: m.scenario,
+  ...(m.goal ? { goal: m.goal } : {}),
+  key_phrases: m.key_phrases,
+  model_dialogue: [],
+}));
 const builtInPacks = (drillPacksJson as unknown as { packs: DrillPack[] }).packs ?? [];
 const PREFIX = "speak-lab:";
 const DAY = 86_400_000;
