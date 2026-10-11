@@ -69,7 +69,7 @@ function MaterialPage() {
       )}
       {pack && (
         <Button asChild size="lg" className="mb-3 w-full">
-          <Link to="/uberclass/$packId" params={{ packId: pack.id }} search={{ nivel: "todos" }}>{p.studyThis}</Link>
+          <Link to="/aplicabilidade/$packId" params={{ packId: pack.id }} search={{ nivel: "todos" }}>{p.studyThis}</Link>
         </Button>
       )}
       <div className="mb-4 flex gap-2">
