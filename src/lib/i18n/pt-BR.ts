@@ -192,6 +192,8 @@ export const t = {
     cards: (n: number) => (n === 1 ? "1 cartão de revisão criado." : `${n} cartões de revisão criados.`),
     aiFailed: "A IA não respondeu. Confira a internet e a chave em Ajustes.",
     left: (m: number) => `${m} min`,
+    fine: (focus: string) => (/his|her|their|owner|dono/i.test(focus) ? "Multa! Olha o dono." : "Multa! Olha a atenção."),
+    meta: "Aula com o Coach — Speak Lab",
   },
   drills: {
     title: "Aplicabilidade",
