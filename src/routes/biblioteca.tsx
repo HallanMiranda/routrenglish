@@ -6,6 +6,8 @@ export const Route = createFileRoute("/biblioteca")({
   head: () => ({
     meta: [
       { title: "Biblioteca — Speak Lab" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "description", content: "Missões e materiais de estudo." },
       { property: "og:title", content: "Biblioteca — Speak Lab" },
       { property: "og:description", content: "Missões e materiais de estudo." },

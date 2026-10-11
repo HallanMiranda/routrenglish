@@ -31,6 +31,13 @@ export const t = {
   library: { title: "Biblioteca", empty: "Missões e materiais aparecerão aqui." },
   material: { title: "Material" },
   progress: { title: "Progresso", empty: "Seu progresso aparecerá aqui." },
+  theme: { title: "Aparência", dark: "Tema escuro", system: "Seguir o sistema" },
+  mic: {
+    actions: { idle: "Iniciar demonstração", recording: "Encerrar demonstração", processing: "Processando demonstração" },
+    states: { idle: "Pronto", recording: "Gravando", processing: "Processando" },
+    demo: "Demonstração · sem captura de áudio",
+  },
+  errors: { notFound: "Página não encontrada", notFoundBody: "Esta página não existe ou foi movida.", home: "Voltar para Hoje", failed: "Esta página não carregou", failedBody: "Algo deu errado. Tente novamente ou volte para Hoje.", retry: "Tentar novamente" },
   login: { title: "Entrar", subtitle: "Login chega na etapa 3." },
   common: { comingSoon: "Em breve" },
 } as const;

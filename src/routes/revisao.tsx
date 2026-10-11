@@ -6,6 +6,8 @@ export const Route = createFileRoute("/revisao")({
   head: () => ({
     meta: [
       { title: "Revisão — Speak Lab" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "description", content: "Revise os cartões criados a partir dos seus erros." },
       { property: "og:title", content: "Revisão — Speak Lab" },
       { property: "og:description", content: "Revise os cartões criados a partir dos seus erros." },

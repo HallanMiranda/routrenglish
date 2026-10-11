@@ -1,7 +1,9 @@
 # Speak Lab roadmap
 
 - [x] 1. Design system + app shell + empty pages
-- [ ] 2. PWA basics
+- [x] 2. PWA manifest, icons, and offline app shell (published offline check pending publication)
+- [x] 2a. System-aware light/dark theme with control on Progresso
+- [x] 2b. Reusable MicButton and step 1 session demo (no real audio)
 - [ ] 3. Cloud + login (move pages under auth gate)
 - [ ] 4. Schema migration + seed missions
 - [ ] 5. Hoje

@@ -6,6 +6,8 @@ export const Route = createFileRoute("/relatorio/$sessionId")({
   head: () => ({
     meta: [
       { title: "Relatório — Speak Lab" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "description", content: "Relatório da sessão com seus 3 erros principais." },
       { property: "og:title", content: "Relatório — Speak Lab" },
       { property: "og:description", content: "Relatório da sessão com seus 3 erros principais." },
