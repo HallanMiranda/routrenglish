@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Plus, Sparkles, Zap } from "lucide-react";
+import { Plus, Sparkles, Trash2, Zap } from "lucide-react";
 import { AppShell, EmptyState } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import type { Difficulty, DrillPack, PackProgress } from "@/data/types";
 import { difficultyOf } from "@/drills/difficulty";
 import { cn } from "@/lib/utils";
 import { parseDrillLines } from "@/drills/check";
+import { parsePackJson } from "@/drills/importPack";
 import { t } from "@/lib/i18n/pt-BR";
 
 const d = t.drills;
@@ -33,6 +34,7 @@ function PracticePage() {
   const [progress, setProgress] = useState<Record<string, PackProgress>>({});
   const [creating, setCreating] = useState(false);
   const [filter, setFilter] = useState<Difficulty | "todos">("todos");
+  const [confirmId, setConfirmId] = useState<string | null>(null);
   const shown = packs?.filter((p) => filter === "todos" || difficultyOf(p.level) === filter);
 
   async function load() {
@@ -87,7 +89,7 @@ function PracticePage() {
           const pr = progress[p.id];
           const diff = difficultyOf(p.level);
           return (
-            <li key={p.id}>
+            <li key={p.id} className="relative">
               <Link
                 to="/uberclass/$packId"
                 params={{ packId: p.id }}
@@ -107,6 +109,27 @@ function PracticePage() {
                   <span className="text-muted-foreground">{d.accuracy(pr?.accuracy ?? null)}</span>
                 </div>
               </Link>
+              {p.user_created && confirmId !== p.id && (
+                <button
+                  type="button"
+                  onClick={() => setConfirmId(p.id)}
+                  aria-label={`${d.delete} ${p.title_pt}`}
+                  className="absolute bottom-3 right-3 grid size-8 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-destructive"
+                >
+                  <Trash2 className="size-4" />
+                </button>
+              )}
+              {confirmId === p.id && (
+                <div role="alert" className="mt-2 space-y-2 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm">
+                  <p>{d.deleteConfirm(p.title_pt)}</p>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="ghost" onClick={() => setConfirmId(null)}>{d.cancel}</Button>
+                    <Button size="sm" variant="destructive" onClick={async () => { await repo.deleteDrillPack(p.id); setConfirmId(null); void load(); }}>
+                      {d.confirmDelete}
+                    </Button>
+                  </div>
+                </div>
+              )}
             </li>
           );
         })}
@@ -116,36 +139,76 @@ function PracticePage() {
 }
 
 function NewPackForm({ onDone }: { onDone: () => void }) {
+  const [mode, setMode] = useState<"lines" | "json">("lines");
   const [title, setTitle] = useState("");
   const [lines, setLines] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [json, setJson] = useState("");
+  const [errors, setErrors] = useState<string[]>([]);
 
   async function save() {
-    const items = parseDrillLines(lines);
-    if (!items.length) return setError(d.invalid);
-    await repo.saveDrillPack({ title_pt: title.trim() || d.newPack, level: d.userLevel, focus_pt: d.userFocus, items });
+    if (mode === "lines") {
+      const items = parseDrillLines(lines);
+      if (!items.length) return setErrors([d.invalid]);
+      await repo.saveDrillPack({ title_pt: title.trim() || d.newPack, level: d.userLevel, focus_pt: d.userFocus, items });
+      return onDone();
+    }
+    const r = parsePackJson(json);
+    if (!r.ok) return setErrors(r.errors);
+    if (Object.keys(r.pulo).length) await repo.mergePuloDoGato(r.pulo);
+    await repo.saveDrillPack(r.pack);
     onDone();
   }
 
   return (
     <div className="mb-5 space-y-3 rounded-2xl border bg-card p-4">
       <h2 className="text-lg font-bold">{d.newPackTitle}</h2>
-      <label className="block space-y-1 text-sm font-medium">
-        <span>{d.packName}</span>
-        <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={d.packNamePlaceholder} />
-      </label>
-      <label className="block space-y-1 text-sm font-medium">
-        <span>{d.linesLabel}</span>
-        <Textarea rows={6} value={lines} onChange={(e) => { setLines(e.target.value); setError(null); }} placeholder={d.linesPlaceholder} />
-        <span className="block text-xs font-normal text-muted-foreground">{d.linesHelp}</span>
-      </label>
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button variant="outline" className="w-full" disabled>
-        <Sparkles /> {d.fromMaterial}
-      </Button>
+      <div className="grid grid-cols-2 gap-1 rounded-xl bg-muted p-1" role="tablist">
+        {(["lines", "json"] as const).map((m) => (
+          <button
+            key={m}
+            type="button"
+            role="tab"
+            aria-selected={mode === m}
+            onClick={() => { setMode(m); setErrors([]); }}
+            className={cn("rounded-lg px-2 py-1.5 text-sm font-semibold", mode === m ? "bg-card shadow-sm" : "text-muted-foreground")}
+          >
+            {m === "lines" ? d.modeLines : d.modeJson}
+          </button>
+        ))}
+      </div>
+      {mode === "lines" ? (
+        <>
+          <label className="block space-y-1 text-sm font-medium">
+            <span>{d.packName}</span>
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={d.packNamePlaceholder} />
+          </label>
+          <label className="block space-y-1 text-sm font-medium">
+            <span>{d.linesLabel}</span>
+            <Textarea rows={6} value={lines} onChange={(e) => { setLines(e.target.value); setErrors([]); }} placeholder={d.linesPlaceholder} />
+            <span className="block text-xs font-normal text-muted-foreground">{d.linesHelp}</span>
+          </label>
+          <Button variant="outline" className="w-full" disabled>
+            <Sparkles /> {d.fromMaterial}
+          </Button>
+        </>
+      ) : (
+        <label className="block space-y-1 text-sm font-medium">
+          <span>{d.jsonLabel}</span>
+          <Textarea rows={10} className="font-mono text-xs" spellCheck={false} value={json} onChange={(e) => { setJson(e.target.value); setErrors([]); }} placeholder='{"title_pt": "...", "level": "A2", "focus_pt": "...", "items": [...]}' />
+          <span className="block text-xs font-normal text-muted-foreground">{d.jsonHelp}</span>
+        </label>
+      )}
+      {errors.length > 0 && (
+        <div role="alert" className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">
+          {errors.length > 1 && <p className="mb-1 font-semibold">{d.jsonErrors}</p>}
+          <ul className="list-disc space-y-0.5 pl-4">
+            {errors.slice(0, 12).map((e) => <li key={e}>{e}</li>)}
+          </ul>
+        </div>
+      )}
       <div className="flex gap-2">
         <Button variant="ghost" className="flex-1" onClick={onDone}>{d.cancel}</Button>
-        <Button className="flex-1" onClick={save}>{d.save}</Button>
+        <Button className="flex-1" onClick={save}>{mode === "json" ? d.import : d.save}</Button>
       </div>
     </div>
   );

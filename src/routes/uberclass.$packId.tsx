@@ -5,7 +5,7 @@ import { MicButton, type MicState } from "@/components/session/MicButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { repo } from "@/data/repo";
-import type { Difficulty, DrillItem, DrillPack, DrillRound, DrillTrap, PuloDoGato, TranslateItem } from "@/data/types";
+import type { Difficulty, DrillItem, DrillPack, DrillRound, DrillTrap, LadderItem, PuloDoGato, QaItem, TranslateItem } from "@/data/types";
 import { checkAnswer, checkQa, checkTranslate, isAttentionSlip, type DiffOp } from "@/drills/check";
 import { difficultyOf } from "@/drills/difficulty";
 import { playError, playSuccess } from "@/drills/sounds";
@@ -41,8 +41,57 @@ export const Route = createFileRoute("/uberclass/$packId")({
 
 // ---------- helpers ----------
 const pick = <T,>(arr: readonly T[]) => arr[Math.floor(Math.random() * arr.length)]!;
-const modelOf = (i: DrillItem) => (i.mode === "translate" ? i.en[0]! : i.model_answers[0]!);
-const promptPtOf = (i: DrillItem) => (i.mode === "translate" ? i.pt : i.q_pt);
+/** What is actually asked: ladders are expanded into one translate item per step (+ a QA item for "free"). */
+type Playable = TranslateItem | QaItem;
+const modelOf = (i: Playable) => (i.mode === "translate" ? i.en[0]! : i.model_answers[0]!);
+const promptPtOf = (i: Playable) => (i.mode === "translate" ? i.pt : i.q_pt);
+const LADDER_SECONDS = 6;
+
+interface LadderMeta {
+  ladderId: string;
+  /** 0-based step index; equals steps.length for the free step. */
+  index: number;
+  total: number;
+  free: boolean;
+  prevEn: string | null;
+  change: string;
+  newWords: string[];
+  nextId: string | null;
+  fast: boolean;
+}
+
+const wordsOf = (s: string) => s.toLowerCase().replace(/[^a-z0-9'\s]/g, " ").split(/\s+/).filter(Boolean);
+function newWordsOf(prev: string | null, cur: string) {
+  const before = new Set(prev ? wordsOf(prev) : []);
+  return cur.split(/\s+/).filter((w) => !before.has(wordsOf(w)[0] ?? ""));
+}
+
+/** Expands a ladder into playable steps, keyed by id, plus per-step metadata. */
+function expandLadder(l: LadderItem, fast: boolean) {
+  const suffix = fast ? "~fast" : "";
+  const total = l.steps.length + (l.free ? 1 : 0);
+  const ids = Array.from({ length: total }, (_, k) => `${l.id}~s${k}${suffix}`);
+  const items: Playable[] = l.steps.map((st, k) => ({
+    id: ids[k]!, mode: "translate", pt: st.pt, en: st.en, focus: st.focus, traps: st.traps,
+  }));
+  if (l.free)
+    items.push({
+      id: ids[l.steps.length]!, mode: "qa", q_en: l.free.prompt_pt, q_pt: l.free.prompt_pt,
+      accept_patterns: l.free.accept_patterns, model_answers: l.free.model_answers, focus: l.steps.at(-1)?.focus ?? "", traps: [],
+    });
+  const meta: Record<string, LadderMeta> = {};
+  items.forEach((it, k) => {
+    const prevEn = k > 0 ? l.steps[k - 1]?.en[0] ?? null : null;
+    const free = k === l.steps.length;
+    meta[it.id] = {
+      ladderId: l.id, index: k, total, free, prevEn,
+      change: free ? "" : l.steps[k]!.change_pt,
+      newWords: free ? [] : newWordsOf(prevEn, l.steps[k]!.en[0]!),
+      nextId: ids[k + 1] ?? null, fast,
+    };
+  });
+  return { items, meta, firstId: ids[0]! };
+}
 const firstWords = (s: string, n: number) => s.split(/\s+/).slice(0, n).join(" ");
 const variationId = (parent: string, k: number) => `${parent}~v${k}`;
 function shuffle<T>(arr: T[]) {
@@ -56,7 +105,9 @@ function shuffle<T>(arr: T[]) {
 
 interface Run {
   round: DrillRound;
-  items: Record<string, DrillItem>;
+  items: Record<string, Playable>;
+  ladder: Record<string, LadderMeta>;
+  ladders: Record<string, LadderItem>;
   queue: string[];
   pos: number;
   /** Wrong tries for the current presentation. */
@@ -76,8 +127,27 @@ interface Run {
 }
 
 function newRun(round: DrillRound, list: DrillItem[], counts: boolean): Run {
+  const items: Record<string, Playable> = {};
+  const ladder: Record<string, LadderMeta> = {};
+  const ladders: Record<string, LadderItem> = {};
+  const queue: string[] = [];
+  for (const it of list) {
+    if (it.mode === "ladder") {
+      if (!it.steps.length) continue;
+      ladders[it.id] = it;
+      for (const fast of [false, true]) {
+        const x = expandLadder(it, fast);
+        for (const p of x.items) items[p.id] = p;
+        Object.assign(ladder, x.meta);
+        if (!fast) queue.push(x.firstId);
+      }
+    } else {
+      items[it.id] = it;
+      queue.push(it.id);
+    }
+  }
   return {
-    round, items: Object.fromEntries(list.map((i) => [i.id, i])), queue: list.map((i) => i.id), pos: 0, tries: 0,
+    round, items, ladder, ladders, queue, pos: 0, tries: 0,
     lives: LIVES, score: 0, attempted: new Set(), firstTry: new Set(), helped: new Set(), requeued: new Set(),
     expanded: new Set(), maxTries: {}, missedFocus: {}, counts, out: false,
   };
@@ -87,7 +157,9 @@ interface Summary {
   round: DrillRound;
   accuracy: number;
   score: number;
-  helped: DrillItem[];
+  helped: Playable[];
+  /** What "Treinar só os erros" replays: missed items, with ladder steps mapped back to their whole ladder. */
+  retry: DrillItem[];
   pulos: { focus: string; text: string }[];
   cards: number;
   counts: boolean;
@@ -148,6 +220,7 @@ function DrillPage() {
   async function finish(r: Run) {
     if (!pack) return;
     const attempted = Object.values(r.items).filter((i) => r.attempted.has(i.id));
+    const retry = missedOf(r);
     const accuracy = attempted.length ? r.firstTry.size / attempted.length : 0;
     const helped = attempted.filter((i) => r.helped.has(i.id));
     const hard = attempted.filter((i) => (r.maxTries[i.id] ?? 0) >= 3);
@@ -156,15 +229,26 @@ function DrillPage() {
     const topFocus = Object.entries(r.missedFocus).sort((a, b) => b[1] - a[1]).slice(0, 3);
     setRun(null);
     setSummary({
-      round: r.round, accuracy, score: r.score, helped, cards: hard.length, counts: r.counts,
+      round: r.round, accuracy, score: r.score, helped, retry, cards: hard.length, counts: r.counts,
       pulos: topFocus.filter(([f]) => pulos[f]).map(([f]) => ({ focus: f, text: pulos[f]! })),
     });
     if (!express) void refresh();
   }
 
+  function missedOf(r: Run): DrillItem[] {
+    const out: DrillItem[] = [];
+    const seenLadders = new Set<string>();
+    for (const id of r.helped) {
+      const m = r.ladder[id];
+      if (m) {
+        if (!seenLadders.has(m.ladderId)) { seenLadders.add(m.ladderId); out.push(r.ladders[m.ladderId]!); }
+      } else if (r.items[id]) out.push(r.items[id]!);
+    }
+    return out;
+  }
   function restartErrors(r: Run) {
-    const missed = Object.values(r.items).filter((i) => r.helped.has(i.id));
-    start(r.round, missed.length ? missed : Object.values(r.items), false);
+    const missed = missedOf(r);
+    start(r.round, missed.length ? missed : [...Object.values(r.items).filter((i) => !r.ladder[i.id]), ...Object.values(r.ladders)], false);
   }
 
   if (pack === undefined) return <div className="min-h-dvh bg-background" />;
@@ -204,7 +288,7 @@ function DrillPage() {
           express={express}
           onNext={() => start((summary.round + 1) as DrillRound, pack.items, true)}
           onRepeat={async () => (express ? start(3, await buildExpress(), false) : start(summary.round, pack.items, true))}
-          onErrors={() => start(summary.round, summary.helped, false)}
+          onErrors={() => start(summary.round, summary.retry, false)}
         />
       ) : (
         !express && <RoundPicker best={bestRound} onPick={(r) => start(r, pack.items, true)} />
@@ -301,7 +385,7 @@ function SummaryView({ summary, express, onNext, onRepeat, onErrors }: { summary
 
 // ---------- runner ----------
 type Feedback =
-  | { kind: "praise"; text: string; clear: boolean; otherWay: string | null }
+  | { kind: "praise"; text: string; clear: boolean; otherWay: string | null; grows: boolean }
   | { kind: "almost"; text: string; ops: DiffOp[] | null; pulo: string | null }
   | { kind: "half"; text: string; ops: DiffOp[] | null }
   | { kind: "repeat"; text: string }
@@ -318,6 +402,9 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
   const item = run.items[run.queue[run.pos]!]!;
   const isQa = item.mode === "qa";
   const model = modelOf(item);
+  const meta = run.ladder[item.id] ?? null;
+  const [showNew, setShowNew] = useState(false);
+  const [review, setReview] = useState<{ ladder: LadderItem; next: Run } | null>(null);
   const [mic, setMic] = useState<MicState>("idle");
   const [heard, setHeard] = useState("");
   const [feedback, setFeedback] = useState<Feedback>(null);
@@ -336,17 +423,20 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
   const sfx = (ok: boolean) => { if (!muted) (ok ? playSuccess : playError)(); };
 
   const sayPrompt = useCallback((rate = 1) => {
-    if (item.mode === "qa") void speak(item.q_en, { lang: "en-US", rate }).catch(() => {});
+    if (meta) void speak(item.mode === "qa" ? item.q_pt : item.pt, { lang: "pt-BR", rate }).catch(() => {});
+    else if (item.mode === "qa") void speak(item.q_en, { lang: "en-US", rate }).catch(() => {});
     else if (run.round === 1) void speak(item.en[0]!, { lang: "en-US", rate: 0.9 * rate }).catch(() => {});
     else void speak(item.pt, { lang: "pt-BR", rate }).catch(() => {});
-  }, [item, run.round]);
+  }, [item, run.round, meta]);
 
   // New challenge: reset and let the tutor speak.
   useEffect(() => {
-    setHeard(""); setFeedback(null); setTyped(""); setMicError(null); setShowPt(false);
+    setHeard(""); setFeedback(null); setTyped(""); setMicError(null); setShowPt(false); setShowNew(false);
     busyRef.current = false;
     const timer = window.setTimeout(() => sayPrompt(), 300);
-    return () => { window.clearTimeout(timer); abortRef.current?.abort(); };
+    // Ladder round 1: highlight the new words after 3 s if the learner hasn't started.
+    const hl = meta && run.round === 1 ? window.setTimeout(() => setShowNew(true), 3000) : undefined;
+    return () => { window.clearTimeout(timer); window.clearTimeout(hl); abortRef.current?.abort(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stepKey]);
 
@@ -359,12 +449,13 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
 
   // Round 4 countdown: 6 s translate, 8 s QA.
   useEffect(() => {
-    if (run.round !== 4 || repeatMode || praised || run.out) { setSecondsLeft(null); return; }
-    setSecondsLeft(isQa ? 8 : 6);
+    const timed = run.round === 4 || meta?.fast === true;
+    if (!timed || repeatMode || praised || run.out || review) { setSecondsLeft(null); return; }
+    setSecondsLeft(meta && !meta.free ? LADDER_SECONDS : isQa ? 8 : 6);
     const id = window.setInterval(() => setSecondsLeft((s) => (s === null ? s : s - 1)), 1000);
     return () => window.clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stepKey, run.tries, run.round, repeatMode, praised, run.out]);
+  }, [stepKey, run.tries, run.round, repeatMode, praised, run.out, review]);
   useEffect(() => {
     if (secondsLeft === 0 && mic !== "processing") {
       abortRef.current?.abort();
@@ -372,6 +463,24 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [secondsLeft]);
+
+  /** After a correct answer: a finished ladder shows its review first. */
+  function proceed(next: Run) {
+    if (meta && !meta.nextId) {
+      const ladder = next.ladders[meta.ladderId];
+      if (ladder) { stopSpeaking(); setFeedback(null); setHeard(""); setReview({ ladder, next }); return; }
+    }
+    advance(next);
+  }
+  function redoFast() {
+    if (!review) return;
+    const { ladder, next } = review;
+    const fast = expandLadder(ladder, true);
+    const queue = [...next.queue];
+    queue.splice(next.pos + 1, 0, ...fast.items.map((i) => i.id));
+    setReview(null);
+    advance({ ...next, queue });
+  }
 
   function advance(next: Run) {
     if (next.pos + 1 >= next.queue.length) onFinish(next);
@@ -415,8 +524,10 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
         for (const v of vars) items[v.id] = v;
         queue.splice(run.pos + 1, 0, ...vars.map((v) => v.id));
       }
-      // Missed items go back to the end of the round once.
-      if (run.helped.has(item.id) && !requeued.has(item.id)) {
+      // Ladders never skip: the next step comes right after this one.
+      if (meta?.nextId) queue.splice(run.pos + 1, 0, meta.nextId);
+      // Missed items go back to the end of the round once (ladder steps are completed in place).
+      if (!meta && run.helped.has(item.id) && !requeued.has(item.id)) {
         requeued.add(item.id);
         queue.push(item.id);
       }
@@ -424,9 +535,10 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
       const next: Run = { ...run, items, queue, attempted, firstTry, expanded, requeued, score: run.score + gained };
       const clear = confidence !== null && confidence >= 0.85 && Math.random() < 0.4;
       const otherWay = isQa && !repeatMode ? pick(item.model_answers) : null;
-      setFeedback({ kind: "praise", text: pick(d.praise), clear, otherWay });
+      const grows = !!meta?.nextId;
+      setFeedback({ kind: "praise", text: pick(d.praise), clear, otherWay, grows });
       setRun(next);
-      if (!otherWay) window.setTimeout(() => advance(next), 1100);
+      if (!otherWay) window.setTimeout(() => proceed(next), grows ? 1500 : 1100);
       return;
     }
 
@@ -488,8 +600,17 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
   }
 
   const bubble = repeatMode ? d.repeatWithMe
+    : meta?.free ? d.ladderFreePrompt
+    : meta ? d.promptTranslate
     : isQa ? d.promptAnswer
     : run.round === 1 ? d.promptRepeat : d.promptTranslate;
+
+  if (review)
+    return (
+      <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col overflow-y-auto px-4 pb-4">
+        <LadderReview ladder={review.ladder} onFast={redoFast} onContinue={() => { const n = review.next; setReview(null); advance(n); }} />
+      </div>
+    );
 
   return (
     <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col gap-3 px-4 pb-4">
@@ -497,7 +618,7 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
       <section className="relative flex flex-1 flex-col overflow-hidden rounded-3xl bg-card p-5 shadow-sm ring-1 ring-border">
         <div className="flex items-center justify-between gap-2">
           <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-bold text-secondary-foreground">
-            {isQa ? d.badgeAnswer : d.badgeTranslate}
+            {meta ? d.badgeLadder : isQa ? d.badgeAnswer : d.badgeTranslate}
           </span>
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-0.5" aria-label={d.lives(run.lives)}>
@@ -526,7 +647,7 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
           <div className="mt-3 flex items-center gap-3">
             <CoachAvatar talking={!feedback || feedback.kind === "repeat"} />
             <div className="rounded-2xl rounded-tl-sm bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground">
-              {feedback?.kind === "praise" ? <span>{feedback.text}{feedback.clear && ` ${d.clear}`}</span>
+              {feedback?.kind === "praise" ? <span>{feedback.text}{feedback.clear && ` ${d.clear}`}{feedback.grows && ` ${d.ladderGrows}`}</span>
                 : feedback?.kind === "almost" ? feedback.text
                 : feedback?.kind === "half" ? d.half
                 : bubble}
@@ -539,7 +660,11 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
           </div>
 
           <div className="flex flex-1 flex-col justify-center gap-3 py-4 text-center">
-            <Challenge item={item} round={run.round} repeatMode={repeatMode} showPt={showPt} onShowPt={() => setShowPt(true)} onReplay={sayPrompt} />
+            {meta && !repeatMode ? (
+              <LadderChallenge item={item} meta={meta} round={run.round} showNew={showNew && mic === "idle" && !heard} />
+            ) : (
+              <Challenge item={item} round={run.round} repeatMode={repeatMode} showPt={showPt} onShowPt={() => setShowPt(true)} onReplay={sayPrompt} />
+            )}
             {feedback?.kind === "half" && <p lang="en" className="text-lg font-semibold text-primary">{feedback.text}</p>}
             {feedback?.kind === "almost" && feedback.pulo && <PuloCard text={feedback.pulo} />}
             {feedback?.kind === "praise" && feedback.otherWay && (
@@ -553,7 +678,7 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
                     </Button>
                   </div>
                 </div>
-                <Button className="w-full" onClick={() => { stopSpeaking(); advance(run); }}>{d.next}</Button>
+                <Button className="w-full" onClick={() => { stopSpeaking(); proceed(run); }}>{d.next}</Button>
               </div>
             )}
           </div>
@@ -597,8 +722,80 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
   );
 }
 
+function LadderChallenge({ item, meta, round, showNew }: { item: Playable; meta: LadderMeta; round: DrillRound; showNew: boolean }) {
+  const pt = item.mode === "qa" ? item.q_pt : item.pt;
+  const showPrev = (round <= 2 || meta.free) && meta.prevEn;
+  return (
+    <div className="flex items-stretch gap-3 text-left">
+      <LadderRail index={meta.index} total={meta.total} />
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-2">
+        <p className="text-xs font-semibold text-muted-foreground">
+          {meta.free ? d.ladderFree : d.ladderStep(meta.index + 1, meta.total)}
+        </p>
+        {showPrev && (
+          <p lang="en" className="text-sm text-muted-foreground"><span className="font-semibold">{d.previous}</span> {meta.prevEn}</p>
+        )}
+        {meta.change && (
+          <span className="w-fit rounded-full bg-live px-2.5 py-0.5 text-xs font-bold text-live-foreground">{meta.change}</span>
+        )}
+        <p className="font-display text-2xl font-bold leading-tight">{pt}</p>
+        {round === 1 && showNew && meta.newWords.length > 0 && (
+          <p className="text-sm text-muted-foreground animate-in fade-in">
+            {d.ladderNewWords}{" "}
+            {meta.newWords.map((w, i) => (
+              <mark key={i} lang="en" className="mr-1 rounded bg-live/40 px-1 font-semibold text-foreground">{w}</mark>
+            ))}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function LadderRail({ index, total }: { index: number; total: number }) {
+  return (
+    <ol className="flex flex-col-reverse justify-center gap-1" aria-label={d.ladderStep(index + 1, total)}>
+      {Array.from({ length: total }, (_, k) => (
+        <li
+          key={k}
+          className={cn(
+            "h-3 w-6 rounded-sm",
+            k < index ? "bg-primary" : k === index ? "bg-live ring-2 ring-primary" : "bg-muted",
+          )}
+        />
+      ))}
+    </ol>
+  );
+}
+
+function LadderReview({ ladder, onFast, onContinue }: { ladder: LadderItem; onFast: () => void; onContinue: () => void }) {
+  return (
+    <div className="flex flex-col gap-3 rounded-3xl bg-card p-5 shadow-sm ring-1 ring-border animate-story">
+      <p className="font-display text-xl font-bold">{d.ladderDone}</p>
+      <p className="text-sm text-muted-foreground">{ladder.title_pt}</p>
+      <ol className="space-y-2">
+        {ladder.steps.map((st, k) => (
+          <li key={k} className="rounded-xl bg-muted p-2.5 text-sm">
+            <p className="text-muted-foreground">{st.pt}</p>
+            <div className="flex items-center gap-2">
+              <p lang="en" className="flex-1 font-semibold">{st.en[0]}</p>
+              <Button size="icon" variant="ghost" aria-label={d.play} onClick={() => void speak(st.en[0]!, { lang: "en-US" }).catch(() => {})}>
+                <Volume2 />
+              </Button>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <div className="mt-auto space-y-2 pt-2">
+        <Button className="w-full" onClick={onFast}><Zap /> {d.ladderAgain}</Button>
+        <Button variant="outline" className="w-full" onClick={onContinue}>{d.ladderContinue}</Button>
+      </div>
+    </div>
+  );
+}
+
 function Challenge({ item, round, repeatMode, showPt, onShowPt, onReplay }: {
-  item: DrillItem;
+  item: Playable;
   round: DrillRound;
   repeatMode: boolean;
   showPt: boolean;

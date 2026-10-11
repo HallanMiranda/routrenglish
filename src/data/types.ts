@@ -132,7 +132,23 @@ export interface QaItem {
   focus: string;
   traps: DrillTrap[];
 }
-export type DrillItem = TranslateItem | QaItem;
+export interface LadderStep {
+  pt: string;
+  /** Accepted answers; the first is the model answer. */
+  en: string[];
+  focus: string;
+  /** Short label of what changed from the previous step, e.g. "+ quando". */
+  change_pt: string;
+  traps: DrillTrap[];
+}
+export interface LadderItem {
+  id: string;
+  mode: "ladder";
+  title_pt: string;
+  steps: LadderStep[];
+  free?: { prompt_pt: string; accept_patterns: string[]; model_answers: string[] };
+}
+export type DrillItem = TranslateItem | QaItem | LadderItem;
 export interface DrillPack {
   id: string;
   title_pt: string;

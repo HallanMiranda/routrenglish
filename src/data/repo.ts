@@ -41,6 +41,8 @@ export interface Repo {
   saveDrillAttempt(a: Omit<DrillAttempt, "id" | "created_at">): Promise<DrillAttempt>;
   getPackProgress(packId: string): Promise<PackProgress>;
   getPuloDoGato(): Promise<PuloDoGato>;
+  mergePuloDoGato(p: PuloDoGato): Promise<void>;
+  deleteDrillPack(id: string): Promise<void>;
   getSoundMuted(): Promise<boolean>;
   setSoundMuted(muted: boolean): Promise<void>;
 }
