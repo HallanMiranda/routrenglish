@@ -16,12 +16,14 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as PrintsRouteImport } from './routes/prints'
 import { Route as ProgressoRouteImport } from './routes/progresso'
 import { Route as RevisaoRouteImport } from './routes/revisao'
+import { Route as TeteATeteRouteImport } from './routes/tete-a-tete'
 import { Route as UberclassRouteImport } from './routes/uberclass'
 import { Route as AplicabilidadeIndexRouteImport } from './routes/aplicabilidade.index'
 import { Route as AplicabilidadePackIdRouteImport } from './routes/aplicabilidade.$packId'
 import { Route as AulasIndexRouteImport } from './routes/aulas.index'
 import { Route as AulasPackIdRouteImport } from './routes/aulas.$packId'
 import { Route as AulasRevisarRouteImport } from './routes/aulas.revisar'
+import { Route as LivroPageRouteImport } from './routes/livro.$page'
 import { Route as PrintsMaterialIdRouteImport } from './routes/prints.$materialId'
 import { Route as RelatorioSessionIdRouteImport } from './routes/relatorio.$sessionId'
 import { Route as SessaoSessionIdRouteImport } from './routes/sessao.$sessionId'
@@ -62,6 +64,11 @@ const RevisaoRoute = RevisaoRouteImport.update({
   path: '/revisao',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TeteATeteRoute = TeteATeteRouteImport.update({
+  id: '/tete-a-tete',
+  path: '/tete-a-tete',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UberclassRoute = UberclassRouteImport.update({
   id: '/uberclass',
   path: '/uberclass',
@@ -90,6 +97,11 @@ const AulasPackIdRoute = AulasPackIdRouteImport.update({
 const AulasRevisarRoute = AulasRevisarRouteImport.update({
   id: '/aulas/revisar',
   path: '/aulas/revisar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LivroPageRoute = LivroPageRouteImport.update({
+  id: '/livro/$page',
+  path: '/livro/$page',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrintsMaterialIdRoute = PrintsMaterialIdRouteImport.update({
@@ -121,10 +133,12 @@ export interface FileRoutesByFullPath {
   '/prints': typeof PrintsRouteWithChildren
   '/progresso': typeof ProgressoRoute
   '/revisao': typeof RevisaoRoute
+  '/tete-a-tete': typeof TeteATeteRoute
   '/uberclass': typeof UberclassRouteWithChildren
   '/aplicabilidade/$packId': typeof AplicabilidadePackIdRoute
   '/aulas/$packId': typeof AulasPackIdRoute
   '/aulas/revisar': typeof AulasRevisarRoute
+  '/livro/$page': typeof LivroPageRoute
   '/prints/$materialId': typeof PrintsMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
@@ -140,10 +154,12 @@ export interface FileRoutesByTo {
   '/prints': typeof PrintsRouteWithChildren
   '/progresso': typeof ProgressoRoute
   '/revisao': typeof RevisaoRoute
+  '/tete-a-tete': typeof TeteATeteRoute
   '/uberclass': typeof UberclassRouteWithChildren
   '/aplicabilidade/$packId': typeof AplicabilidadePackIdRoute
   '/aulas/$packId': typeof AulasPackIdRoute
   '/aulas/revisar': typeof AulasRevisarRoute
+  '/livro/$page': typeof LivroPageRoute
   '/prints/$materialId': typeof PrintsMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
@@ -160,10 +176,12 @@ export interface FileRoutesById {
   '/prints': typeof PrintsRouteWithChildren
   '/progresso': typeof ProgressoRoute
   '/revisao': typeof RevisaoRoute
+  '/tete-a-tete': typeof TeteATeteRoute
   '/uberclass': typeof UberclassRouteWithChildren
   '/aplicabilidade/$packId': typeof AplicabilidadePackIdRoute
   '/aulas/$packId': typeof AulasPackIdRoute
   '/aulas/revisar': typeof AulasRevisarRoute
+  '/livro/$page': typeof LivroPageRoute
   '/prints/$materialId': typeof PrintsMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
@@ -181,10 +199,12 @@ export interface FileRouteTypes {
     | '/prints'
     | '/progresso'
     | '/revisao'
+    | '/tete-a-tete'
     | '/uberclass'
     | '/aplicabilidade/$packId'
     | '/aulas/$packId'
     | '/aulas/revisar'
+    | '/livro/$page'
     | '/prints/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
@@ -200,10 +220,12 @@ export interface FileRouteTypes {
     | '/prints'
     | '/progresso'
     | '/revisao'
+    | '/tete-a-tete'
     | '/uberclass'
     | '/aplicabilidade/$packId'
     | '/aulas/$packId'
     | '/aulas/revisar'
+    | '/livro/$page'
     | '/prints/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
@@ -219,10 +241,12 @@ export interface FileRouteTypes {
     | '/prints'
     | '/progresso'
     | '/revisao'
+    | '/tete-a-tete'
     | '/uberclass'
     | '/aplicabilidade/$packId'
     | '/aulas/$packId'
     | '/aulas/revisar'
+    | '/livro/$page'
     | '/prints/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
@@ -239,10 +263,12 @@ export interface RootRouteChildren {
   PrintsRoute: typeof PrintsRouteWithChildren
   ProgressoRoute: typeof ProgressoRoute
   RevisaoRoute: typeof RevisaoRoute
+  TeteATeteRoute: typeof TeteATeteRoute
   UberclassRoute: typeof UberclassRouteWithChildren
   AplicabilidadePackIdRoute: typeof AplicabilidadePackIdRoute
   AulasPackIdRoute: typeof AulasPackIdRoute
   AulasRevisarRoute: typeof AulasRevisarRoute
+  LivroPageRoute: typeof LivroPageRoute
   RelatorioSessionIdRoute: typeof RelatorioSessionIdRoute
   SessaoSessionIdRoute: typeof SessaoSessionIdRoute
   AplicabilidadeIndexRoute: typeof AplicabilidadeIndexRoute
@@ -300,6 +326,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RevisaoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tete-a-tete': {
+      id: '/tete-a-tete'
+      path: '/tete-a-tete'
+      fullPath: '/tete-a-tete'
+      preLoaderRoute: typeof TeteATeteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/uberclass': {
       id: '/uberclass'
       path: '/uberclass'
@@ -340,6 +373,13 @@ declare module '@tanstack/react-router' {
       path: '/aulas/revisar'
       fullPath: '/aulas/revisar'
       preLoaderRoute: typeof AulasRevisarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/livro/$page': {
+      id: '/livro/$page'
+      path: '/livro/$page'
+      fullPath: '/livro/$page'
+      preLoaderRoute: typeof LivroPageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/prints/$materialId': {
@@ -404,10 +444,12 @@ const rootRouteChildren: RootRouteChildren = {
   PrintsRoute: PrintsRouteWithChildren,
   ProgressoRoute: ProgressoRoute,
   RevisaoRoute: RevisaoRoute,
+  TeteATeteRoute: TeteATeteRoute,
   UberclassRoute: UberclassRouteWithChildren,
   AplicabilidadePackIdRoute: AplicabilidadePackIdRoute,
   AulasPackIdRoute: AulasPackIdRoute,
   AulasRevisarRoute: AulasRevisarRoute,
+  LivroPageRoute: LivroPageRoute,
   RelatorioSessionIdRoute: RelatorioSessionIdRoute,
   SessaoSessionIdRoute: SessaoSessionIdRoute,
   AplicabilidadeIndexRoute: AplicabilidadeIndexRoute,

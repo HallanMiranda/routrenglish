@@ -8,6 +8,7 @@ import type { DrillPack, Mission } from "@/data/types";
 import { bestTalk, clock, nextGoal, spokenToday } from "@/talk/goal";
 import { t } from "@/lib/i18n/pt-BR";
 import { loadCourses, unitNumber, unitTitle } from "@/course/course";
+import { BOOK_COURSE, pagesOfUnit } from "@/book/book";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -40,8 +41,10 @@ function Today() {
   useEffect(() => {
     let alive = true;
     (async () => {
-      const [mission, streak, cards, courses, talks] = await Promise.all([repo.getTodayMission(), repo.getStreak(), repo.listDueCards(), loadCourses(), repo.listTalks()]);
-      const cur = courses.find((c) => c.current)?.current;
+      const [mission, streak, cards, courses, talks, pagesDone] = await Promise.all([repo.getTodayMission(), repo.getStreak(), repo.listDueCards(), loadCourses(), repo.listTalks(), repo.listBookPagesDone()]);
+      const book = courses.find((c) => c.course.id === BOOK_COURSE);
+      const withPages = book?.units.find((u) => { const ps = pagesOfUnit(unitNumber(u.pack)); return ps.length > 0 && ps.some((p) => !pagesDone.includes(p.page)); });
+      const cur = withPages ?? courses.find((c) => c.current)?.current;
       const unit = cur ? { pack: cur.pack, n: unitNumber(cur.pack) } : null;
       const talk = { goal: nextGoal(talks), today: spokenToday(talks), best: bestTalk(talks) };
       if (alive) setS({ loading: false, mission, streak, due: cards.length, unit, talk });

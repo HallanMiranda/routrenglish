@@ -29,6 +29,9 @@ export interface Repo {
   startOrResumeSession(missionId: string): Promise<Session>;
   getSession(id: string): Promise<Session | null>;
   listTalks(): Promise<TalkSession[]>;
+  /** Book Students: pages the learner marked as studied. */
+  listBookPagesDone(): Promise<number[]>;
+  setBookPageDone(page: number, done: boolean): Promise<number[]>;
   saveTalk(t: Omit<TalkSession, "id" | "created_at">): Promise<TalkSession>;
   completeStep(sessionId: string, step: StepIndex): Promise<Session>;
   finishSession(sessionId: string): Promise<Session>;

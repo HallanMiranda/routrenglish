@@ -2,7 +2,7 @@ import { fromFirstUnfinished, groupCollections } from "@/drills/collections";
 import { markStep, saveChallenge, unitTag } from "@/course/course";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Gauge, HelpCircle, PartyPopper, Pause, Play, RotateCcw, Sparkles, Volume2, X } from "lucide-react";
+import { Gauge, HelpCircle, Keyboard, Mic, PartyPopper, Pause, Play, RotateCcw, Send, Sparkles, Volume2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MicButton, type MicState } from "@/components/session/MicButton";
 import { CoachAvatar, DiffLine, Hearts, LIVES, PuloCard } from "@/components/drill/CoachParts";
@@ -148,6 +148,7 @@ function LessonPage() {
   const search = Route.useSearch();
   const [packTitle, setPackTitle] = useState("");
   useEffect(() => {
+    if (search.modo === "unidade" && search.pack) { void repo.getDrillPack(search.pack).then((p) => p && setPackTitle(unitTag(p))); return; }
     if (search.modo !== "pacotes" || !search.pack || search.pack.startsWith("col:")) return;
     void repo.getDrillPack(search.pack).then((p) => p && setPackTitle(p.title_pt));
   }, [search.modo, search.pack]);
@@ -181,6 +182,11 @@ function LessonPage() {
   const wantAudio = useRef(false);
   const abortRef = useRef<AbortController | null>(null);
   const btnCmd = useRef<VoiceCommand | null>(null);
+  // Typed answers: the learner can answer by text instead of voice.
+  const [typing, setTyping] = useState(false);
+  const typingRef = useRef(false);
+  const [typed, setTyped] = useState("");
+  const typedWait = useRef<((r: Listened) => void) | null>(null);
   const resumeRef = useRef<(() => void) | null>(null);
   const slowRef = useRef(false);
   const clock = useRef({ start: 0, pausedAt: 0, pausedTotal: 0 });
@@ -225,7 +231,31 @@ function LessonPage() {
     setError(null);
   }
 
+  function waitTyped(): Promise<Listened> {
+    setMic("idle");
+    lastAudio.current = null;
+    setHeard("");
+    return new Promise((resolve) => { typedWait.current = resolve; });
+  }
+  function sendTyped() {
+    const txt = typed.trim();
+    if (!txt || !typedWait.current) return;
+    const r = typedWait.current;
+    typedWait.current = null;
+    setTyped("");
+    setHeard(txt);
+    r(detectCommand(txt) ? { cmd: detectCommand(txt)! } : { text: txt });
+  }
+  function toggleTyping() {
+    const on = !typingRef.current;
+    typingRef.current = on;
+    setTyping(on);
+    if (on) abortRef.current?.abort();
+    else if (typedWait.current) { const r = typedWait.current; typedWait.current = null; r(null); }
+  }
+
   function button(cmd: VoiceCommand) {
+    if (typedWait.current) { const r = typedWait.current; typedWait.current = null; r({ cmd }); return; }
     btnCmd.current = cmd;
     abortRef.current?.abort();
     stopCoach();
@@ -233,6 +263,7 @@ function LessonPage() {
 
   async function listen(expected: string[], spoken: { s: number }): Promise<Listened> {
     if (btnCmd.current) { const c = btnCmd.current; btnCmd.current = null; return { cmd: c }; }
+    if (typingRef.current) return waitTyped();
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     setHeard("");
@@ -256,6 +287,7 @@ function LessonPage() {
       setMic("idle");
       lastAudio.current = h.audio;
       if (btnCmd.current) { const c = btnCmd.current; btnCmd.current = null; return { cmd: c }; }
+      if (typingRef.current) return waitTyped();
       spoken.s += h.seconds;
       if (!h.transcript) return null;
       const cmd = detectCommand(h.transcript);
@@ -264,10 +296,14 @@ function LessonPage() {
       setMic("idle");
       if (timedOut) return { cmd: "dontKnow" };
       if (btnCmd.current) { const c = btnCmd.current; btnCmd.current = null; return { cmd: c }; }
+      if (typingRef.current) return waitTyped();
       const msg = e instanceof Error ? e.message : t.speech.failed;
       if (msg === t.speech.noSpeech) return null;
-      setError(msg);
-      return { cmd: "pause" };
+      // No microphone (or no permission): keep the lesson going by text.
+      setError(`${msg} ${L.typingFallback}`);
+      typingRef.current = true;
+      setTyping(true);
+      return waitTyped();
     }
   }
 
@@ -592,11 +628,13 @@ function LessonPage() {
     resumeRef.current?.();
   }
 
-  const title = search.modo === "unidade" ? t.aulas.steps[search.parte === "perguntas" ? 2 : search.parte === "desafio" ? 4 : 1]! : search.modo === "livre" ? L.free : search.modo === "print" ? L.printTitle(material?.title ?? "") : packTitle || L.fromPacks;
+  const unitPart = t.aulas.steps[search.parte === "perguntas" ? 2 : search.parte === "desafio" ? 4 : 1]!;
+  const title = search.modo === "unidade" ? (packTitle ? `${unitPart} · ${packTitle}` : unitPart) : search.modo === "livre" ? L.free : search.modo === "print" ? L.printTitle(material?.title ?? "") : packTitle || L.fromPacks;
   const toPrint = search.modo === "print" && !!search.mat;
-  const backUnit = search.modo === "unidade" ? search.pack : material?.unit_pack_id;
+  const backUnit = search.modo === "unidade" ? null : material?.unit_pack_id;
   const Back = ({ children, ...rest }: { children: ReactNode; onClick?: () => void; className?: string }) =>
-    backUnit ? <Link to="/aulas/$packId" params={{ packId: backUnit }} {...rest}>{children}</Link>
+    search.modo === "unidade" ? <Link to="/tete-a-tete" search={{ u: search.pack }} {...rest}>{children}</Link>
+    : backUnit ? <Link to="/aulas/$packId" params={{ packId: backUnit }} {...rest}>{children}</Link>
     : toPrint ? <Link to="/prints/$materialId" params={{ materialId: search.mat }} {...rest}>{children}</Link>
     : <Link to="/aplicabilidade" {...rest}>{children}</Link>;
   const printImg = material?.images?.[0] ?? material?.thumbnail;
@@ -657,8 +695,30 @@ function LessonPage() {
             <div className="flex min-h-14 w-full items-center justify-center text-center">
               {ops && ops.some((o) => o.type !== "equal") ? <DiffLine ops={ops} /> : heard ? <p lang="en" className="text-headline">{heard}</p> : null}
             </div>
-            <MicButton state={mic} onClick={() => (mic === "recording" ? abortRef.current?.abort() : undefined)} disabled={mic !== "recording"} />
-            <p role="status" aria-live="polite" className="text-caption h-5 font-semibold text-muted-foreground">{t.mic.states[mic]}</p>
+            {typing ? (
+              <form className="flex w-full gap-2" onSubmit={(e) => { e.preventDefault(); sendTyped(); }}>
+                <input
+                  lang="en"
+                  autoFocus
+                  autoCapitalize="sentences"
+                  autoComplete="off"
+                  value={typed}
+                  onChange={(e) => setTyped(e.target.value)}
+                  placeholder={L.typePlaceholder}
+                  aria-label={L.typePlaceholder}
+                  className="h-12 min-w-0 flex-1 rounded-full border bg-card px-4 text-base outline-none focus:border-primary"
+                />
+                <Button type="submit" size="lg" className="h-12 rounded-full px-5" disabled={!typed.trim()}><Send /></Button>
+              </form>
+            ) : (
+              <MicButton state={mic} onClick={() => (mic === "recording" ? abortRef.current?.abort() : undefined)} disabled={mic !== "recording"} />
+            )}
+            <div className="flex items-center gap-3">
+              {!typing && <p role="status" aria-live="polite" className="text-caption h-5 font-semibold text-muted-foreground">{t.mic.states[mic]}</p>}
+              <Button variant="ghost" size="sm" onClick={toggleTyping} aria-pressed={typing}>
+                {typing ? <><Mic /> {L.answerVoice}</> : <><Keyboard /> {L.answerText}</>}
+              </Button>
+            </div>
             {error && <p role="alert" className="text-center text-base text-destructive">{error}</p>}
             {wantAudio.current && (
               <Button variant="ghost" size="sm" disabled={assessQueued} onClick={() => { assessRef.current = true; setAssessQueued(true); }}>

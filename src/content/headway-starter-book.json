@@ -1,0 +1,2937 @@
+{
+"course_id": "headway-starter",
+"pages": [
+{
+"page": 28,
+"unit": 5,
+"title": "Things I like",
+"subtitle_pt": "Esportes, comida e bebida · I like / I don't like",
+"sections": [
+{
+"kind": "intro",
+"text_pt": "Nesta página você aprende a dizer do que gosta e do que não gosta, com 15 palavras de esportes, comidas e bebidas."
+},
+{
+"kind": "vocab",
+"title_pt": "Esportes",
+"items": [
+{
+"en": "football",
+"pt": "futebol americano"
+},
+{
+"en": "basketball",
+"pt": "basquete"
+},
+{
+"en": "tennis",
+"pt": "tênis"
+},
+{
+"en": "swimming",
+"pt": "natação"
+}
+]
+},
+{
+"kind": "vocab",
+"title_pt": "Comida",
+"items": [
+{
+"en": "hamburger",
+"pt": "hambúrguer"
+},
+{
+"en": "pizza",
+"pt": "pizza"
+},
+{
+"en": "Chinese food",
+"pt": "comida chinesa"
+},
+{
+"en": "Italian food",
+"pt": "comida italiana"
+},
+{
+"en": "oranges",
+"pt": "laranjas"
+},
+{
+"en": "ice cream",
+"pt": "sorvete"
+}
+]
+},
+{
+"kind": "vocab",
+"title_pt": "Bebidas",
+"items": [
+{
+"en": "water",
+"pt": "água"
+},
+{
+"en": "soda",
+"pt": "refrigerante"
+},
+{
+"en": "tea",
+"pt": "chá"
+},
+{
+"en": "coffee",
+"pt": "café"
+},
+{
+"en": "juice",
+"pt": "suco"
+}
+]
+},
+{
+"kind": "grammar",
+"title_pt": "Gostar no presente",
+"rows": [
+{
+"label": "Afirmativa",
+"en": "I like pizza."
+},
+{
+"label": "Negativa",
+"en": "I don't like tea."
+},
+{
+"label": "Três coisas",
+"en": "I like swimming, pizza, and soda."
+}
+],
+"note_pt": "Gostar DE = like, sem 'of'. Com várias coisas, use vírgulas e 'and' antes da última."
+},
+{
+"kind": "fill",
+"title_pt": "Complete com like ou don't like (pense na sua vida, mas confira o sentido)",
+"items": [
+{
+"en": "I ___ ice cream. It's delicious!",
+"answers": [
+"like",
+"love"
+],
+"pt": "Eu gosto de sorvete. É delicioso!"
+},
+{
+"en": "I ___ tea. It's awful!",
+"answers": [
+"don't like",
+"do not like"
+],
+"pt": "Eu não gosto de chá. É horrível!"
+},
+{
+"en": "I ___ swimming, tennis, and basketball.",
+"answers": [
+"like",
+"love"
+],
+"pt": "Eu gosto de natação, tênis e basquete."
+},
+{
+"en": "I ___ coffee, but I like juice.",
+"answers": [
+"don't like",
+"do not like"
+],
+"pt": "Eu não gosto de café, mas gosto de suco."
+}
+]
+},
+{
+"kind": "choose",
+"title_pt": "Escolha a frase certa",
+"items": [
+{
+"options": [
+"I like of pizza.",
+"I like pizza."
+],
+"correct": 1,
+"why_pt": "Like não leva 'of'."
+},
+{
+"options": [
+"I no like soda.",
+"I don't like soda."
+],
+"correct": 1,
+"why_pt": "Negativa no presente: don't + verbo."
+},
+{
+"options": [
+"I like swimming, pizza and soda.",
+"I like swimming, pizza, soda."
+],
+"correct": 0,
+"why_pt": "Antes do último item vem 'and'."
+}
+]
+},
+{
+"kind": "speak",
+"title_pt": "Fale em voz alta",
+"prompts": [
+{
+"q": "Say three things you like.",
+"pt": "Diga três coisas de que você gosta.",
+"model": "I like coffee, pizza, and soccer."
+},
+{
+"q": "Say two things you don't like.",
+"pt": "Diga duas coisas de que você não gosta.",
+"model": "I don't like tea, and I don't like swimming."
+}
+]
+}
+]
+},
+{
+"page": 29,
+"unit": 5,
+"title": "Negatives and questions",
+"subtitle_pt": "Do you like…? Yes, I do. / No, I don't.",
+"sections": [
+{
+"kind": "intro",
+"text_pt": "Agora você pergunta e responde sobre gostos com do / don't, como os gêmeos Harvey e Eva."
+},
+{
+"kind": "grammar",
+"title_pt": "Grammar Spot",
+"rows": [
+{
+"label": "Afirmativa",
+"en": "I / You / We / They like tennis."
+},
+{
+"label": "Negativa",
+"en": "I / You / We / They don't like tennis."
+},
+{
+"label": "Pergunta",
+"en": "Do you like basketball?"
+},
+{
+"label": "Pergunta com 'o que'",
+"en": "What do you like?"
+},
+{
+"label": "Resposta curta (sim)",
+"en": "Yes, I do. / Yes, we do."
+},
+{
+"label": "Resposta curta (não)",
+"en": "No, I don't. / No, they don't."
+}
+],
+"note_pt": "Na pergunta entra DO no começo. Na resposta curta repita só do/don't: Yes, I do (não 'Yes, I like')."
+},
+{
+"kind": "dialogue",
+"title_pt": "Harvey fala dos gostos dele",
+"lines": [
+{
+"who": "Harvey",
+"en": "I like sports a lot. I like football and basketball.",
+"pt": "Eu gosto muito de esportes. Gosto de futebol americano e basquete."
+},
+{
+"who": "Harvey",
+"en": "But I don't like tennis, and I don't like swimming.",
+"pt": "Mas não gosto de tênis e não gosto de natação."
+},
+{
+"who": "Harvey",
+"en": "I love pizza, but I don't like Chinese food.",
+"pt": "Eu amo pizza, mas não gosto de comida chinesa."
+}
+],
+"note_pt": "Texto adaptado para estudo. O original está na página 29 do seu livro."
+},
+{
+"kind": "dialogue",
+"title_pt": "Harvey e Eva são gêmeos",
+"lines": [
+{
+"who": "Interviewer",
+"en": "Do you two like the same things?",
+"pt": "Vocês dois gostam das mesmas coisas?"
+},
+{
+"who": "Eva",
+"en": "We really like pizza. It's delicious!",
+"pt": "A gente gosta muito de pizza. É deliciosa!"
+},
+{
+"who": "Harvey",
+"en": "And we both like ice cream. It's fantastic!",
+"pt": "E nós dois gostamos de sorvete. É fantástico!"
+},
+{
+"who": "Eva",
+"en": "But we don't like tea. It's awful!",
+"pt": "Mas não gostamos de chá. É horrível!"
+},
+{
+"who": "Interviewer",
+"en": "Do you like basketball?",
+"pt": "Vocês gostam de basquete?"
+},
+{
+"who": "Harvey",
+"en": "Yes, we do. It's really exciting!",
+"pt": "Sim. É muito emocionante!"
+}
+],
+"note_pt": "Texto adaptado para estudo. O original está na página 29 do seu livro."
+},
+{
+"kind": "vocab",
+"title_pt": "Adjetivos para opinar",
+"items": [
+{
+"en": "delicious",
+"pt": "delicioso"
+},
+{
+"en": "fantastic",
+"pt": "fantástico"
+},
+{
+"en": "great",
+"pt": "ótimo"
+},
+{
+"en": "exciting",
+"pt": "emocionante"
+},
+{
+"en": "awful",
+"pt": "horrível"
+}
+]
+},
+{
+"kind": "fill",
+"title_pt": "Complete com do ou don't",
+"items": [
+{
+"en": "___ you like basketball? — Yes, I do.",
+"answers": [
+"Do"
+],
+"pt": "Você gosta de basquete? — Sim."
+},
+{
+"en": "Do you like tea? — No, I ___.",
+"answers": [
+"don't",
+"do not"
+],
+"pt": "Você gosta de chá? — Não."
+},
+{
+"en": "What ___ you like?",
+"answers": [
+"do"
+],
+"pt": "Do que você gosta?"
+},
+{
+"en": "They ___ like football. They like tennis.",
+"answers": [
+"don't",
+"do not"
+],
+"pt": "Eles não gostam de futebol americano. Gostam de tênis."
+}
+]
+},
+{
+"kind": "choose",
+"title_pt": "Escolha a resposta certa",
+"items": [
+{
+"options": [
+"Do you like coffee? — Yes, I like.",
+"Do you like coffee? — Yes, I do."
+],
+"correct": 1,
+"why_pt": "Resposta curta: Yes, I do."
+},
+{
+"options": [
+"Do they like pizza?",
+"They like pizza?"
+],
+"correct": 0,
+"why_pt": "Pergunta precisa de Do no começo."
+},
+{
+"options": [
+"We both like ice cream.",
+"We like both ice cream."
+],
+"correct": 0,
+"why_pt": "'Os dois' = both, antes do verbo."
+}
+]
+},
+{
+"kind": "speak",
+"title_pt": "Pergunte e responda",
+"prompts": [
+{
+"q": "Do you like basketball?",
+"pt": "Você gosta de basquete?",
+"model": "No, I don't, but I like soccer."
+},
+{
+"q": "What do Harvey and Eva like?",
+"pt": "Do que Harvey e Eva gostam?",
+"model": "They like pizza, ice cream, and basketball."
+},
+{
+"q": "Do you like Italian food?",
+"pt": "Você gosta de comida italiana?",
+"model": "Yes, I do. I love pasta."
+}
+]
+}
+]
+},
+{
+"page": 30,
+"unit": 5,
+"title": "Diego from California",
+"subtitle_pt": "Where do you come from? · a ou an?",
+"sections": [
+{
+"kind": "intro",
+"text_pt": "Leitura sobre o Diego e as perguntas mais usadas para conhecer alguém: de onde vem, onde mora, com quem, onde trabalha."
+},
+{
+"kind": "dialogue",
+"title_pt": "Diego se apresenta",
+"lines": [
+{
+"who": "Diego",
+"en": "Hi! I'm Diego. I come from Los Angeles, but now I live in New York.",
+"pt": "Oi! Sou o Diego. Venho de Los Angeles, mas agora moro em Nova York."
+},
+{
+"who": "Diego",
+"en": "I live in a small apartment with two friends.",
+"pt": "Moro num apartamento pequeno com dois amigos."
+},
+{
+"who": "Diego",
+"en": "I'm a server in an Italian restaurant, and I'm a drama student, too.",
+"pt": "Sou garçom num restaurante italiano e também estudo teatro."
+},
+{
+"who": "Diego",
+"en": "I drink coffee, but I don't drink tea.",
+"pt": "Tomo café, mas não tomo chá."
+},
+{
+"who": "Diego",
+"en": "I speak English and Spanish, but I don't speak Italian.",
+"pt": "Falo inglês e espanhol, mas não falo italiano."
+},
+{
+"who": "Diego",
+"en": "I want to be an actor.",
+"pt": "Quero ser ator."
+}
+],
+"note_pt": "Texto adaptado para estudo. O original está na página 30 do seu livro."
+},
+{
+"kind": "dialogue",
+"title_pt": "Entrevista com o Diego",
+"lines": [
+{
+"who": "Q",
+"en": "Where do you come from?",
+"pt": "De onde você vem?"
+},
+{
+"who": "Diego",
+"en": "I come from California.",
+"pt": "Venho da Califórnia."
+},
+{
+"who": "Q",
+"en": "Do you live in Los Angeles?",
+"pt": "Você mora em Los Angeles?"
+},
+{
+"who": "Diego",
+"en": "No, I don't. I live and work in New York.",
+"pt": "Não. Moro e trabalho em Nova York."
+},
+{
+"who": "Q",
+"en": "Do you live with friends?",
+"pt": "Você mora com amigos?"
+},
+{
+"who": "Diego",
+"en": "Yes, I do. I live with two friends.",
+"pt": "Sim. Moro com dois amigos."
+},
+{
+"who": "Q",
+"en": "Where do you work?",
+"pt": "Onde você trabalha?"
+},
+{
+"who": "Diego",
+"en": "I work in an Italian restaurant.",
+"pt": "Trabalho num restaurante italiano."
+},
+{
+"who": "Q",
+"en": "Do you like your job?",
+"pt": "Você gosta do seu trabalho?"
+},
+{
+"who": "Diego",
+"en": "No, I don't. I want to be an actor.",
+"pt": "Não. Quero ser ator."
+}
+]
+},
+{
+"kind": "grammar",
+"title_pt": "a ou an?",
+"rows": [
+{
+"label": "a + som de consoante",
+"en": "a small apartment · a server · a student · a computer"
+},
+{
+"label": "an + som de vogal",
+"en": "an actor · an Italian restaurant · an orange · an American car · an ice cream"
+}
+],
+"note_pt": "Olhe o SOM da palavra seguinte, não a letra: an actor, mas a university (som de 'iu')."
+},
+{
+"kind": "fill",
+"title_pt": "Escreva a ou an",
+"items": [
+{
+"en": "___ ice cream",
+"answers": [
+"an"
+],
+"pt": "um sorvete"
+},
+{
+"en": "___ orange",
+"answers": [
+"an"
+],
+"pt": "uma laranja"
+},
+{
+"en": "___ student",
+"answers": [
+"a"
+],
+"pt": "um estudante"
+},
+{
+"en": "___ American car",
+"answers": [
+"an"
+],
+"pt": "um carro americano"
+},
+{
+"en": "___ computer",
+"answers": [
+"a"
+],
+"pt": "um computador"
+},
+{
+"en": "He wants to be ___ actor.",
+"answers": [
+"an"
+],
+"pt": "Ele quer ser ator."
+}
+]
+},
+{
+"kind": "match",
+"title_pt": "Ligue o verbo à expressão",
+"pairs": [
+{
+"a": "eat",
+"b": "Italian food"
+},
+{
+"a": "play",
+"b": "sports"
+},
+{
+"a": "live",
+"b": "in an apartment"
+},
+{
+"a": "have",
+"b": "two brothers"
+},
+{
+"a": "work",
+"b": "in a bank"
+},
+{
+"a": "come",
+"b": "from Japan"
+},
+{
+"a": "want",
+"b": "to be a millionaire"
+},
+{
+"a": "drink",
+"b": "tea"
+},
+{
+"a": "speak",
+"b": "Spanish"
+}
+]
+},
+{
+"kind": "speak",
+"title_pt": "Responda sobre você (respostas verdadeiras)",
+"prompts": [
+{
+"q": "Where do you come from?",
+"pt": "De onde você vem?",
+"model": "I come from Brazil, from Hortolândia."
+},
+{
+"q": "Do you live with friends?",
+"pt": "Você mora com amigos?",
+"model": "No, I don't. I live with my family."
+},
+{
+"q": "Where do you work?",
+"pt": "Onde você trabalha?",
+"model": "I work from home."
+},
+{
+"q": "Do you like your job?",
+"pt": "Você gosta do seu trabalho?",
+"model": "Yes, I do. I like it a lot."
+}
+]
+}
+]
+},
+{
+"page": 31,
+"unit": 5,
+"title": "Talking about you",
+"subtitle_pt": "Perguntas com do · Check it",
+"sections": [
+{
+"kind": "intro",
+"text_pt": "Pratique as conversas do Diego no dia a dia e faça perguntas para um colega. No fim, o 'Check it' mostra os erros mais comuns."
+},
+{
+"kind": "dialogue",
+"title_pt": "Situações com o Diego",
+"lines": [
+{
+"who": "Roommate",
+"en": "Bye, Diego. See you later.",
+"pt": "Tchau, Diego. Até mais tarde."
+},
+{
+"who": "Diego",
+"en": "Yeah, very late. I work late on Fridays.",
+"pt": "É, bem tarde. Sexta eu trabalho até tarde."
+},
+{
+"who": "Diego",
+"en": "Good evening. Do you want to order?",
+"pt": "Boa noite. Querem pedir?"
+},
+{
+"who": "Customer",
+"en": "Yes. A large cheese pizza, please. Do you have water?",
+"pt": "Sim. Uma pizza grande de queijo, por favor. Vocês têm água?"
+},
+{
+"who": "Mom",
+"en": "Do you like your apartment?",
+"pt": "Você gosta do seu apartamento?"
+},
+{
+"who": "Diego",
+"en": "Yes, I do, but it's a little small for three people.",
+"pt": "Gosto, mas é um pouco pequeno para três pessoas."
+}
+],
+"note_pt": "Texto adaptado para estudo. O original está na página 31 do seu livro."
+},
+{
+"kind": "fill",
+"title_pt": "Complete as perguntas",
+"items": [
+{
+"en": "Where ___ you come from?",
+"answers": [
+"do"
+],
+"pt": "De onde você vem?"
+},
+{
+"en": "Do you ___ in a house or an apartment?",
+"answers": [
+"live"
+],
+"pt": "Você mora numa casa ou num apartamento?"
+},
+{
+"en": "Where ___ you work?",
+"answers": [
+"do"
+],
+"pt": "Onde você trabalha?"
+},
+{
+"en": "___ you like your work?",
+"answers": [
+"Do"
+],
+"pt": "Você gosta do seu trabalho?"
+},
+{
+"en": "How many languages ___ you speak?",
+"answers": [
+"do"
+],
+"pt": "Quantas línguas você fala?"
+},
+{
+"en": "What sports ___ you play?",
+"answers": [
+"do"
+],
+"pt": "Que esportes você pratica?"
+},
+{
+"en": "Do you ___ to be a millionaire?",
+"answers": [
+"want"
+],
+"pt": "Você quer ser milionário?"
+}
+]
+},
+{
+"kind": "choose",
+"title_pt": "Check it: escolha a frase correta",
+"items": [
+{
+"options": [
+"Live you in Osaka?",
+"Do you live in Osaka?"
+],
+"correct": 1,
+"why_pt": "Pergunta: Do + you + verbo."
+},
+{
+"options": [
+"Where do you come from?",
+"Where you come from?"
+],
+"correct": 0,
+"why_pt": "Não esqueça o do."
+},
+{
+"options": [
+"Do you speak Korean?",
+"Are you speak Korean?"
+],
+"correct": 0,
+"why_pt": "Speak é verbo normal: usa do, não are."
+},
+{
+"options": [
+"I don't speak Chinese.",
+"I no speak Chinese."
+],
+"correct": 0,
+"why_pt": "Negativa: don't."
+},
+{
+"options": [
+"\"Do you like soccer?\" \"Yes, I like.\"",
+"\"Do you like soccer?\" \"Yes, I do.\""
+],
+"correct": 1,
+"why_pt": "Resposta curta: Yes, I do."
+},
+{
+"options": [
+"He's a actor.",
+"He's an actor."
+],
+"correct": 1,
+"why_pt": "Som de vogal: an actor."
+}
+]
+},
+{
+"kind": "speak",
+"title_pt": "Responda sobre você",
+"prompts": [
+{
+"q": "How many languages do you speak?",
+"pt": "Quantas línguas você fala?",
+"model": "I speak two languages, Portuguese and English."
+},
+{
+"q": "Do you like Chinese food?",
+"pt": "Você gosta de comida chinesa?",
+"model": "Yes, I do. I like it a lot."
+},
+{
+"q": "Do you want to be a millionaire?",
+"pt": "Você quer ser milionário?",
+"model": "Yes, of course! I want to travel a lot."
+}
+]
+}
+]
+},
+{
+"page": 32,
+"unit": 5,
+"title": "Languages and nationalities",
+"subtitle_pt": "Países, nacionalidades e línguas",
+"sections": [
+{
+"kind": "intro",
+"text_pt": "Os países mais comuns, a nacionalidade de cada um e a língua que se fala lá."
+},
+{
+"kind": "vocab",
+"title_pt": "País → nacionalidade",
+"items": [
+{
+"en": "England → English",
+"pt": "Inglaterra → inglês"
+},
+{
+"en": "Canada → Canadian",
+"pt": "Canadá → canadense"
+},
+{
+"en": "Italy → Italian",
+"pt": "Itália → italiano"
+},
+{
+"en": "Mexico → Mexican",
+"pt": "México → mexicano"
+},
+{
+"en": "Brazil → Brazilian",
+"pt": "Brasil → brasileiro"
+},
+{
+"en": "Japan → Japanese",
+"pt": "Japão → japonês"
+},
+{
+"en": "South Korea → Korean",
+"pt": "Coreia do Sul → coreano"
+},
+{
+"en": "China → Chinese",
+"pt": "China → chinês"
+},
+{
+"en": "France → French",
+"pt": "França → francês"
+},
+{
+"en": "the United States → American",
+"pt": "Estados Unidos → americano"
+},
+{
+"en": "Spain → Spanish",
+"pt": "Espanha → espanhol"
+}
+]
+},
+{
+"kind": "grammar",
+"title_pt": "Que língua eles falam?",
+"rows": [
+{
+"label": "Pergunta",
+"en": "What do they speak in Brazil?"
+},
+{
+"label": "Resposta",
+"en": "In Brazil they speak Portuguese."
+},
+{
+"label": "Duas línguas",
+"en": "In Canada they speak English and French."
+}
+],
+"note_pt": "Nacionalidade e língua sempre com letra MAIÚSCULA em inglês: Brazilian, Portuguese. 'The' só em the United States."
+},
+{
+"kind": "fill",
+"title_pt": "Complete com a língua",
+"items": [
+{
+"en": "In Mexico they speak ___.",
+"answers": [
+"Spanish"
+],
+"pt": "No México eles falam espanhol."
+},
+{
+"en": "In Japan they speak ___.",
+"answers": [
+"Japanese"
+],
+"pt": "No Japão eles falam japonês."
+},
+{
+"en": "In France they speak ___.",
+"answers": [
+"French"
+],
+"pt": "Na França eles falam francês."
+},
+{
+"en": "In South Korea they speak ___.",
+"answers": [
+"Korean"
+],
+"pt": "Na Coreia do Sul eles falam coreano."
+},
+{
+"en": "In the United States they speak ___.",
+"answers": [
+"English"
+],
+"pt": "Nos Estados Unidos eles falam inglês."
+},
+{
+"en": "In Brazil they speak ___.",
+"answers": [
+"Portuguese"
+],
+"pt": "No Brasil eles falam português."
+}
+]
+},
+{
+"kind": "choose",
+"title_pt": "Escolha a certa",
+"items": [
+{
+"options": [
+"I'm brazilian.",
+"I'm Brazilian."
+],
+"correct": 1,
+"why_pt": "Nacionalidade com maiúscula."
+},
+{
+"options": [
+"In United States they speak English.",
+"In the United States they speak English."
+],
+"correct": 1,
+"why_pt": "The United States leva 'the'."
+},
+{
+"options": [
+"She's from Canada. She's Canadian.",
+"She's from Canada. She's Canada."
+],
+"correct": 0,
+"why_pt": "País ≠ nacionalidade."
+}
+]
+},
+{
+"kind": "speak",
+"title_pt": "Pergunte e responda",
+"prompts": [
+{
+"q": "What do they speak in Brazil?",
+"pt": "O que eles falam no Brasil?",
+"model": "They speak Portuguese."
+},
+{
+"q": "What do they speak in Canada?",
+"pt": "O que eles falam no Canadá?",
+"model": "They speak English and French."
+},
+{
+"q": "What nationality are you?",
+"pt": "Qual é a sua nacionalidade?",
+"model": "I'm Brazilian."
+}
+]
+}
+]
+},
+{
+"page": 33,
+"unit": 5,
+"title": "What's this? Where's it from?",
+"subtitle_pt": "Adjetivo + substantivo",
+"sections": [
+{
+"kind": "intro",
+"text_pt": "Como dizer a origem das coisas: an American car, Spanish oranges. O adjetivo vem ANTES e nunca vai para o plural."
+},
+{
+"kind": "vocab",
+"title_pt": "Coisas e origem",
+"items": [
+{
+"en": "an American car",
+"pt": "um carro americano"
+},
+{
+"en": "a Korean TV",
+"pt": "uma TV coreana"
+},
+{
+"en": "Spanish oranges",
+"pt": "laranjas espanholas"
+},
+{
+"en": "a Japanese camera",
+"pt": "uma câmera japonesa"
+},
+{
+"en": "Mexican food",
+"pt": "comida mexicana"
+},
+{
+"en": "an English dictionary",
+"pt": "um dicionário de inglês"
+},
+{
+"en": "an Italian bag",
+"pt": "uma bolsa italiana"
+},
+{
+"en": "Brazilian coffee",
+"pt": "café brasileiro"
+},
+{
+"en": "Chinese tea",
+"pt": "chá chinês"
+}
+]
+},
+{
+"kind": "grammar",
+"title_pt": "Grammar Spot",
+"rows": [
+{
+"label": "O adjetivo vem antes",
+"en": "a Japanese camera (não: a camera Japanese)"
+},
+{
+"label": "Sem -s no adjetivo",
+"en": "Spanish oranges (não: Spanishes oranges)"
+},
+{
+"label": "Também",
+"en": "blue jeans (não: blues jeans)"
+}
+],
+"note_pt": "Pense ao contrário do português: carro AMERICANO → AMERICAN car."
+},
+{
+"kind": "fill",
+"title_pt": "Escreva a frase (país entre parênteses)",
+"items": [
+{
+"en": "It's a ___ camera. (Japan)",
+"answers": [
+"Japanese"
+],
+"pt": "É uma câmera japonesa."
+},
+{
+"en": "They're ___ oranges. (Spain)",
+"answers": [
+"Spanish"
+],
+"pt": "São laranjas espanholas."
+},
+{
+"en": "It's ___ coffee. (Brazil)",
+"answers": [
+"Brazilian"
+],
+"pt": "É café brasileiro."
+},
+{
+"en": "It's an ___ car. (the US)",
+"answers": [
+"American"
+],
+"pt": "É um carro americano."
+},
+{
+"en": "It's ___ food. (Mexico)",
+"answers": [
+"Mexican"
+],
+"pt": "É comida mexicana."
+}
+]
+},
+{
+"kind": "choose",
+"title_pt": "Escolha a certa",
+"items": [
+{
+"options": [
+"Chinese tea",
+"tea Chinese"
+],
+"correct": 0,
+"why_pt": "Adjetivo antes do substantivo."
+},
+{
+"options": [
+"Italians bags",
+"Italian bags"
+],
+"correct": 1,
+"why_pt": "Adjetivo não tem plural."
+},
+{
+"options": [
+"Do you have an American car?",
+"Do you have a car American?"
+],
+"correct": 0,
+"why_pt": "Adjetivo antes."
+}
+]
+},
+{
+"kind": "speak",
+"title_pt": "Fale sobre você com have, eat e drink",
+"prompts": [
+{
+"q": "Do you drink Chinese tea?",
+"pt": "Você toma chá chinês?",
+"model": "No, I don't. I drink Brazilian coffee."
+},
+{
+"q": "Do you have an American car?",
+"pt": "Você tem um carro americano?",
+"model": "No, I don't. I have a Japanese car."
+},
+{
+"q": "What food do you eat?",
+"pt": "Que comida você come?",
+"model": "I eat Brazilian food, and sometimes Italian food."
+}
+]
+}
+]
+},
+{
+"page": 34,
+"unit": 5,
+"title": "At a party",
+"subtitle_pt": "Conhecer alguém numa festa",
+"sections": [
+{
+"kind": "intro",
+"text_pt": "Uma brasileira de São Paulo conversa com um ator numa festa em Miami. Use as mesmas perguntas para conhecer pessoas."
+},
+{
+"kind": "dialogue",
+"title_pt": "Numa festa em Miami",
+"lines": [
+{
+"who": "Alessandra",
+"en": "Hello, I'm Alessandra.",
+"pt": "Olá, sou a Alessandra."
+},
+{
+"who": "Justin",
+"en": "Hi, I'm Justin.",
+"pt": "Oi, sou o Justin."
+},
+{
+"who": "Alessandra",
+"en": "Do you live here in Miami?",
+"pt": "Você mora aqui em Miami?"
+},
+{
+"who": "Justin",
+"en": "No, I don't. I work in Miami, but I live in Coral Gables.",
+"pt": "Não. Trabalho em Miami, mas moro em Coral Gables."
+},
+{
+"who": "Alessandra",
+"en": "What's your job?",
+"pt": "Qual é o seu trabalho?"
+},
+{
+"who": "Justin",
+"en": "I'm an actor. You speak English very well. Where do you come from?",
+"pt": "Sou ator. Você fala inglês muito bem. De onde você vem?"
+},
+{
+"who": "Alessandra",
+"en": "I come from Brazil, from São Paulo.",
+"pt": "Venho do Brasil, de São Paulo."
+},
+{
+"who": "Justin",
+"en": "Oh, I love Brazil! I don't know São Paulo, but I know Rio.",
+"pt": "Ah, eu amo o Brasil! Não conheço São Paulo, mas conheço o Rio."
+},
+{
+"who": "Alessandra",
+"en": "Do you speak Portuguese?",
+"pt": "Você fala português?"
+},
+{
+"who": "Justin",
+"en": "No, I don't. I speak Spanish, but I don't speak Portuguese.",
+"pt": "Não. Falo espanhol, mas não falo português."
+}
+],
+"note_pt": "Texto adaptado para estudo. O original está na página 34 do seu livro."
+},
+{
+"kind": "choose",
+"title_pt": "O que o Justin diz?",
+"items": [
+{
+"options": [
+"I live in Miami.",
+"I live in Coral Gables."
+],
+"correct": 1,
+"why_pt": "Ele trabalha em Miami, mas mora em Coral Gables."
+},
+{
+"options": [
+"I'm a doctor.",
+"I'm an actor."
+],
+"correct": 1,
+"why_pt": "Ele é ator."
+},
+{
+"options": [
+"I know São Paulo very well.",
+"I don't know São Paulo."
+],
+"correct": 1,
+"why_pt": "Ele conhece o Rio, não São Paulo."
+},
+{
+"options": [
+"I speak Spanish and Portuguese.",
+"I don't speak Portuguese."
+],
+"correct": 1,
+"why_pt": "Ele fala espanhol, mas não português."
+}
+]
+},
+{
+"kind": "fill",
+"title_pt": "Role play: complete as perguntas",
+"items": [
+{
+"en": "Hello! What's ___ name?",
+"answers": [
+"your"
+],
+"pt": "Olá! Qual é o seu nome?"
+},
+{
+"en": "Where ___ you live?",
+"answers": [
+"do"
+],
+"pt": "Onde você mora?"
+},
+{
+"en": "___ you have a house or an apartment?",
+"answers": [
+"Do"
+],
+"pt": "Você tem uma casa ou um apartamento?"
+},
+{
+"en": "What's your ___?",
+"answers": [
+"job"
+],
+"pt": "Qual é o seu trabalho?"
+},
+{
+"en": "Where do you ___?",
+"answers": [
+"work"
+],
+"pt": "Onde você trabalha?"
+},
+{
+"en": "How many languages do you ___?",
+"answers": [
+"speak"
+],
+"pt": "Quantas línguas você fala?"
+},
+{
+"en": "What sports ___ you like?",
+"answers": [
+"do"
+],
+"pt": "De que esportes você gosta?"
+}
+]
+},
+{
+"kind": "speak",
+"title_pt": "Você está na festa: responda",
+"prompts": [
+{
+"q": "Hello! What's your name?",
+"pt": "Olá! Qual é o seu nome?",
+"model": "Hi! My name's Allan. Nice to meet you."
+},
+{
+"q": "Where do you live?",
+"pt": "Onde você mora?",
+"model": "I live in Hortolândia, near Campinas, in Brazil."
+},
+{
+"q": "What's your job?",
+"pt": "Qual é o seu trabalho?",
+"model": "I'm an analytics engineer. I work with American clients."
+},
+{
+"q": "What sports do you like?",
+"pt": "De que esportes você gosta?",
+"model": "I like soccer a lot."
+}
+]
+}
+]
+},
+{
+"page": 35,
+"unit": 5,
+"title": "How much is it?",
+"subtitle_pt": "Números de 10 a 100 · preços",
+"sections": [
+{
+"kind": "intro",
+"text_pt": "Everyday English: contar de dez em dez até 100 e falar preços em dólar."
+},
+{
+"kind": "vocab",
+"title_pt": "Dezenas",
+"items": [
+{
+"en": "10 ten",
+"pt": "dez"
+},
+{
+"en": "20 twenty",
+"pt": "vinte"
+},
+{
+"en": "30 thirty",
+"pt": "trinta"
+},
+{
+"en": "40 forty",
+"pt": "quarenta"
+},
+{
+"en": "50 fifty",
+"pt": "cinquenta"
+},
+{
+"en": "60 sixty",
+"pt": "sessenta"
+},
+{
+"en": "70 seventy",
+"pt": "setenta"
+},
+{
+"en": "80 eighty",
+"pt": "oitenta"
+},
+{
+"en": "90 ninety",
+"pt": "noventa"
+},
+{
+"en": "100 one hundred",
+"pt": "cem"
+}
+]
+},
+{
+"kind": "vocab",
+"title_pt": "Preços",
+"items": [
+{
+"en": "30¢ thirty cents",
+"pt": "trinta centavos"
+},
+{
+"en": "$1 one dollar",
+"pt": "um dólar"
+},
+{
+"en": "$20 twenty dollars",
+"pt": "vinte dólares"
+},
+{
+"en": "$1.60 a dollar sixty",
+"pt": "um dólar e sessenta"
+},
+{
+"en": "$3.45 three forty-five",
+"pt": "três e quarenta e cinco"
+},
+{
+"en": "$22.80 twenty-two eighty",
+"pt": "vinte e dois e oitenta"
+}
+]
+},
+{
+"kind": "grammar",
+"title_pt": "Como falar preços",
+"rows": [
+{
+"label": "Pergunta",
+"en": "How much is it? / How much is the bag?"
+},
+{
+"label": "Resposta",
+"en": "It's $44.99. (forty-four ninety-nine)"
+},
+{
+"label": "Dica",
+"en": "$5.90 = five ninety (sem 'dollars' e sem 'and')"
+}
+],
+"note_pt": "Cuidado: thirteen (13) × thirty (30), fourteen (14) × forty (40). No -teen a força vai no fim: thir-TEEN; no -ty vai no começo: THIR-ty."
+},
+{
+"kind": "fill",
+"title_pt": "Escreva o número por extenso",
+"items": [
+{
+"en": "40 = ___",
+"answers": [
+"forty"
+],
+"pt": "quarenta (sem 'u')"
+},
+{
+"en": "90 = ___",
+"answers": [
+"ninety"
+],
+"pt": "noventa"
+},
+{
+"en": "15 = ___",
+"answers": [
+"fifteen"
+],
+"pt": "quinze"
+},
+{
+"en": "$17 = seventeen ___",
+"answers": [
+"dollars"
+],
+"pt": "dezessete dólares"
+},
+{
+"en": "$1.50 = a dollar ___",
+"answers": [
+"fifty"
+],
+"pt": "um dólar e cinquenta"
+}
+]
+},
+{
+"kind": "choose",
+"title_pt": "Escolha como se fala",
+"items": [
+{
+"options": [
+"$5.90 = five ninety",
+"$5.90 = five and ninety dollars"
+],
+"correct": 0,
+"why_pt": "Preço: só os números."
+},
+{
+"options": [
+"40 = fourty",
+"40 = forty"
+],
+"correct": 1,
+"why_pt": "Forty, sem u."
+},
+{
+"options": [
+"How many is it?",
+"How much is it?"
+],
+"correct": 1,
+"why_pt": "Preço = how much."
+}
+]
+},
+{
+"kind": "speak",
+"title_pt": "Pergunte o preço e responda",
+"prompts": [
+{
+"q": "How much is the phone?",
+"pt": "Quanto custa o celular?",
+"model": "It's ninety-nine ninety-five."
+},
+{
+"q": "How much is the dictionary?",
+"pt": "Quanto custa o dicionário?",
+"model": "It's seventeen ninety-five."
+},
+{
+"q": "How much is a coffee in your city?",
+"pt": "Quanto custa um café na sua cidade?",
+"model": "It's about five reais."
+}
+]
+}
+]
+},
+{
+"page": 36,
+"unit": 6,
+"title": "What time is it?",
+"subtitle_pt": "As horas",
+"sections": [
+{
+"kind": "intro",
+"text_pt": "Como perguntar e dizer as horas em inglês."
+},
+{
+"kind": "vocab",
+"title_pt": "As horas",
+"items": [
+{
+"en": "It's nine o'clock.",
+"pt": "São nove horas."
+},
+{
+"en": "It's nine thirty.",
+"pt": "São nove e meia."
+},
+{
+"en": "It's nine forty-five.",
+"pt": "São nove e quarenta e cinco."
+},
+{
+"en": "It's ten o'clock.",
+"pt": "São dez horas."
+},
+{
+"en": "It's ten fifteen.",
+"pt": "São dez e quinze."
+},
+{
+"en": "It's two thirty.",
+"pt": "São duas e meia."
+},
+{
+"en": "It's three fifteen.",
+"pt": "São três e quinze."
+}
+]
+},
+{
+"kind": "dialogue",
+"title_pt": "Que horas são?",
+"lines": [
+{
+"who": "A",
+"en": "What time is it, please?",
+"pt": "Que horas são, por favor?"
+},
+{
+"who": "B",
+"en": "It's nine o'clock.",
+"pt": "São nove horas."
+},
+{
+"who": "A",
+"en": "Thank you very much.",
+"pt": "Muito obrigado."
+}
+]
+},
+{
+"kind": "grammar",
+"title_pt": "Horas",
+"rows": [
+{
+"label": "Pergunta",
+"en": "What time is it?"
+},
+{
+"label": "Hora cheia",
+"en": "It's six o'clock."
+},
+{
+"label": "Com minutos",
+"en": "It's six fifteen. / It's six thirty. / It's six forty-five."
+}
+],
+"note_pt": "Pergunta = What time is it? (não 'What hours are?'). O jeito mais simples: diga os números (seven twenty)."
+},
+{
+"kind": "fill",
+"title_pt": "Escreva a hora",
+"items": [
+{
+"en": "7:00 = It's seven ___.",
+"answers": [
+"o'clock",
+"oclock"
+],
+"pt": "Sete horas."
+},
+{
+"en": "8:30 = It's eight ___.",
+"answers": [
+"thirty"
+],
+"pt": "Oito e meia."
+},
+{
+"en": "4:15 = It's four ___.",
+"answers": [
+"fifteen"
+],
+"pt": "Quatro e quinze."
+},
+{
+"en": "11:45 = It's eleven ___.",
+"answers": [
+"forty-five",
+"forty five"
+],
+"pt": "Onze e quarenta e cinco."
+}
+]
+},
+{
+"kind": "choose",
+"title_pt": "Escolha a certa",
+"items": [
+{
+"options": [
+"What hours are?",
+"What time is it?"
+],
+"correct": 1,
+"why_pt": "Que horas são = What time is it?"
+},
+{
+"options": [
+"It's six o'clock.",
+"It's six hours."
+],
+"correct": 0,
+"why_pt": "Hora cheia: o'clock."
+}
+]
+},
+{
+"kind": "speak",
+"title_pt": "Pergunte e responda",
+"prompts": [
+{
+"q": "What time is it now?",
+"pt": "Que horas são agora?",
+"model": "It's four thirty."
+},
+{
+"q": "What time is it in New York now?",
+"pt": "Que horas são em Nova York agora?",
+"model": "I think it's three thirty."
+}
+]
+}
+]
+},
+{
+"page": 37,
+"unit": 6,
+"title": "What time do you get up?",
+"subtitle_pt": "Rotina com I / you",
+"sections": [
+{
+"kind": "intro",
+"text_pt": "A rotina de um dia de semana: levantar, tomar café, ir, almoçar, chegar em casa e dormir — sempre com 'at' + hora."
+},
+{
+"kind": "vocab",
+"title_pt": "Rotina",
+"items": [
+{
+"en": "get up",
+"pt": "levantar"
+},
+{
+"en": "have breakfast",
+"pt": "tomar café da manhã"
+},
+{
+"en": "go to school / work",
+"pt": "ir para a escola / o trabalho"
+},
+{
+"en": "have lunch",
+"pt": "almoçar"
+},
+{
+"en": "leave school / work",
+"pt": "sair da escola / do trabalho"
+},
+{
+"en": "get home",
+"pt": "chegar em casa"
+},
+{
+"en": "go to bed",
+"pt": "ir dormir"
+}
+]
+},
+{
+"kind": "dialogue",
+"title_pt": "O dia da Kim",
+"lines": [
+{
+"who": "Kim",
+"en": "On weekdays I get up at 6:45.",
+"pt": "Nos dias de semana eu levanto às 6:45."
+},
+{
+"who": "Kim",
+"en": "I have breakfast at 7:00, and I go to school at 7:30.",
+"pt": "Tomo café às 7 e vou para a escola às 7:30."
+},
+{
+"who": "Kim",
+"en": "I have lunch at school with my friends.",
+"pt": "Almoço na escola com meus amigos."
+},
+{
+"who": "Kim",
+"en": "I get home at 3:30 and watch TV.",
+"pt": "Chego em casa às 3:30 e vejo TV."
+},
+{
+"who": "Kim",
+"en": "I go to bed at 11:00 on weekdays.",
+"pt": "Vou dormir às 11 nos dias de semana."
+}
+],
+"note_pt": "Texto adaptado para estudo. O original está na página 37 do seu livro."
+},
+{
+"kind": "grammar",
+"title_pt": "Perguntas",
+"rows": [
+{
+"label": "Que horas?",
+"en": "What time do you get up?"
+},
+{
+"label": "Outra",
+"en": "What time do you have breakfast?"
+},
+{
+"label": "Resposta",
+"en": "I get up at 7:30."
+}
+],
+"note_pt": "Hora usa AT: at six, at 7:30. Chegar em casa = get home (sem 'in' e sem 'to')."
+},
+{
+"kind": "fill",
+"title_pt": "Complete",
+"items": [
+{
+"en": "I get up ___ seven o'clock.",
+"answers": [
+"at"
+],
+"pt": "Eu levanto às sete."
+},
+{
+"en": "What time ___ you have breakfast?",
+"answers": [
+"do"
+],
+"pt": "Que horas você toma café?"
+},
+{
+"en": "I ___ home at six thirty.",
+"answers": [
+"get"
+],
+"pt": "Chego em casa às seis e meia."
+},
+{
+"en": "I ___ to bed at eleven.",
+"answers": [
+"go"
+],
+"pt": "Vou dormir às onze."
+},
+{
+"en": "I have ___ at twelve.",
+"answers": [
+"lunch"
+],
+"pt": "Almoço ao meio-dia."
+}
+]
+},
+{
+"kind": "choose",
+"title_pt": "Escolha a certa",
+"items": [
+{
+"options": [
+"I get home at six.",
+"I get in home at six."
+],
+"correct": 0,
+"why_pt": "Get home, sem 'in'."
+},
+{
+"options": [
+"I take breakfast at seven.",
+"I have breakfast at seven."
+],
+"correct": 1,
+"why_pt": "Tomar café = have breakfast."
+}
+]
+},
+{
+"kind": "speak",
+"title_pt": "Fale do seu dia",
+"prompts": [
+{
+"q": "What time do you get up?",
+"pt": "Que horas você levanta?",
+"model": "I get up at six thirty."
+},
+{
+"q": "What time do you go to work?",
+"pt": "Que horas você vai trabalhar?",
+"model": "I start work at eight. I work from home."
+},
+{
+"q": "What time do you go to bed?",
+"pt": "Que horas você vai dormir?",
+"model": "I go to bed at eleven."
+}
+]
+}
+]
+},
+{
+"page": 38,
+"unit": 6,
+"title": "Luke's day",
+"subtitle_pt": "He / She + -s · always / sometimes / never",
+"sections": [
+{
+"kind": "intro",
+"text_pt": "A rotina do Luke na 3ª pessoa: o verbo ganha -s. E os advérbios always, sometimes e never."
+},
+{
+"kind": "dialogue",
+"title_pt": "Um dia na vida do Luke",
+"lines": [
+{
+"who": "",
+"en": "Luke lives in New York. He's a lawyer, and he works with famous athletes.",
+"pt": "O Luke mora em Nova York. É advogado e trabalha com atletas famosos."
+},
+{
+"who": "",
+"en": "He gets up at six and takes a shower.",
+"pt": "Ele levanta às seis e toma banho."
+},
+{
+"who": "",
+"en": "He goes to work by taxi and has lunch in his office.",
+"pt": "Vai trabalhar de táxi e almoça no escritório."
+},
+{
+"who": "",
+"en": "He always works late. He sometimes buys a pizza and eats it at home.",
+"pt": "Ele sempre trabalha até tarde. Às vezes compra uma pizza e come em casa."
+},
+{
+"who": "",
+"en": "He never goes out in the evening. He works at his computer.",
+"pt": "Ele nunca sai à noite. Trabalha no computador."
+},
+{
+"who": "",
+"en": "He always goes to bed late, and he watches TV in bed.",
+"pt": "Ele sempre vai dormir tarde e vê TV na cama."
+}
+],
+"note_pt": "Texto adaptado para estudo. O original está na página 38 do seu livro."
+},
+{
+"kind": "grammar",
+"title_pt": "always / sometimes / never",
+"rows": [
+{
+"label": "Sempre",
+"en": "He always works late."
+},
+{
+"label": "Às vezes",
+"en": "He sometimes buys a pizza."
+},
+{
+"label": "Nunca",
+"en": "He never goes out in the evening."
+}
+],
+"note_pt": "Esses advérbios vêm ANTES do verbo. Never já é negativo: He never goes (não 'doesn't never')."
+},
+{
+"kind": "vocab",
+"title_pt": "Pronúncia do -s",
+"items": [
+{
+"en": "/s/ gets up, works, eats, takes",
+"pt": "som de 'ss'"
+},
+{
+"en": "/z/ lives, leaves, has, buys, goes, does",
+"pt": "som de 'z'"
+},
+{
+"en": "/iz/ watches",
+"pt": "som de 'iz', uma sílaba a mais"
+}
+]
+},
+{
+"kind": "fill",
+"title_pt": "Complete com o verbo na forma certa",
+"items": [
+{
+"en": "He ___ up at six. (get)",
+"answers": [
+"gets"
+],
+"pt": "Ele levanta às seis."
+},
+{
+"en": "He ___ a shower. (take)",
+"answers": [
+"takes"
+],
+"pt": "Ele toma banho."
+},
+{
+"en": "He ___ to work by taxi. (go)",
+"answers": [
+"goes"
+],
+"pt": "Ele vai trabalhar de táxi."
+},
+{
+"en": "He ___ lunch in his office. (have)",
+"answers": [
+"has"
+],
+"pt": "Ele almoça no escritório."
+},
+{
+"en": "He ___ TV in bed. (watch)",
+"answers": [
+"watches"
+],
+"pt": "Ele vê TV na cama."
+}
+]
+},
+{
+"kind": "choose",
+"title_pt": "Escolha a certa",
+"items": [
+{
+"options": [
+"He works always late.",
+"He always works late."
+],
+"correct": 1,
+"why_pt": "Always antes do verbo."
+},
+{
+"options": [
+"He doesn't never go out.",
+"He never goes out."
+],
+"correct": 1,
+"why_pt": "Never já é negativo."
+},
+{
+"options": [
+"He have lunch at one.",
+"He has lunch at one."
+],
+"correct": 1,
+"why_pt": "Ele = has."
+}
+]
+},
+{
+"kind": "speak",
+"title_pt": "Fale da rotina de alguém (he / she)",
+"prompts": [
+{
+"q": "What time does your mother get up?",
+"pt": "Que horas a sua mãe levanta?",
+"model": "She gets up at six."
+},
+{
+"q": "What does your father always do?",
+"pt": "O que o seu pai sempre faz?",
+"model": "He always watches the news."
+}
+]
+}
+]
+},
+{
+"page": 39,
+"unit": 6,
+"title": "Questions and negatives",
+"subtitle_pt": "does / doesn't",
+"sections": [
+{
+"kind": "intro",
+"text_pt": "Perguntas e negativas com he / she: entra does / doesn't e o verbo perde o -s."
+},
+{
+"kind": "grammar",
+"title_pt": "Grammar Spot",
+"rows": [
+{
+"label": "Afirmativa",
+"en": "He gets up at 6:00. He has breakfast at 6:45."
+},
+{
+"label": "Negativa",
+"en": "He doesn't have lunch. He doesn't go to bed early."
+},
+{
+"label": "Pergunta",
+"en": "What time does he get up?"
+},
+{
+"label": "Sim/não",
+"en": "Does he work late? Yes, he does. / No, he doesn't."
+}
+],
+"note_pt": "doesn't = does not. Depois de does / doesn't o verbo volta ao normal: Does he GO? He doesn't GO."
+},
+{
+"kind": "grammar",
+"title_pt": "Quadro do presente",
+"rows": [
+{
+"label": "I / You / We / They",
+"en": "work · don't work · Do you work?"
+},
+{
+"label": "He / She",
+"en": "works · doesn't work · Does she work?"
+}
+]
+},
+{
+"kind": "fill",
+"title_pt": "Complete as respostas sobre o Luke",
+"items": [
+{
+"en": "What time does he get up? — He ___ up at 6:00.",
+"answers": [
+"gets"
+],
+"pt": "Que horas ele levanta? — Às 6."
+},
+{
+"en": "Does he go to work by taxi? — Yes, he ___.",
+"answers": [
+"does"
+],
+"pt": "Ele vai de táxi? — Sim."
+},
+{
+"en": "Does he have lunch in a restaurant? — No, he ___.",
+"answers": [
+"doesn't",
+"does not"
+],
+"pt": "Ele almoça num restaurante? — Não."
+},
+{
+"en": "Does he go out in the evening? — No. He never ___ out.",
+"answers": [
+"goes"
+],
+"pt": "Ele sai à noite? — Não. Nunca sai."
+},
+{
+"en": "___ he usually work late? — Yes, he does.",
+"answers": [
+"Does"
+],
+"pt": "Ele costuma trabalhar até tarde? — Sim."
+}
+]
+},
+{
+"kind": "fill",
+"title_pt": "Escreva a negativa",
+"items": [
+{
+"en": "live in London → He ___ in London.",
+"answers": [
+"doesn't live",
+"does not live"
+],
+"pt": "Ele não mora em Londres."
+},
+{
+"en": "work in a bank → He ___ in a bank.",
+"answers": [
+"doesn't work",
+"does not work"
+],
+"pt": "Ele não trabalha num banco."
+},
+{
+"en": "go to bed early → He ___ to bed early.",
+"answers": [
+"doesn't go",
+"does not go"
+],
+"pt": "Ele não vai dormir cedo."
+}
+]
+},
+{
+"kind": "choose",
+"title_pt": "Escolha a certa",
+"items": [
+{
+"options": [
+"Does he works late?",
+"Does he work late?"
+],
+"correct": 1,
+"why_pt": "Depois de does: work."
+},
+{
+"options": [
+"He don't live in London.",
+"He doesn't live in London."
+],
+"correct": 1,
+"why_pt": "Ele = doesn't."
+},
+{
+"options": [
+"What time he gets up?",
+"What time does he get up?"
+],
+"correct": 1,
+"why_pt": "Pergunta: does + verbo normal."
+}
+]
+},
+{
+"kind": "speak",
+"title_pt": "Pergunte e responda sobre o Luke",
+"prompts": [
+{
+"q": "What time does he have breakfast?",
+"pt": "Que horas ele toma café?",
+"model": "He has breakfast at 6:45."
+},
+{
+"q": "Where does he have lunch?",
+"pt": "Onde ele almoça?",
+"model": "He has lunch in his office."
+},
+{
+"q": "What does he do in the evening?",
+"pt": "O que ele faz à noite?",
+"model": "He works at his computer."
+}
+]
+}
+]
+},
+{
+"page": 40,
+"unit": 6,
+"title": "Molly's day",
+"subtitle_pt": "A rotina da irmã do Luke",
+"sections": [
+{
+"kind": "intro",
+"text_pt": "A Molly é artista e tem um dia bem diferente do irmão. Pratique os verbos da rotina com she."
+},
+{
+"kind": "dialogue",
+"title_pt": "Um dia da Molly",
+"lines": [
+{
+"who": "",
+"en": "Molly is Luke's sister. She's an artist, and she lives in a small house by the ocean.",
+"pt": "A Molly é irmã do Luke. É artista e mora numa casa pequena perto do mar."
+},
+{
+"who": "",
+"en": "She always gets up late and has a big breakfast.",
+"pt": "Ela sempre levanta tarde e toma um café da manhã grande."
+},
+{
+"who": "",
+"en": "Then she goes to the beach with her dog.",
+"pt": "Depois vai à praia com o cachorro."
+},
+{
+"who": "",
+"en": "She works in her studio until seven. She never eats lunch.",
+"pt": "Trabalha no ateliê até as sete. Nunca almoça."
+},
+{
+"who": "",
+"en": "She always cooks a big dinner, and she often invites friends.",
+"pt": "Ela sempre cozinha um jantar grande e muitas vezes convida amigos."
+},
+{
+"who": "",
+"en": "After dinner she listens to music or plays the piano.",
+"pt": "Depois do jantar ouve música ou toca piano."
+}
+],
+"note_pt": "Texto adaptado para estudo. O original está na página 40 do seu livro."
+},
+{
+"kind": "fill",
+"title_pt": "Complete com: cooks, eats, gets up, goes, invites, lives, plays, works",
+"items": [
+{
+"en": "She ___ in a small house.",
+"answers": [
+"lives"
+],
+"pt": "Ela mora numa casa pequena."
+},
+{
+"en": "She always ___ late.",
+"answers": [
+"gets up"
+],
+"pt": "Ela sempre levanta tarde."
+},
+{
+"en": "She ___ to the beach with her dog.",
+"answers": [
+"goes"
+],
+"pt": "Ela vai à praia com o cachorro."
+},
+{
+"en": "She ___ in her studio until seven.",
+"answers": [
+"works"
+],
+"pt": "Ela trabalha no ateliê até as sete."
+},
+{
+"en": "She never ___ lunch.",
+"answers": [
+"eats"
+],
+"pt": "Ela nunca almoça."
+},
+{
+"en": "She always ___ a big dinner.",
+"answers": [
+"cooks"
+],
+"pt": "Ela sempre cozinha um jantar grande."
+},
+{
+"en": "She often ___ friends.",
+"answers": [
+"invites"
+],
+"pt": "Ela muitas vezes convida amigos."
+},
+{
+"en": "She ___ the piano.",
+"answers": [
+"plays"
+],
+"pt": "Ela toca piano."
+}
+]
+},
+{
+"kind": "choose",
+"title_pt": "He (Luke) ou She (Molly)?",
+"items": [
+{
+"options": [
+"He's a lawyer.",
+"She's a lawyer."
+],
+"correct": 0,
+"why_pt": "O Luke é advogado."
+},
+{
+"options": [
+"He's an artist.",
+"She's an artist."
+],
+"correct": 1,
+"why_pt": "A Molly é artista."
+},
+{
+"options": [
+"He gets up very early.",
+"She gets up very early."
+],
+"correct": 0,
+"why_pt": "O Luke levanta às seis."
+},
+{
+"options": [
+"He cooks for friends.",
+"She cooks for friends."
+],
+"correct": 1,
+"why_pt": "A Molly cozinha para os amigos."
+}
+]
+},
+{
+"kind": "speak",
+"title_pt": "Compare você com a Molly",
+"prompts": [
+{
+"q": "Do you get up late, like Molly?",
+"pt": "Você levanta tarde, como a Molly?",
+"model": "No, I don't. I get up early."
+},
+{
+"q": "Do you cook dinner?",
+"pt": "Você cozinha o jantar?",
+"model": "Sometimes. I usually cook on the weekend."
+}
+]
+}
+]
+},
+{
+"page": 41,
+"unit": 6,
+"title": "Talking about you",
+"subtitle_pt": "Conversa ao telefone · do / does",
+"sections": [
+{
+"kind": "intro",
+"text_pt": "Uma ligação entre irmãos, corrigir frases com doesn't e perguntas sobre pessoas da sua família."
+},
+{
+"kind": "dialogue",
+"title_pt": "Molly liga para o Luke",
+"lines": [
+{
+"who": "Molly",
+"en": "Hi, Luke, how are you?",
+"pt": "Oi, Luke, tudo bem?"
+},
+{
+"who": "Luke",
+"en": "I'm fine, thanks. Busy, as usual.",
+"pt": "Tudo bem, obrigado. Ocupado, como sempre."
+},
+{
+"who": "Molly",
+"en": "You're always busy! I love my work, too, but I relax sometimes.",
+"pt": "Você está sempre ocupado! Eu também amo meu trabalho, mas às vezes descanso."
+},
+{
+"who": "Luke",
+"en": "How's your friend Natalie?",
+"pt": "Como está a sua amiga Natalie?"
+},
+{
+"who": "Molly",
+"en": "She's OK. She often asks about you.",
+"pt": "Está bem. Ela sempre pergunta de você."
+},
+{
+"who": "Molly",
+"en": "Come and visit me soon. I want to cook for you.",
+"pt": "Venha me visitar logo. Quero cozinhar para você."
+},
+{
+"who": "Luke",
+"en": "Good idea! See you on Friday. Have a good week!",
+"pt": "Boa ideia! Até sexta. Boa semana!"
+}
+],
+"note_pt": "Texto adaptado para estudo. O original está na página 41 do seu livro."
+},
+{
+"kind": "fill",
+"title_pt": "Corrija as frases (negativa + a verdade)",
+"items": [
+{
+"en": "Molly lives in an apartment. → She ___ in an apartment. She lives in a house.",
+"answers": [
+"doesn't live",
+"does not live"
+],
+"pt": "Ela não mora num apartamento."
+},
+{
+"en": "Luke gets up at ten. → He ___ at ten. He gets up at six.",
+"answers": [
+"doesn't get up",
+"does not get up"
+],
+"pt": "Ele não levanta às dez."
+},
+{
+"en": "Molly is a businesswoman. → She ___ a businesswoman. She's an artist.",
+"answers": [
+"isn't",
+"is not"
+],
+"pt": "Com be: isn't."
+},
+{
+"en": "Luke goes to work by bus. → He ___ to work by bus. He goes by taxi.",
+"answers": [
+"doesn't go",
+"does not go"
+],
+"pt": "Ele não vai de ônibus."
+}
+]
+},
+{
+"kind": "fill",
+"title_pt": "Check it: do, don't, does ou doesn't",
+"items": [
+{
+"en": "___ you like ice cream? — Yes, I do.",
+"answers": [
+"Do"
+],
+"pt": ""
+},
+{
+"en": "___ she work in Toronto? — Yes, she does.",
+"answers": [
+"Does"
+],
+"pt": ""
+},
+{
+"en": "Where ___ he work? — In a bank.",
+"answers": [
+"does"
+],
+"pt": ""
+},
+{
+"en": "Do you go to work by bus? — No, I ___.",
+"answers": [
+"don't",
+"do not"
+],
+"pt": ""
+},
+{
+"en": "Does she go to bed early? — No, she ___.",
+"answers": [
+"doesn't",
+"does not"
+],
+"pt": ""
+},
+{
+"en": "___ they have a car? — Yes, they do.",
+"answers": [
+"Do"
+],
+"pt": ""
+},
+{
+"en": "Does he speak Spanish? — No, he ___.",
+"answers": [
+"doesn't",
+"does not"
+],
+"pt": ""
+}
+]
+},
+{
+"kind": "speak",
+"title_pt": "Fale de duas pessoas da sua família",
+"prompts": [
+{
+"q": "Who is she?",
+"pt": "Quem é ela?",
+"model": "She's my sister. Her name's Ana."
+},
+{
+"q": "Where does she live?",
+"pt": "Onde ela mora?",
+"model": "She lives in Campinas."
+},
+{
+"q": "What's his job?",
+"pt": "Qual é o trabalho dele?",
+"model": "He's a mechanic."
+},
+{
+"q": "Does she have a car?",
+"pt": "Ela tem carro?",
+"model": "Yes, she does. She has a small car."
+}
+]
+}
+]
+},
+{
+"page": 42,
+"unit": 6,
+"title": "Words that go together",
+"subtitle_pt": "Expressões do dia a dia · questionário",
+"sections": [
+{
+"kind": "intro",
+"text_pt": "Verbos que andam juntos com certas palavras, e um questionário de estilo de vida com always / usually / sometimes / never."
+},
+{
+"kind": "match",
+"title_pt": "Ligue as palavras que andam juntas",
+"pairs": [
+{
+"a": "get up",
+"b": "early"
+},
+{
+"a": "go",
+"b": "to bed late"
+},
+{
+"a": "listen to",
+"b": "music"
+},
+{
+"a": "watch",
+"b": "TV"
+},
+{
+"a": "cook",
+"b": "dinner"
+},
+{
+"a": "work",
+"b": "in an office"
+},
+{
+"a": "go",
+"b": "shopping"
+},
+{
+"a": "drink",
+"b": "water"
+},
+{
+"a": "eat",
+"b": "in restaurants"
+},
+{
+"a": "take",
+"b": "a shower"
+},
+{
+"a": "play",
+"b": "the piano"
+},
+{
+"a": "stay",
+"b": "home"
+}
+]
+},
+{
+"kind": "grammar",
+"title_pt": "Frequência",
+"rows": [
+{
+"label": "100%",
+"en": "always"
+},
+{
+"label": "80%",
+"en": "usually"
+},
+{
+"label": "40%",
+"en": "sometimes"
+},
+{
+"label": "0%",
+"en": "never"
+},
+{
+"label": "Exemplo",
+"en": "Marco usually gets up early. I never get up early."
+}
+],
+"note_pt": "Na resposta curta: Yes, sometimes. / No, never."
+},
+{
+"kind": "fill",
+"title_pt": "Complete",
+"items": [
+{
+"en": "I always ___ a shower in the morning.",
+"answers": [
+"take",
+"have"
+],
+"pt": "Eu sempre tomo banho de manhã."
+},
+{
+"en": "I never ___ to bed early.",
+"answers": [
+"go"
+],
+"pt": "Eu nunca vou dormir cedo."
+},
+{
+"en": "I sometimes ___ in restaurants.",
+"answers": [
+"eat"
+],
+"pt": "Às vezes como em restaurantes."
+},
+{
+"en": "I usually ___ home on Sunday.",
+"answers": [
+"stay"
+],
+"pt": "Normalmente fico em casa no domingo."
+},
+{
+"en": "I ___ to music at work.",
+"answers": [
+"listen"
+],
+"pt": "Ouço música no trabalho."
+}
+]
+},
+{
+"kind": "speak",
+"title_pt": "Questionário: responda com always, usually, sometimes ou never",
+"prompts": [
+{
+"q": "Do you get up early?",
+"pt": "Você levanta cedo?",
+"model": "Yes, I usually get up early."
+},
+{
+"q": "Do you have a big breakfast?",
+"pt": "Você toma um café da manhã grande?",
+"model": "No, never. I just drink coffee."
+},
+{
+"q": "Do you watch TV in the evening?",
+"pt": "Você vê TV à noite?",
+"model": "Yes, sometimes."
+},
+{
+"q": "Do you go shopping on the weekend?",
+"pt": "Você faz compras no fim de semana?",
+"model": "Yes, I usually go shopping on Saturday."
+},
+{
+"q": "Do you go to bed late?",
+"pt": "Você vai dormir tarde?",
+"model": "Yes, I always go to bed late."
+}
+]
+}
+]
+},
+{
+"page": 43,
+"unit": 6,
+"title": "Days of the week",
+"subtitle_pt": "Dias da semana · at / on / in",
+"sections": [
+{
+"kind": "intro",
+"text_pt": "Everyday English: os dias da semana e as preposições de tempo at, on e in."
+},
+{
+"kind": "vocab",
+"title_pt": "Dias da semana",
+"items": [
+{
+"en": "Monday",
+"pt": "segunda-feira"
+},
+{
+"en": "Tuesday",
+"pt": "terça-feira"
+},
+{
+"en": "Wednesday",
+"pt": "quarta-feira"
+},
+{
+"en": "Thursday",
+"pt": "quinta-feira"
+},
+{
+"en": "Friday",
+"pt": "sexta-feira"
+},
+{
+"en": "Saturday",
+"pt": "sábado"
+},
+{
+"en": "Sunday",
+"pt": "domingo"
+},
+{
+"en": "the weekend",
+"pt": "o fim de semana"
+}
+]
+},
+{
+"kind": "grammar",
+"title_pt": "at / on / in",
+"rows": [
+{
+"label": "at + hora",
+"en": "at nine o'clock · at ten thirty · at twelve fifteen"
+},
+{
+"label": "on + dia",
+"en": "on Sunday · on Monday · on Saturday evening · on Thursday morning"
+},
+{
+"label": "in + parte do dia",
+"en": "in the morning · in the afternoon · in the evening"
+},
+{
+"label": "Fim de semana",
+"en": "on the weekend (americano)"
+}
+],
+"note_pt": "Dias da semana sempre com maiúscula. Dia + parte do dia usa ON: on Monday morning."
+},
+{
+"kind": "fill",
+"title_pt": "Escreva at, on ou in",
+"items": [
+{
+"en": "___ nine o'clock",
+"answers": [
+"at"
+],
+"pt": "às nove"
+},
+{
+"en": "___ Sunday",
+"answers": [
+"on"
+],
+"pt": "no domingo"
+},
+{
+"en": "___ the morning",
+"answers": [
+"in"
+],
+"pt": "de manhã"
+},
+{
+"en": "___ Saturday evening",
+"answers": [
+"on"
+],
+"pt": "no sábado à noite"
+},
+{
+"en": "___ the weekend",
+"answers": [
+"on"
+],
+"pt": "no fim de semana"
+},
+{
+"en": "___ the afternoon",
+"answers": [
+"in"
+],
+"pt": "à tarde"
+},
+{
+"en": "___ twelve fifteen",
+"answers": [
+"at"
+],
+"pt": "ao meio-dia e quinze"
+}
+]
+},
+{
+"kind": "choose",
+"title_pt": "Escolha a certa",
+"items": [
+{
+"options": [
+"I work in Monday.",
+"I work on Monday."
+],
+"correct": 1,
+"why_pt": "Dia: on."
+},
+{
+"options": [
+"See you at the morning.",
+"See you in the morning."
+],
+"correct": 1,
+"why_pt": "Parte do dia: in."
+},
+{
+"options": [
+"I have class on Monday morning.",
+"I have class in Monday morning."
+],
+"correct": 0,
+"why_pt": "Dia + parte do dia: on."
+}
+]
+},
+{
+"kind": "speak",
+"title_pt": "Responda",
+"prompts": [
+{
+"q": "What day is it today?",
+"pt": "Que dia é hoje?",
+"model": "It's Sunday."
+},
+{
+"q": "What days do you work?",
+"pt": "Em que dias você trabalha?",
+"model": "I work from Monday to Friday."
+},
+{
+"q": "What days do you like?",
+"pt": "De que dias você gosta?",
+"model": "I like Friday and Saturday."
+},
+{
+"q": "Do you stay home on Friday evening?",
+"pt": "Você fica em casa na sexta à noite?",
+"model": "Yes, I usually stay home on Friday evening."
+}
+]
+}
+]
+}
+]
+}

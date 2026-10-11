@@ -109,6 +109,15 @@ export const localRepo: Repo = {
     return list.find((m) => !done.has(m.id)) ?? null;
   },
 
+  async listBookPagesDone() {
+    return read<number>("book_pages_done");
+  },
+  async setBookPageDone(page, done) {
+    const rows = read<number>("book_pages_done").filter((p) => p !== page);
+    const next = done ? [...rows, page].sort((a, b) => a - b) : rows;
+    write("book_pages_done", next);
+    return next;
+  },
   async listTalks() {
     return read<TalkSession>("talks");
   },
