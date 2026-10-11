@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useMatch, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Camera, ClipboardPaste, FileText, Loader2, X } from "lucide-react";
-import { AppShell, EmptyState } from "@/components/layout/AppShell";
+import { AppShell, EmptyState, ListSkeleton } from "@/components/layout/AppShell";
 import { ApiKeyForm } from "@/components/prints/ApiKeyForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -85,51 +85,48 @@ function PrintsHome() {
   return (
     <AppShell title={p.title}>
       {settings && !settings.api_key && (
-        <div className="mb-5">
-          <ApiKeyForm onChange={setSettings} />
-        </div>
+        <ApiKeyForm onChange={setSettings} />
       )}
       {source ? (
         <NewStudy source={source} settings={settings} note={note} onClose={() => { setSource(null); setNote(null); }} />
       ) : pasting ? (
         <PasteText onCancel={() => setPasting(false)} onDone={(text) => { setPasting(false); setSource({ kind: "text", images: [], text }); }} />
       ) : (
-        <div className="mb-6">
-          <Button size="lg" className="h-16 w-full text-lg" onClick={() => imgRef.current?.click()}>
+        <div>
+          <Button size="lg" className="h-20 w-full text-lg" onClick={() => imgRef.current?.click()}>
             <Camera className="size-6" /> {p.newPrint}
           </Button>
-          <p className="mt-1.5 text-center text-xs text-muted-foreground">{p.newPrintHelp}</p>
+          <p className="text-caption mt-2 text-center text-muted-foreground">{p.newPrintHelp}</p>
           <div className="mt-3 flex justify-center gap-2">
-            <Button size="sm" variant="outline" onClick={() => pdfRef.current?.click()}><FileText /> {p.pdf}</Button>
-            <Button size="sm" variant="outline" onClick={() => setPasting(true)}><ClipboardPaste /> {p.paste}</Button>
+            <Button size="sm" variant="ghost" onClick={() => pdfRef.current?.click()}><FileText /> {p.pdf}</Button>
+            <Button size="sm" variant="ghost" onClick={() => setPasting(true)}><ClipboardPaste /> {p.paste}</Button>
           </div>
           <input ref={imgRef} type="file" accept="image/*" multiple hidden onChange={(e) => { void onImages(e.target.files); e.target.value = ""; }} />
           <input ref={pdfRef} type="file" accept="application/pdf" hidden onChange={(e) => { void onPdf(e.target.files?.[0]); e.target.value = ""; }} />
-          {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
+          {error && <p role="alert" className="mt-3 text-base text-destructive">{error}</p>}
         </div>
       )}
+      {!rows && !source && <ListSkeleton rows={2} />}
       {rows && rows.length === 0 && !source && <EmptyState>{p.empty}</EmptyState>}
-      {!source && (
-        <ul className="space-y-3">
-          {rows?.map(({ m, pack, prog }) => (
-            <li key={m.id} className="flex gap-3 rounded-2xl border bg-card p-3">
-              <Link to="/prints/$materialId" params={{ materialId: m.id }} className="flex min-w-0 flex-1 gap-3">
-                <Thumb m={m} className="size-16" />
-                <span className="min-w-0">
-                  <span className="block truncate font-bold leading-tight">{m.title}</span>
-                  <span className="block text-xs text-muted-foreground">{new Date(m.created_at).toLocaleDateString("pt-BR")}</span>
-                  <span className="mt-1 block text-xs font-medium">
-                    {p.items(pack?.items.length ?? 0)} · {t.drills.bestRound(prog?.best_round ?? 1)}
+      {!source && rows && rows.length > 0 && (
+        <ul className="grid grid-cols-2 gap-3">
+          {rows.map(({ m, pack, prog }) => {
+            const done = prog?.accuracy == null ? 0 : prog.best_round;
+            return (
+              <li key={m.id}>
+                <Link to="/prints/$materialId" params={{ materialId: m.id }} className="block overflow-hidden rounded-[20px] border bg-card">
+                  <Thumb m={m} className="aspect-[4/3] w-full rounded-none border-0" />
+                  <span className="block space-y-1 p-3">
+                    <span className="text-headline line-clamp-2 block leading-tight">{m.title}</span>
+                    <span className="text-caption block text-muted-foreground">{p.items(pack?.items.length ?? 0)}</span>
+                    <span className="grid grid-cols-4 gap-1 pt-1" aria-label={t.drills.bestRound(prog?.best_round ?? 1)}>
+                      {[1, 2, 3, 4].map((r) => <span key={r} className={cn("h-1 rounded-full", r <= done ? "bg-primary" : "bg-muted")} />)}
+                    </span>
                   </span>
-                </span>
-              </Link>
-              {pack && (
-                <Button asChild size="sm" className="self-center">
-                  <Link to="/uberclass/$packId" params={{ packId: pack.id }} search={{ nivel: "todos" }}>{p.study}</Link>
-                </Button>
-              )}
-            </li>
-          ))}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       )}
     </AppShell>
@@ -148,11 +145,11 @@ export function Thumb({ m, className }: { m: Material; className?: string }) {
 function PasteText({ onCancel, onDone }: { onCancel: () => void; onDone: (text: string) => void }) {
   const [text, setText] = useState("");
   return (
-    <div className="mb-6 space-y-3">
-      <Textarea rows={8} value={text} placeholder={p.pastePlaceholder} onChange={(e) => setText(e.target.value)} />
+    <div className="space-y-3">
+      <Textarea className="text-base" rows={8} value={text} placeholder={p.pastePlaceholder} onChange={(e) => setText(e.target.value)} />
       <div className="flex gap-2">
         <Button variant="ghost" onClick={onCancel}>{p.cancel}</Button>
-        <Button className="flex-1" disabled={!text.trim()} onClick={() => onDone(text.trim())}>{t.apiKey.save}</Button>
+        <Button className="flex-1" disabled={!text.trim()} onClick={() => onDone(text.trim())}>{t.drills.ladderContinue}</Button>
       </div>
     </div>
   );
@@ -196,16 +193,27 @@ export function GenerationStatus({ g }: { g: ReturnType<typeof useGeneration> })
   return (
     <>
       {g.busy && (
-        <div role="status" className="flex items-center justify-between gap-3 rounded-xl bg-muted p-3 text-sm">
-          <span className="flex items-center gap-2"><Loader2 className="size-4 animate-spin" /> {g.label}</span>
-          <Button size="sm" variant="ghost" onClick={g.cancel}><X /> {p.cancel}</Button>
+        <div role="status" className="space-y-3 rounded-xl bg-muted p-3 text-base">
+          <ol className="space-y-1.5">
+            {p.phases.map((ph, i) => {
+              const cur = p.phases.indexOf(g.label as (typeof p.phases)[number]);
+              const at = cur === -1 ? p.phases.length - 1 : cur;
+              return (
+                <li key={ph} className={cn("flex items-center gap-2", i > at && "text-muted-foreground", i < at && "text-muted-foreground line-through")}>
+                  {i === at ? <Loader2 className="size-4 shrink-0 motion-safe:animate-spin" /> : <span className="size-4 shrink-0 text-center">{i < at ? "✓" : "·"}</span>}
+                  {i === at && cur === -1 ? g.label : ph}
+                </li>
+              );
+            })}
+          </ol>
+          <Button variant="outline" className="w-full" onClick={g.cancel}><X /> {p.cancel}</Button>
         </div>
       )}
       {g.errors && (
-        <div role="alert" className="space-y-1 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm">
+        <div role="alert" className="space-y-1 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-base">
           <p>{g.errors.message}</p>
           {g.errors.details.length > 0 && (
-            <ul className="list-disc pl-5 text-xs">{g.errors.details.slice(0, 12).map((d) => <li key={d}>{d}</li>)}</ul>
+            <ul className="text-caption list-disc pl-5">{g.errors.details.slice(0, 12).map((d) => <li key={d}>{d}</li>)}</ul>
           )}
         </div>
       )}
@@ -221,21 +229,21 @@ function NewStudy({ source, settings, note, onClose }: { source: StudySource; se
   const hasKey = !!settings?.api_key;
 
   return (
-    <div className="mb-6 space-y-4 rounded-2xl border bg-card p-4">
+    <div className="space-y-4 rounded-[20px] border bg-card p-4">
       {source.kind === "image" ? (
         <div className="flex gap-2 overflow-x-auto">
           {source.images.map((src, i) => <img key={i} src={src} alt="" className="h-28 rounded-lg border object-cover" />)}
         </div>
       ) : (
-        <p className="line-clamp-5 whitespace-pre-line rounded-lg bg-muted p-3 text-sm">{source.text}</p>
+        <p className="line-clamp-5 whitespace-pre-line rounded-xl bg-muted p-3 text-base">{source.text}</p>
       )}
-      {note && <p className="text-xs text-muted-foreground">{note}</p>}
+      {note && <p className="text-caption text-muted-foreground">{note}</p>}
       <div>
         <p className="mb-2 text-sm font-semibold">{p.level}</p>
         <div className="grid grid-cols-3 gap-2" role="radiogroup">
           {(["A1", "A2", "B1"] as const).map((l) => (
             <button key={l} type="button" role="radio" aria-checked={level === l} onClick={() => setLevel(l)}
-              className={cn("rounded-xl border px-2 py-2 text-xs font-semibold", level === l ? "border-primary bg-primary text-primary-foreground" : "bg-background")}>
+              className={cn("min-h-11 rounded-full border px-2 text-sm font-semibold", level === l ? "border-primary bg-primary text-primary-foreground" : "bg-background")}>
               {p.levels[l]}
             </button>
           ))}
@@ -245,7 +253,7 @@ function NewStudy({ source, settings, note, onClose }: { source: StudySource; se
         <label htmlFor="focus" className="mb-1 block text-sm font-semibold">{p.focus}</label>
         <Input id="focus" value={focus} placeholder={p.focusPlaceholder} onChange={(e) => setFocus(e.target.value)} />
       </div>
-      {!hasKey && <p className="text-sm text-destructive">{t.apiKey.missing}</p>}
+      {!hasKey && <p className="text-base text-destructive">{t.apiKey.missing}</p>}
       <GenerationStatus g={g} />
       {!g.busy && (
         <div className="flex gap-2">
