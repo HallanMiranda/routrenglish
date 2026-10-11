@@ -18,6 +18,7 @@ import { Route as BibliotecaMaterialIdRouteImport } from './routes/biblioteca.$m
 import { Route as RelatorioSessionIdRouteImport } from './routes/relatorio.$sessionId'
 import { Route as SessaoSessionIdRouteImport } from './routes/sessao.$sessionId'
 import { Route as UberclassIndexRouteImport } from './routes/uberclass.index'
+import { Route as UberclassPackIdRouteImport } from './routes/uberclass.$packId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +65,11 @@ const UberclassIndexRoute = UberclassIndexRouteImport.update({
   path: '/uberclass/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UberclassPackIdRoute = UberclassPackIdRouteImport.update({
+  id: '/uberclass/$packId',
+  path: '/uberclass/$packId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/biblioteca/$materialId': typeof BibliotecaMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
+  '/uberclass/$packId': typeof UberclassPackIdRoute
   '/uberclass/': typeof UberclassIndexRoute
 }
 export interface FileRoutesByTo {
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/biblioteca/$materialId': typeof BibliotecaMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
+  '/uberclass/$packId': typeof UberclassPackIdRoute
   '/uberclass': typeof UberclassIndexRoute
 }
 export interface FileRoutesById {
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/biblioteca/$materialId': typeof BibliotecaMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
+  '/uberclass/$packId': typeof UberclassPackIdRoute
   '/uberclass/': typeof UberclassIndexRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/biblioteca/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
+    | '/uberclass/$packId'
     | '/uberclass/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/biblioteca/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
+    | '/uberclass/$packId'
     | '/uberclass'
   id:
     | '__root__'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/biblioteca/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
+    | '/uberclass/$packId'
     | '/uberclass/'
   fileRoutesById: FileRoutesById
 }
@@ -143,6 +155,7 @@ export interface RootRouteChildren {
   RevisaoRoute: typeof RevisaoRoute
   RelatorioSessionIdRoute: typeof RelatorioSessionIdRoute
   SessaoSessionIdRoute: typeof SessaoSessionIdRoute
+  UberclassPackIdRoute: typeof UberclassPackIdRoute
   UberclassIndexRoute: typeof UberclassIndexRoute
 }
 
@@ -211,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UberclassIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/uberclass/$packId': {
+      id: '/uberclass/$packId'
+      path: '/uberclass/$packId'
+      fullPath: '/uberclass/$packId'
+      preLoaderRoute: typeof UberclassPackIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -234,6 +254,7 @@ const rootRouteChildren: RootRouteChildren = {
   RevisaoRoute: RevisaoRoute,
   RelatorioSessionIdRoute: RelatorioSessionIdRoute,
   SessaoSessionIdRoute: SessaoSessionIdRoute,
+  UberclassPackIdRoute: UberclassPackIdRoute,
   UberclassIndexRoute: UberclassIndexRoute,
 }
 export const routeTree = rootRouteImport
