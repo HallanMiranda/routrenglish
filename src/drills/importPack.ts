@@ -17,13 +17,45 @@ export function parsePackJson(text: string): ImportResult {
   } catch {
     return { ok: false, errors: ["O texto não é um JSON válido. Confira vírgulas, aspas e chaves."] };
   }
-  const errors: string[] = [];
-  const err = (where: string, field: string, what: string) => errors.push(`${where}: campo "${field}" ${what}.`);
   if (!isObj(raw)) return { ok: false, errors: ["O pacote precisa ser um objeto JSON { ... }."] };
   // Accept either a pack, or { pulo_do_gato, packs: [pack] }.
   const top = raw;
   const packRaw = Array.isArray(top["packs"]) ? (top["packs"] as unknown[])[0] : top;
   if (!isObj(packRaw)) return { ok: false, errors: ['"packs" precisa ter pelo menos um pacote.'] };
+  return parseOne(top, packRaw);
+}
+
+export interface MultiImport {
+  packs: (Omit<DrillPack, "id"> & { id?: string })[];
+  pulo: PuloDoGato;
+  errors: string[];
+}
+
+/** A single pack or {pulo_do_gato, packs:[...]}: imports every valid pack, errors name the failing pack. */
+export function parsePacksJson(text: string): MultiImport {
+  let raw: unknown;
+  try {
+    raw = JSON.parse(text);
+  } catch {
+    return { packs: [], pulo: {}, errors: ["O texto não é um JSON válido. Confira vírgulas, aspas e chaves."] };
+  }
+  if (!isObj(raw)) return { packs: [], pulo: {}, errors: ["O pacote precisa ser um objeto JSON { ... }."] };
+  const list = Array.isArray(raw["packs"]) ? (raw["packs"] as unknown[]) : [raw];
+  if (!list.length) return { packs: [], pulo: {}, errors: ['"packs" precisa ter pelo menos um pacote.'] };
+  const out: MultiImport = { packs: [], pulo: {}, errors: [] };
+  list.forEach((pr, i) => {
+    const name = isObj(pr) ? String(pr["id"] ?? pr["title_pt"] ?? i + 1) : String(i + 1);
+    if (!isObj(pr)) return void out.errors.push(`Pacote ${name}: precisa ser um objeto.`);
+    const r = parseOne(i === 0 ? raw as Obj : {}, pr);
+    if (r.ok) { out.packs.push(r.pack); Object.assign(out.pulo, r.pulo); }
+    else out.errors.push(...(list.length > 1 ? r.errors.map((e) => `Pacote ${name} → ${e}`) : r.errors));
+  });
+  return out;
+}
+
+function parseOne(top: Obj, packRaw: Obj): ImportResult {
+  const errors: string[] = [];
+  const err = (where: string, field: string, what: string) => errors.push(`${where}: campo "${field}" ${what}.`);
 
   for (const f of ["title_pt", "level", "focus_pt"]) if (!isStr(packRaw[f])) err("Pacote", f, "é obrigatório e precisa ser texto");
   if (packRaw["id"] !== undefined && !isStr(packRaw["id"])) err("Pacote", "id", "precisa ser texto");
