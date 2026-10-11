@@ -12,7 +12,7 @@
 ## Project rules
 - UI strings live in `src/lib/i18n/pt-BR.ts`; study content stays in English — keeps copy in one place.
 - App pages use `AppShell` (header + BottomNav); the session route is full-screen without nav — consistent mobile layout.
-- Prints pack generation calls OpenAI directly from the browser with the user's own key, stored only via `repo` on the device (`src/ai/openai.ts`, `src/ai/generatePack.ts`); any future shared/server AI goes through Lovable AI Gateway server functions — personal no-backend phase, user's explicit choice.
+- All OpenAI calls go through `src/ai/client.ts` (user's own key, stored on-device via `repo`, called from the browser), and every AI feature falls back to the local version when the key is missing, the switch is off, offline, or the call fails; any future shared/server AI goes through Lovable AI Gateway server functions — personal no-backend phase, user's explicit choice.
 - Offline app-shell support uses vite-plugin-pwa generateSW after explicit public-root prerendering; NetworkFirst navigations exclude API/OAuth and the sole registration wrapper refuses dev, previews, iframes, and sw=off — avoids stale previews and private-data caching. Remove root prerendering before Hoje gains authenticated data.
 - Theme preference is browser-local and applied after hydration with CSS system fallback — follows device settings without SSR mismatches or Cloud dependencies.
 - MicButton is a controlled presentation component; demo timers belong to the session — keeps microphone visuals reusable and separate from future audio capture.

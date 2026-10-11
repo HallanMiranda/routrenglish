@@ -26,3 +26,6 @@
 - [x] drill-packs.json v2 pasted (5 packs, pulo_do_gato)
 - [x] Prints tab (replaces Biblioteca): own OpenAI key, images/PDF/text → UberClass pack
 - [x] Design polish pass (type scale, radii, touch targets, focus drill screen, feedback sheet, Prints grid)
+- [x] Shared AI layer (own key): Ouvir/Corrigir/Conversa com IA, Meu nome, lenient check
+- [ ] Wire AI judge into Revisão card practice (waits for step 14 Review screen)
+- [ ] Wire AI conversation + report into Hoje session (waits for steps 11 and 13)
