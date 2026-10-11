@@ -5,9 +5,9 @@ import type { AiSettings, DrillItem, Material } from "@/data/types";
 export interface StudySource {
   kind: "image" | "pdf" | "text";
   images: string[];
-  thumbnail?: string;
-  text?: string;
-  truncated?: boolean;
+  thumbnail?: string | undefined;
+  text?: string | undefined;
+  truncated?: boolean | undefined;
 }
 
 const stamp = () => Date.now().toString(36);

@@ -58,7 +58,7 @@ export interface ChatMessage {
 export async function chatJson(key: string, model: string, messages: ChatMessage[], signal?: AbortSignal) {
   const data = (await call("/chat/completions", key, model, {
     method: "POST",
-    signal,
+    signal: signal ?? null,
     body: JSON.stringify({ model, messages, response_format: { type: "json_object" } }),
   })) as {
     choices?: { message?: { content?: string | null } }[];

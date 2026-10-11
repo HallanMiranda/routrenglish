@@ -10,11 +10,11 @@ export interface GenerateInput {
   level: string;
   focus: string;
   images: string[];
-  text?: string;
+  text?: string | undefined;
   /** Short descriptions of items already generated, to avoid repeats. */
-  avoid?: string[];
-  signal?: AbortSignal;
-  onFixing?: () => void;
+  avoid?: string[] | undefined;
+  signal?: AbortSignal | undefined;
+  onFixing?: () => void | undefined;
 }
 export interface GenerateResult {
   pack: Omit<DrillPack, "id"> & { id?: string };

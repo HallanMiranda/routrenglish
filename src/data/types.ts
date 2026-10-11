@@ -93,18 +93,18 @@ export interface Material {
   created_at: ISODate;
   items: MaterialItem[];
   /** Prints tab: what was uploaded and the pack generated from it. */
-  kind?: "image" | "pdf" | "text";
-  thumbnail?: string;
+  kind?: "image" | "pdf" | "text" | undefined;
+  thumbnail?: string | undefined;
   /** Compressed JPEG data URLs sent to the model (dropped if storage is full). */
-  images?: string[];
-  text?: string;
-  truncated?: boolean;
-  pack_id?: string;
-  level?: string;
-  focus?: string;
-  tokens_in?: number;
-  tokens_out?: number;
-  cost_usd?: number;
+  images?: string[] | undefined;
+  text?: string | undefined;
+  truncated?: boolean | undefined;
+  pack_id?: string | undefined;
+  level?: string | undefined;
+  focus?: string | undefined;
+  tokens_in?: number | undefined;
+  tokens_out?: number | undefined;
+  cost_usd?: number | undefined;
 }
 
 export interface AiSettings {
