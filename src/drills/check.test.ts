@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkAnswer, normalizeTokens, parseDrillLines } from "./check";
+import { checkAnswer, checkQa, isAttentionSlip, normalizeTokens, parseDrillLines } from "./check";
 
 describe("drill check", () => {
   it("normalizes contractions, numbers, accents and US", () => {
@@ -20,5 +20,16 @@ describe("drill check", () => {
   });
   it("parses pasted lines", () => {
     expect(parseDrillLines("Oi | Hi | Hello\nlixo\n")).toHaveLength(1);
+  });
+  it("checks QA answers by pattern and length", () => {
+    const item = { accept_patterns: ["i live in"], traps: [] };
+    expect(checkQa("I live in Miami", item).correct).toBe(true);
+    expect(checkQa("live in", item).correct).toBe(false);
+    expect(checkQa("Actually I live in Miami now", item).correct).toBe(true);
+  });
+  it("detects attention slips", () => {
+    expect(isAttentionSlip(checkAnswer("Her name is Ana", ["His name is Ana."]).ops)).toBe(true);
+    expect(isAttentionSlip(checkAnswer("She work here", ["She works here."]).ops)).toBe(true);
+    expect(isAttentionSlip(checkAnswer("She lives there", ["She works here."]).ops)).toBe(false);
   });
 });

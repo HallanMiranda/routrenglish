@@ -21,3 +21,5 @@
 - [ ] 16. Progress
 - [ ] 17. api_usage + polish
 - [x] Praticar tab: guided translation drills (local, 4 rounds, checker, cards)
+- [x] UberClass tab (replaces Praticar): QA items, lives/multas/score, variations, sounds, Simulação Expressa
+- [x] drill-packs.json v2 pasted (5 packs, pulo_do_gato)

@@ -1,10 +1,10 @@
-import type { DrillItem, DrillTrap } from "@/data/types";
+import type { DrillTrap, QaItem, TranslateItem } from "@/data/types";
 
 const CONTRACTIONS: Record<string, string> = {
   "i'm": "i am", "you're": "you are", "he's": "he is", "she's": "she is", "it's": "it is",
   "what's": "what is", "that's": "that is", "name's": "name is", "isn't": "is not",
   "aren't": "are not", "don't": "do not", "doesn't": "does not", "i'll": "i will",
-  "i've": "i have", "can't": "cannot", "won't": "will not",
+  "i've": "i have", "there's": "there is", "haven't": "have not", "can't": "cannot", "won't": "will not",
 };
 const UNITS: Record<string, number> = {
   one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9,
@@ -96,10 +96,32 @@ export function checkAnswer(answer: string, accepted: string[], traps: DrillTrap
   return { correct: false, closest: accepted[best.idx] ?? "", ops: best.ops, trap };
 }
 
-export const checkItem = (answer: string, item: DrillItem) => checkAnswer(answer, item.en, item.traps);
+export const checkTranslate = (answer: string, item: Pick<TranslateItem, "en" | "traps">) => checkAnswer(answer, item.en, item.traps);
 
-/** Parses "português | english | alt" lines into drill items (no traps). */
-export function parseDrillLines(text: string): DrillItem[] {
+/** QA: at least 3 words and contains any accept pattern as a whole-word phrase. */
+export function checkQa(answer: string, item: Pick<QaItem, "accept_patterns" | "traps">): { correct: boolean; trap: DrillTrap | null } {
+  const got = normalizeTokens(answer);
+  const correct = got.length >= 3 && item.accept_patterns.some((p) => containsSeq(got, normalizeTokens(p)));
+  if (correct) return { correct, trap: null };
+  const trap = item.traps.find((t) => containsSeq(got, normalizeTokens(t.word))) ?? null;
+  return { correct, trap };
+}
+
+const SWAP_GROUPS = [["his", "her", "their"], ["is", "are", "am"]];
+/** Translate mode: the only differences are his/her/their, is/are/am, or a final -s. */
+export function isAttentionSlip(ops: DiffOp[]): boolean {
+  const diffs = ops.filter((o) => o.type !== "equal");
+  if (!diffs.length) return false;
+  return diffs.every((o) => {
+    if (o.type !== "wrong") return false;
+    const a = o.word, b = o.expected;
+    if (a + "s" === b || b + "s" === a) return true;
+    return SWAP_GROUPS.some((g) => g.includes(a) && g.includes(b));
+  });
+}
+
+/** Parses "português | english | alt" lines into translate items (no traps, focus "chunks"). */
+export function parseDrillLines(text: string): TranslateItem[] {
   return text.split(/\r?\n/).map((l) => l.split("|").map((p) => p.trim())).filter((p) => p.length >= 2 && p[0] && p[1])
-    .map((p, i) => ({ id: `u-${Date.now().toString(36)}-${i}`, pt: p[0]!, en: p.slice(1).filter(Boolean), focus: "custom", traps: [] }));
+    .map((p, i) => ({ id: `u-${Date.now().toString(36)}-${i}`, mode: "translate" as const, pt: p[0]!, en: p.slice(1).filter(Boolean), focus: "chunks", traps: [] }));
 }

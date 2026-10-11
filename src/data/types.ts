@@ -107,19 +107,32 @@ export interface ConverseTurn {
   text: string;
 }
 
-// ---- Guided translation drills (Praticar) ----
+// ---- UberClass drills ----
 export interface DrillTrap {
   word: string;
   hint_pt: string;
 }
-export interface DrillItem {
+export interface TranslateItem {
   id: string;
+  mode: "translate";
   pt: string;
   /** Accepted answers; the first is the model answer. */
   en: string[];
   focus: string;
   traps: DrillTrap[];
+  variations?: { pt: string; en: string[] }[];
 }
+export interface QaItem {
+  id: string;
+  mode: "qa";
+  q_en: string;
+  q_pt: string;
+  accept_patterns: string[];
+  model_answers: string[];
+  focus: string;
+  traps: DrillTrap[];
+}
+export type DrillItem = TranslateItem | QaItem;
 export interface DrillPack {
   id: string;
   title_pt: string;
@@ -128,6 +141,9 @@ export interface DrillPack {
   items: DrillItem[];
   user_created?: boolean;
 }
+export type Difficulty = "iniciante" | "intermediario" | "avancado";
+/** One mental shortcut per focus. */
+export type PuloDoGato = Record<string, string>;
 export type DrillRound = 1 | 2 | 3 | 4;
 export interface DrillAttempt {
   id: string;

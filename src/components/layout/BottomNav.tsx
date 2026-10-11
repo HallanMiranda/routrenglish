@@ -4,7 +4,7 @@ import { t } from "@/lib/i18n/pt-BR";
 
 const items = [
   { to: "/", label: t.nav.today, icon: Sun },
-  { to: "/praticar", label: t.nav.practice, icon: MessageSquareText },
+  { to: "/uberclass", label: t.nav.practice, icon: MessageSquareText },
   { to: "/revisao", label: t.nav.review, icon: Layers },
   { to: "/biblioteca", label: t.nav.library, icon: BookOpen },
   { to: "/progresso", label: t.nav.progress, icon: BarChart3 },
