@@ -2,6 +2,9 @@ import type {
   Card,
   CardRating,
   Checkpoint,
+  DrillAttempt,
+  DrillPack,
+  PackProgress,
   ErrorItem,
   Material,
   Mission,
@@ -31,6 +34,11 @@ export interface Repo {
   listMaterials(): Promise<Material[]>;
   saveMaterial(m: Omit<Material, "id" | "created_at"> & { id?: string }): Promise<Material>;
   getStreak(): Promise<number>;
+  listDrillPacks(): Promise<DrillPack[]>;
+  getDrillPack(id: string): Promise<DrillPack | null>;
+  saveDrillPack(p: Omit<DrillPack, "id"> & { id?: string }): Promise<DrillPack>;
+  saveDrillAttempt(a: Omit<DrillAttempt, "id" | "created_at">): Promise<DrillAttempt>;
+  getPackProgress(packId: string): Promise<PackProgress>;
 }
 
 // Swap this for a cloud implementation later; the UI only imports `repo`.
