@@ -22,7 +22,6 @@ const pwa = VitePWA({
     navigateFallback: null,
     // HTML is never served by the precache router; navigations use NetworkFirst.
     directoryIndex: null,
-    cleanURLs: false,
     ignoreURLParametersMatching: [],
     cleanupOutdatedCaches: true,
     skipWaiting: true,

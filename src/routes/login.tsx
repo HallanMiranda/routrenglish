@@ -5,6 +5,8 @@ export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       { title: "Entrar — Speak Lab" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "description", content: "Entre no Speak Lab para praticar inglês." },
       { property: "og:title", content: "Entrar — Speak Lab" },
       { property: "og:description", content: "Entre no Speak Lab para praticar inglês." },

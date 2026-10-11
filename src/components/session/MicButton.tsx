@@ -8,13 +8,14 @@ export function MicButton({ state = "idle", className, disabled, ...props }: Omi
   return (
     <Button
       {...props}
+      variant={state === "recording" ? "recording" : "microphone"}
       type="button"
       disabled={disabled || state === "processing"}
       aria-label={t.mic.actions[state]}
       aria-pressed={state === "recording"}
       aria-busy={state === "processing"}
       data-state={state}
-      className={cn("relative size-28 shrink-0 rounded-full p-0 [&_svg]:size-9", state === "recording" && "mic-recording bg-live text-live-foreground hover:bg-live/90", className)}
+      className={cn("relative size-28 shrink-0 rounded-full p-0 [&_svg]:size-9", state === "recording" && "mic-recording", className)}
     >
       {state === "idle" && <Mic aria-hidden="true" />}
       {state === "processing" && <LoaderCircle aria-hidden="true" className="motion-safe:animate-spin" />}

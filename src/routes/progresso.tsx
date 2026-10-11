@@ -9,6 +9,8 @@ export const Route = createFileRoute("/progresso")({
   head: () => ({
     meta: [
       { title: "Progresso — Speak Lab" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "description", content: "Sequência, fluência e evolução dos erros." },
       { property: "og:title", content: "Progresso — Speak Lab" },
       { property: "og:description", content: "Sequência, fluência e evolução dos erros." },
