@@ -33,3 +33,16 @@ describe("drill check", () => {
     expect(isAttentionSlip(checkAnswer("She lives there", ["She works here."]).ops)).toBe(false);
   });
 });
+
+import { applyMyName, checkTranslate as ct2 } from "./check";
+describe("lenient recognizer spelling", () => {
+  it("accepts a name alias and proper-noun spelling", () => {
+    expect(ct2(applyMyName("My name is Alan", "Allan", ["Alan", "Allen"]), { en: ["My name is Allan."], traps: [] }).correct).toBe(true);
+    expect(ct2("I live in Sao Paolo", { en: ["I live in São Paulo."], traps: [] }).correct).toBe(true);
+  });
+  it("forgives one letter in long words but never in attention words", () => {
+    expect(ct2("I work as an enginer", { en: ["I work as an engineer."], traps: [] }).correct).toBe(true);
+    expect(ct2("She is his sister", { en: ["She is her sister."], traps: [] }).correct).toBe(false);
+    expect(ct2("They is here", { en: ["They are here."], traps: [] }).correct).toBe(false);
+  });
+});
