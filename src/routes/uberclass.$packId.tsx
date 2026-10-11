@@ -24,7 +24,7 @@ const NIVEIS: Nivel[] = ["todos", "iniciante", "intermediario", "avancado"];
 
 export const Route = createFileRoute("/uberclass/$packId")({
   validateSearch: (s: Record<string, unknown>): { nivel: Nivel } => ({
-    nivel: NIVEIS.includes(s.nivel as Nivel) ? (s.nivel as Nivel) : "todos",
+    nivel: NIVEIS.includes(s["nivel"] as Nivel) ? (s["nivel"] as Nivel) : "todos",
   }),
   head: () => ({
     meta: [
