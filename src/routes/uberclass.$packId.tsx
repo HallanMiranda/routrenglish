@@ -605,6 +605,13 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
     : isQa ? d.promptAnswer
     : run.round === 1 ? d.promptRepeat : d.promptTranslate;
 
+  if (review)
+    return (
+      <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col overflow-y-auto px-4 pb-4">
+        <LadderReview ladder={review.ladder} onFast={redoFast} onContinue={() => { const n = review.next; setReview(null); advance(n); }} />
+      </div>
+    );
+
   return (
     <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col gap-3 px-4 pb-4">
       {/* Tutor panel */}
@@ -676,8 +683,6 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
             )}
           </div>
         </div>
-
-        {review && <LadderReview ladder={review.ladder} onFast={redoFast} onContinue={() => { const n = review.next; setReview(null); advance(n); }} />}
 
         {run.out && (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-card/95 p-6 text-center">
@@ -765,7 +770,7 @@ function LadderRail({ index, total }: { index: number; total: number }) {
 
 function LadderReview({ ladder, onFast, onContinue }: { ladder: LadderItem; onFast: () => void; onContinue: () => void }) {
   return (
-    <div className="absolute inset-0 z-20 flex flex-col gap-3 overflow-y-auto bg-card p-5 [&>*]:shrink-0">
+    <div className="flex flex-col gap-3 rounded-3xl bg-card p-5 shadow-sm ring-1 ring-border animate-story">
       <p className="font-display text-xl font-bold">{d.ladderDone}</p>
       <p className="text-sm text-muted-foreground">{ladder.title_pt}</p>
       <ol className="space-y-2">
