@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { repo } from "@/data/repo";
 import type { DrillPack, Mission } from "@/data/types";
 import { t } from "@/lib/i18n/pt-BR";
+import { loadCourses, unitNumber } from "@/course/course";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,20 +28,23 @@ interface State {
   streak: number;
   due: number;
   drill: { pack: DrillPack; round: number } | null;
+  unit: { pack: DrillPack; n: number } | null;
 }
 
 function Today() {
   const navigate = useNavigate();
-  const [s, setS] = useState<State>({ loading: true, mission: null, streak: 0, due: 0, drill: null });
+  const [s, setS] = useState<State>({ loading: true, mission: null, streak: 0, due: 0, drill: null, unit: null });
   const [starting, setStarting] = useState(false);
 
   useEffect(() => {
     let alive = true;
     (async () => {
-      const [mission, streak, cards, last] = await Promise.all([repo.getTodayMission(), repo.getStreak(), repo.listDueCards(), repo.getLastDrillAttempt()]);
+      const [mission, streak, cards, last, courses] = await Promise.all([repo.getTodayMission(), repo.getStreak(), repo.listDueCards(), repo.getLastDrillAttempt(), loadCourses()]);
+      const cur = courses.find((c) => c.current)?.current;
+      const unit = cur ? { pack: cur.pack, n: unitNumber(cur.pack) } : null;
       const pack = last ? await repo.getDrillPack(last.pack_id) : null;
       const round = pack ? (await repo.getPackProgress(pack.id)).best_round : 1;
-      if (alive) setS({ loading: false, mission, streak, due: cards.length, drill: pack ? { pack, round } : null });
+      if (alive) setS({ loading: false, mission, streak, due: cards.length, drill: pack ? { pack, round } : null, unit });
     })();
     return () => {
       alive = false;
@@ -54,7 +58,7 @@ function Today() {
     navigate({ to: "/sessao/$sessionId", params: { sessionId: session.id } });
   }
 
-  const { mission, streak, loading, due, drill } = s;
+  const { mission, streak, loading, due, drill, unit } = s;
 
   return (
     <AppShell title={t.nav.today}>
@@ -65,6 +69,18 @@ function Today() {
 
       {loading ? (
         <div className="h-80 animate-pulse rounded-[20px] bg-muted" aria-label={t.today.loading} />
+      ) : unit ? (
+        <section className="flex min-h-64 flex-col rounded-[20px] bg-ink p-6 text-ink-foreground shadow-card">
+          <p className="text-caption font-semibold text-live">{t.aulas.title}</p>
+          <h2 className="text-title mt-3">{t.aulas.hojeContinue(unit.n, unit.pack.title_pt)}</h2>
+          <p className="text-caption mt-4 flex items-center gap-1.5 text-ink-foreground/80">
+            <Clock className="size-4" aria-hidden="true" /> {t.aulas.hojeMin}
+          </p>
+          <div className="flex-1" />
+          <Button size="lg" className="mt-8 w-full" asChild>
+            <Link to="/aulas/$packId" params={{ packId: unit.pack.id }}><Play /> {t.aulas.continue}</Link>
+          </Button>
+        </section>
       ) : mission ? (
         <section className="flex min-h-80 flex-col rounded-[20px] bg-ink p-6 text-ink-foreground shadow-card">
           <p className="text-caption flex items-center gap-2 font-semibold text-live">
@@ -97,8 +113,19 @@ function Today() {
         </EmptyState>
       )}
 
+      {!loading && unit && mission && (
+        <button type="button" onClick={start} disabled={starting} className="flex min-h-14 w-full items-center gap-3 rounded-[20px] border bg-card px-4 py-3 text-left">
+          <Mic className="size-5 shrink-0 text-primary" aria-hidden="true" />
+          <span className="min-w-0 flex-1">
+            <span className="text-caption block text-muted-foreground">{t.today.greeting} · {t.today.day} {mission.day}</span>
+            <span className="block truncate font-semibold" lang="en">{mission.title}</span>
+          </span>
+          <ChevronRight className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+        </button>
+      )}
+
       {due > 0 && (
-        <Link to="/revisao" className="flex min-h-14 items-center gap-3 rounded-[20px] border bg-card px-4 py-3">
+        <Link to="/aulas/revisar" className="flex min-h-14 items-center gap-3 rounded-[20px] border bg-card px-4 py-3">
           <Layers className="size-5 shrink-0 text-primary" aria-hidden="true" />
           <span className="flex-1 font-semibold">{t.today.dueCards(due)}</span>
           <ChevronRight className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
