@@ -10,33 +10,127 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BibliotecaRouteImport } from './routes/biblioteca'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ProgressoRouteImport } from './routes/progresso'
+import { Route as RevisaoRouteImport } from './routes/revisao'
+import { Route as BibliotecaMaterialIdRouteImport } from './routes/biblioteca.$materialId'
+import { Route as RelatorioSessionIdRouteImport } from './routes/relatorio.$sessionId'
+import { Route as SessaoSessionIdRouteImport } from './routes/sessao.$sessionId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BibliotecaRoute = BibliotecaRouteImport.update({
+  id: '/biblioteca',
+  path: '/biblioteca',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgressoRoute = ProgressoRouteImport.update({
+  id: '/progresso',
+  path: '/progresso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RevisaoRoute = RevisaoRouteImport.update({
+  id: '/revisao',
+  path: '/revisao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BibliotecaMaterialIdRoute = BibliotecaMaterialIdRouteImport.update({
+  id: '/$materialId',
+  path: '/$materialId',
+  getParentRoute: () => BibliotecaRoute,
+} as any)
+const RelatorioSessionIdRoute = RelatorioSessionIdRouteImport.update({
+  id: '/relatorio/$sessionId',
+  path: '/relatorio/$sessionId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SessaoSessionIdRoute = SessaoSessionIdRouteImport.update({
+  id: '/sessao/$sessionId',
+  path: '/sessao/$sessionId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/biblioteca': typeof BibliotecaRouteWithChildren
+  '/login': typeof LoginRoute
+  '/progresso': typeof ProgressoRoute
+  '/revisao': typeof RevisaoRoute
+  '/biblioteca/$materialId': typeof BibliotecaMaterialIdRoute
+  '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
+  '/sessao/$sessionId': typeof SessaoSessionIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/biblioteca': typeof BibliotecaRouteWithChildren
+  '/login': typeof LoginRoute
+  '/progresso': typeof ProgressoRoute
+  '/revisao': typeof RevisaoRoute
+  '/biblioteca/$materialId': typeof BibliotecaMaterialIdRoute
+  '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
+  '/sessao/$sessionId': typeof SessaoSessionIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/biblioteca': typeof BibliotecaRouteWithChildren
+  '/login': typeof LoginRoute
+  '/progresso': typeof ProgressoRoute
+  '/revisao': typeof RevisaoRoute
+  '/biblioteca/$materialId': typeof BibliotecaMaterialIdRoute
+  '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
+  '/sessao/$sessionId': typeof SessaoSessionIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/biblioteca'
+    | '/login'
+    | '/progresso'
+    | '/revisao'
+    | '/biblioteca/$materialId'
+    | '/relatorio/$sessionId'
+    | '/sessao/$sessionId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/biblioteca'
+    | '/login'
+    | '/progresso'
+    | '/revisao'
+    | '/biblioteca/$materialId'
+    | '/relatorio/$sessionId'
+    | '/sessao/$sessionId'
+  id:
+    | '__root__'
+    | '/'
+    | '/biblioteca'
+    | '/login'
+    | '/progresso'
+    | '/revisao'
+    | '/biblioteca/$materialId'
+    | '/relatorio/$sessionId'
+    | '/sessao/$sessionId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BibliotecaRoute: typeof BibliotecaRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  ProgressoRoute: typeof ProgressoRoute
+  RevisaoRoute: typeof RevisaoRoute
+  RelatorioSessionIdRoute: typeof RelatorioSessionIdRoute
+  SessaoSessionIdRoute: typeof SessaoSessionIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +142,78 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/biblioteca': {
+      id: '/biblioteca'
+      path: '/biblioteca'
+      fullPath: '/biblioteca'
+      preLoaderRoute: typeof BibliotecaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/progresso': {
+      id: '/progresso'
+      path: '/progresso'
+      fullPath: '/progresso'
+      preLoaderRoute: typeof ProgressoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/revisao': {
+      id: '/revisao'
+      path: '/revisao'
+      fullPath: '/revisao'
+      preLoaderRoute: typeof RevisaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/biblioteca/$materialId': {
+      id: '/biblioteca/$materialId'
+      path: '/$materialId'
+      fullPath: '/biblioteca/$materialId'
+      preLoaderRoute: typeof BibliotecaMaterialIdRouteImport
+      parentRoute: typeof BibliotecaRoute
+    }
+    '/relatorio/$sessionId': {
+      id: '/relatorio/$sessionId'
+      path: '/relatorio/$sessionId'
+      fullPath: '/relatorio/$sessionId'
+      preLoaderRoute: typeof RelatorioSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sessao/$sessionId': {
+      id: '/sessao/$sessionId'
+      path: '/sessao/$sessionId'
+      fullPath: '/sessao/$sessionId'
+      preLoaderRoute: typeof SessaoSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface BibliotecaRouteChildren {
+  BibliotecaMaterialIdRoute: typeof BibliotecaMaterialIdRoute
+}
+
+const BibliotecaRouteChildren: BibliotecaRouteChildren = {
+  BibliotecaMaterialIdRoute: BibliotecaMaterialIdRoute,
+}
+
+const BibliotecaRouteWithChildren = BibliotecaRoute._addFileChildren(
+  BibliotecaRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BibliotecaRoute: BibliotecaRouteWithChildren,
+  LoginRoute: LoginRoute,
+  ProgressoRoute: ProgressoRoute,
+  RevisaoRoute: RevisaoRoute,
+  RelatorioSessionIdRoute: RelatorioSessionIdRoute,
+  SessaoSessionIdRoute: SessaoSessionIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
