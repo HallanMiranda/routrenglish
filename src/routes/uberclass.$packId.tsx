@@ -468,7 +468,7 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted }: {
   function proceed(next: Run) {
     if (meta && !meta.nextId) {
       const ladder = next.ladders[meta.ladderId];
-      if (ladder) { stopSpeaking(); setReview({ ladder, next }); return; }
+      if (ladder) { stopSpeaking(); setFeedback(null); setHeard(""); setReview({ ladder, next }); return; }
     }
     advance(next);
   }
