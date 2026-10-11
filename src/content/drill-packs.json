@@ -1,0 +1,68 @@
+{
+  "format_notes_pt": "Cada item: frase em português (pt), respostas aceitas em inglês (en, a primeira é o modelo), foco gramatical e 'traps': palavras erradas típicas com a dica que o tutor dá se você usá-las.",
+  "packs": [
+    {
+      "id": "pk-personal-info",
+      "title_pt": "Informações pessoais",
+      "level": "A1",
+      "focus_pt": "Se apresentar, falar de onde é, onde mora e o que faz",
+      "items": [
+        {"id": "pi-01", "pt": "Meu nome é Allan.", "en": ["My name is Allan.", "My name's Allan.", "I'm Allan.", "I am Allan."], "focus": "to_be", "traps": []},
+        {"id": "pi-02", "pt": "Eu sou do Brasil.", "en": ["I'm from Brazil.", "I am from Brazil."], "focus": "from", "traps": [{"word": "of", "hint_pt": "Origem usa from, não of: I'm from..."}]},
+        {"id": "pi-03", "pt": "Eu moro em Hortolândia, perto de Campinas.", "en": ["I live in Hortolândia, near Campinas.", "I live in Hortolandia, near Campinas.", "I live in Hortolândia, close to Campinas.", "I live in Hortolandia, close to Campinas."], "focus": "prepositions", "traps": [{"word": "at", "hint_pt": "Cidade usa in: I live in..."}, {"word": "of", "hint_pt": "Perto de = near (sem of) ou close to."}]},
+        {"id": "pi-04", "pt": "Ela tem trinta anos.", "en": ["She's thirty.", "She is thirty.", "She's thirty years old.", "She is thirty years old.", "She's 30.", "She is 30.", "She's 30 years old.", "She is 30 years old."], "focus": "age_be", "traps": [{"word": "has", "hint_pt": "Idade em inglês usa o verbo be: She is..."}]},
+        {"id": "pi-05", "pt": "Eu trabalho com dados de marketing.", "en": ["I work with marketing data."], "focus": "word_order", "traps": [{"word": "of", "hint_pt": "Em inglês o tipo vem antes: marketing data, sem of."}]},
+        {"id": "pi-06", "pt": "Eu trabalho de casa.", "en": ["I work from home."], "focus": "prepositions", "traps": [{"word": "of", "hint_pt": "Trabalhar de casa = work from home."}, {"word": "in", "hint_pt": "Trabalhar de casa = work from home."}]},
+        {"id": "pi-07", "pt": "Qual é o seu nome?", "en": ["What's your name?", "What is your name?"], "focus": "questions", "traps": [{"word": "which", "hint_pt": "Para perguntar o nome, use what."}]},
+        {"id": "pi-08", "pt": "De onde você é?", "en": ["Where are you from?"], "focus": "questions", "traps": []},
+        {"id": "pi-09", "pt": "O que você faz?", "en": ["What do you do?", "What do you do for work?", "What do you do for a living?"], "focus": "questions_do", "traps": [{"word": "make", "hint_pt": "Profissão: What do you do? (do, não make)."}]},
+        {"id": "pi-10", "pt": "Ela tem dois irmãos.", "en": ["She has two brothers.", "She's got two brothers.", "She has 2 brothers."], "focus": "third_person", "traps": [{"word": "have", "hint_pt": "Ela = she: o verbo vira has."}]},
+        {"id": "pi-11", "pt": "Prazer em te conhecer.", "en": ["Nice to meet you.", "Pleased to meet you.", "It's nice to meet you.", "It's a pleasure to meet you."], "focus": "chunks", "traps": [{"word": "know", "hint_pt": "Conhecer alguém pela primeira vez = meet, não know."}]},
+        {"id": "pi-12", "pt": "Eu falo português e um pouco de inglês.", "en": ["I speak Portuguese and a little English.", "I speak Portuguese and a little bit of English.", "I speak Portuguese and some English."], "focus": "quantifiers", "traps": []},
+        {"id": "pi-13", "pt": "Eu não sou dos Estados Unidos.", "en": ["I'm not from the United States.", "I am not from the United States.", "I'm not from the US.", "I am not from the US."], "focus": "negative_be", "traps": [{"word": "don't", "hint_pt": "Com o verbo be, a negação é I'm not, sem don't."}]},
+        {"id": "pi-14", "pt": "Você mora aqui?", "en": ["Do you live here?"], "focus": "questions_do", "traps": []},
+        {"id": "pi-15", "pt": "Eu gosto muito do meu trabalho.", "en": ["I really like my job.", "I like my job a lot.", "I really like my work.", "I like my work a lot.", "I love my job."], "focus": "word_order", "traps": [{"word": "very", "hint_pt": "Gostar muito = really like ou like a lot. Very much vai no fim."}]}
+      ]
+    },
+    {
+      "id": "pk-his-her",
+      "title_pt": "His × Her (dele × dela)",
+      "level": "A1",
+      "focus_pt": "Em inglês o possessivo segue o DONO, não a coisa: dele = his, dela = her",
+      "items": [
+        {"id": "hh-01", "pt": "O nome dele é John.", "en": ["His name is John.", "His name's John."], "focus": "his_her", "traps": [{"word": "her", "hint_pt": "Dele = his. Her é dela."}]},
+        {"id": "hh-02", "pt": "O nome dela é Mary.", "en": ["Her name is Mary.", "Her name's Mary."], "focus": "his_her", "traps": [{"word": "his", "hint_pt": "Dela = her. His é dele."}]},
+        {"id": "hh-03", "pt": "As chaves dele estão embaixo da cama.", "en": ["His keys are under the bed."], "focus": "his_her", "traps": [{"word": "her", "hint_pt": "Dele = his."}, {"word": "is", "hint_pt": "Keys é plural: o verbo é are."}]},
+        {"id": "hh-04", "pt": "O carro dela é vermelho.", "en": ["Her car is red."], "focus": "his_her", "traps": [{"word": "his", "hint_pt": "Dela = her."}]},
+        {"id": "hh-05", "pt": "A mãe dele mora em Miami.", "en": ["His mother lives in Miami.", "His mom lives in Miami."], "focus": "his_her", "traps": [{"word": "her", "hint_pt": "A mãe é DELE: his mother."}, {"word": "live", "hint_pt": "A mãe = she: o verbo leva -s, lives."}]},
+        {"id": "hh-06", "pt": "O pai dela trabalha em um hospital.", "en": ["Her father works at a hospital.", "Her father works in a hospital.", "Her dad works at a hospital.", "Her dad works in a hospital."], "focus": "his_her", "traps": [{"word": "his", "hint_pt": "O pai é DELA: her father."}, {"word": "work", "hint_pt": "O pai = he: o verbo leva -s, works."}]},
+        {"id": "hh-07", "pt": "Os filhos dele estudam inglês.", "en": ["His children study English.", "His kids study English."], "focus": "his_her", "traps": [{"word": "her", "hint_pt": "Dele = his."}, {"word": "studies", "hint_pt": "Os filhos = they: study, sem -s."}]},
+        {"id": "hh-08", "pt": "O celular dela está na mesa.", "en": ["Her phone is on the table.", "Her cell phone is on the table.", "Her cellphone is on the table."], "focus": "his_her", "traps": [{"word": "his", "hint_pt": "Dela = her."}, {"word": "in", "hint_pt": "Em cima da mesa = on the table."}]},
+        {"id": "hh-09", "pt": "Este é o escritório dele.", "en": ["This is his office."], "focus": "his_her", "traps": [{"word": "her", "hint_pt": "Dele = his."}]},
+        {"id": "hh-10", "pt": "Aquela é a irmã dela.", "en": ["That's her sister.", "That is her sister."], "focus": "his_her", "traps": [{"word": "his", "hint_pt": "A irmã é DELA: her sister."}]},
+        {"id": "hh-11", "pt": "Qual é o nome dele?", "en": ["What's his name?", "What is his name?"], "focus": "his_her", "traps": [{"word": "her", "hint_pt": "Dele = his."}]},
+        {"id": "hh-12", "pt": "A cliente dele é dos Estados Unidos.", "en": ["His client is from the United States.", "His client is from the US."], "focus": "his_her", "traps": [{"word": "her", "hint_pt": "A cliente é DELE: his client. O gênero da cliente não importa."}]}
+      ]
+    },
+    {
+      "id": "pk-work-calls",
+      "title_pt": "Calls de trabalho",
+      "level": "A2",
+      "focus_pt": "Frases que você usa em reuniões com clientes americanos",
+      "items": [
+        {"id": "wc-01", "pt": "Você consegue me ouvir?", "en": ["Can you hear me?", "Can you hear me okay?", "Can you hear me OK?"], "focus": "chunks", "traps": [{"word": "listen", "hint_pt": "Conseguir ouvir = hear. Listen é prestar atenção."}]},
+        {"id": "wc-02", "pt": "Deixa eu compartilhar minha tela.", "en": ["Let me share my screen."], "focus": "chunks", "traps": []},
+        {"id": "wc-03", "pt": "Eu vou te mandar um e-mail hoje.", "en": ["I'll send you an email today.", "I will send you an email today.", "I'm going to send you an email today."], "focus": "future", "traps": [{"word": "to", "hint_pt": "Send you an email, sem to antes de you."}]},
+        {"id": "wc-04", "pt": "O formulário não está funcionando.", "en": ["The form isn't working.", "The form is not working.", "The form doesn't work.", "The form does not work."], "focus": "present_continuous", "traps": []},
+        {"id": "wc-05", "pt": "Eu verifiquei a tag ontem.", "en": ["I checked the tag yesterday."], "focus": "past_ed", "traps": [{"word": "check", "hint_pt": "Ontem = passado: checked (o -ed soa como t)."}]},
+        {"id": "wc-06", "pt": "Os leads aumentaram esta semana.", "en": ["Leads went up this week.", "The leads went up this week.", "Leads increased this week.", "The leads increased this week."], "focus": "past", "traps": []},
+        {"id": "wc-07", "pt": "Pode repetir, por favor?", "en": ["Could you repeat that, please?", "Can you repeat that, please?", "Could you say that again, please?", "Can you say that again, please?", "Could you repeat that please?", "Can you repeat that please?"], "focus": "chunks", "traps": []},
+        {"id": "wc-08", "pt": "Eu concordo com você.", "en": ["I agree with you.", "I agree."], "focus": "br_error", "traps": [{"word": "am", "hint_pt": "Agree já é verbo: I agree, sem am."}, {"word": "i'm", "hint_pt": "Agree já é verbo: I agree, sem am."}]},
+        {"id": "wc-09", "pt": "Eu tenho uma dúvida sobre o relatório.", "en": ["I have a question about the report.", "I've got a question about the report."], "focus": "br_error", "traps": [{"word": "doubt", "hint_pt": "Dúvida para perguntar = question. Doubt é desconfiança."}]},
+        {"id": "wc-10", "pt": "Faz três semanas que eu trabalho neste projeto.", "en": ["I've been working on this project for three weeks.", "I have been working on this project for three weeks.", "I've been working on this project for 3 weeks.", "I have been working on this project for 3 weeks."], "focus": "present_perfect", "traps": [{"word": "since", "hint_pt": "Duração (três semanas) usa for. Since é para o ponto de início."}, {"word": "in", "hint_pt": "Trabalhar num projeto = work on a project."}]},
+        {"id": "wc-11", "pt": "Atualmente eu uso o n8n.", "en": ["Currently I use n8n.", "I currently use n8n.", "I'm currently using n8n.", "Right now I use n8n."], "focus": "br_error", "traps": [{"word": "actually", "hint_pt": "Atualmente = currently. Actually é na verdade."}]},
+        {"id": "wc-12", "pt": "Podemos remarcar para quinta-feira?", "en": ["Can we reschedule for Thursday?", "Could we reschedule for Thursday?", "Can we reschedule to Thursday?", "Could we reschedule to Thursday?", "Can we move it to Thursday?"], "focus": "chunks", "traps": []}
+      ]
+    }
+  ]
+}
