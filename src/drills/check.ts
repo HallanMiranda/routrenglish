@@ -5,6 +5,9 @@ const CONTRACTIONS: Record<string, string> = {
   "what's": "what is", "that's": "that is", "name's": "name is", "isn't": "is not",
   "aren't": "are not", "don't": "do not", "doesn't": "does not", "i'll": "i will",
   "i've": "i have", "there's": "there is", "haven't": "have not", "can't": "cannot", "won't": "will not",
+  "we're": "we are", "they're": "they are", "didn't": "did not", "wasn't": "was not", "weren't": "were not",
+  "where's": "where is", "who's": "who is", "how's": "how is", "i'd": "i would", "we'd": "we would",
+  "you'd": "you would", "couldn't": "could not", "let's": "let us", "here's": "here is",
 };
 const UNITS: Record<string, number> = {
   one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9,

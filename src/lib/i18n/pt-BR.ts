@@ -100,7 +100,7 @@ export const t = {
     stepsShort: (k: number) => `${k}/5 etapas`,
     min: (n: number) => `~${n} min`,
     steps: ["O que você vai aprender", "Aula com o Coach", "Perguntas", "Com o livro", "Desafio da unidade"],
-    stepMin: [1, 8, 3, 3, 2],
+    stepMin: [1, 12, 4, 3, 2],
     objective: "Objetivo",
     grammar: "Gramática",
     vocab: "Vocabulário",
@@ -134,7 +134,7 @@ export const t = {
     countdown: (s: number) => `${s} s`,
     timeOut: "Tempo esgotado.",
     hojeContinue: (n: number, title: string) => `Continuar: Unidade ${n} — ${title}`,
-    hojeMin: "~15 min",
+    hojeMin: "~20 min",
     printFor: (u: string) => `Print para ${u}. Depois de gerar, ele aparece na unidade.`,
   },
   reviewSession: {
