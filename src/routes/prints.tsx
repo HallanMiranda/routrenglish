@@ -85,6 +85,7 @@ function PrintsHome() {
 
   return (
     <AppShell title={p.title}>
+      <UnitBanner />
       {settings && !settings.api_key && (
         <ApiKeyForm onChange={setSettings} />
       )}
@@ -275,6 +276,19 @@ function NewStudy({ source, settings, note, onClose }: { source: StudySource; se
           </Button>
         </div>
       )}
+    </div>
+  );
+}
+
+function UnitBanner() {
+  const { unidade } = Route.useSearch();
+  const [title, setTitle] = useState("");
+  useEffect(() => { if (unidade) void repo.getDrillPack(unidade).then((pk) => setTitle(pk ? (pk.unit ? `Unidade ${pk.unit}` : pk.title_pt) : "")); }, [unidade]);
+  if (!unidade) return null;
+  return (
+    <div className="flex items-center gap-3 rounded-[20px] border border-primary/40 bg-card p-4">
+      <p className="flex-1 text-base">{t.aulas.printFor(title || t.aulas.title)}</p>
+      <Button variant="ghost" size="sm" asChild><Link to="/aulas/$packId" params={{ packId: unidade }} search={{ etapa: 4 }}>{t.aulas.backUnit}</Link></Button>
     </div>
   );
 }
