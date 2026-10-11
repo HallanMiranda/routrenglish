@@ -1,0 +1,19 @@
+# Speak Lab roadmap
+
+- [x] 1. Design system + app shell + empty pages
+- [ ] 2. PWA basics
+- [ ] 3. Cloud + login (move pages under auth gate)
+- [ ] 4. Schema migration + seed missions
+- [ ] 5. Hoje
+- [ ] 6. Session shell
+- [ ] 7. Audio core
+- [ ] 8. TTS + Step 1 Listening
+- [ ] 9. Step 2 Shadowing
+- [ ] 10. Transcribe + Step 3 Guided practice
+- [ ] 11. Step 4 Live mission
+- [ ] 12. Step 5 4/3/2
+- [ ] 13. Report + cards
+- [ ] 14. Review
+- [ ] 15. Library + ingest
+- [ ] 16. Progress
+- [ ] 17. api_usage + polish
