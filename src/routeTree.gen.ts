@@ -18,6 +18,9 @@ import { Route as RevisaoRouteImport } from './routes/revisao'
 import { Route as UberclassRouteImport } from './routes/uberclass'
 import { Route as AplicabilidadeIndexRouteImport } from './routes/aplicabilidade.index'
 import { Route as AplicabilidadePackIdRouteImport } from './routes/aplicabilidade.$packId'
+import { Route as AulasIndexRouteImport } from './routes/aulas.index'
+import { Route as AulasPackIdRouteImport } from './routes/aulas.$packId'
+import { Route as AulasRevisarRouteImport } from './routes/aulas.revisar'
 import { Route as PrintsMaterialIdRouteImport } from './routes/prints.$materialId'
 import { Route as RelatorioSessionIdRouteImport } from './routes/relatorio.$sessionId'
 import { Route as SessaoSessionIdRouteImport } from './routes/sessao.$sessionId'
@@ -68,6 +71,21 @@ const AplicabilidadePackIdRoute = AplicabilidadePackIdRouteImport.update({
   path: '/aplicabilidade/$packId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AulasIndexRoute = AulasIndexRouteImport.update({
+  id: '/aulas/',
+  path: '/aulas/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AulasPackIdRoute = AulasPackIdRouteImport.update({
+  id: '/aulas/$packId',
+  path: '/aulas/$packId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AulasRevisarRoute = AulasRevisarRouteImport.update({
+  id: '/aulas/revisar',
+  path: '/aulas/revisar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrintsMaterialIdRoute = PrintsMaterialIdRouteImport.update({
   id: '/$materialId',
   path: '/$materialId',
@@ -98,11 +116,14 @@ export interface FileRoutesByFullPath {
   '/revisao': typeof RevisaoRoute
   '/uberclass': typeof UberclassRouteWithChildren
   '/aplicabilidade/$packId': typeof AplicabilidadePackIdRoute
+  '/aulas/$packId': typeof AulasPackIdRoute
+  '/aulas/revisar': typeof AulasRevisarRoute
   '/prints/$materialId': typeof PrintsMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
   '/uberclass/$': typeof UberclassSplatRoute
   '/aplicabilidade/': typeof AplicabilidadeIndexRoute
+  '/aulas/': typeof AulasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -113,11 +134,14 @@ export interface FileRoutesByTo {
   '/revisao': typeof RevisaoRoute
   '/uberclass': typeof UberclassRouteWithChildren
   '/aplicabilidade/$packId': typeof AplicabilidadePackIdRoute
+  '/aulas/$packId': typeof AulasPackIdRoute
+  '/aulas/revisar': typeof AulasRevisarRoute
   '/prints/$materialId': typeof PrintsMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
   '/uberclass/$': typeof UberclassSplatRoute
   '/aplicabilidade': typeof AplicabilidadeIndexRoute
+  '/aulas': typeof AulasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -129,11 +153,14 @@ export interface FileRoutesById {
   '/revisao': typeof RevisaoRoute
   '/uberclass': typeof UberclassRouteWithChildren
   '/aplicabilidade/$packId': typeof AplicabilidadePackIdRoute
+  '/aulas/$packId': typeof AulasPackIdRoute
+  '/aulas/revisar': typeof AulasRevisarRoute
   '/prints/$materialId': typeof PrintsMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
   '/uberclass/$': typeof UberclassSplatRoute
   '/aplicabilidade/': typeof AplicabilidadeIndexRoute
+  '/aulas/': typeof AulasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -146,11 +173,14 @@ export interface FileRouteTypes {
     | '/revisao'
     | '/uberclass'
     | '/aplicabilidade/$packId'
+    | '/aulas/$packId'
+    | '/aulas/revisar'
     | '/prints/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
     | '/uberclass/$'
     | '/aplicabilidade/'
+    | '/aulas/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -161,11 +191,14 @@ export interface FileRouteTypes {
     | '/revisao'
     | '/uberclass'
     | '/aplicabilidade/$packId'
+    | '/aulas/$packId'
+    | '/aulas/revisar'
     | '/prints/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
     | '/uberclass/$'
     | '/aplicabilidade'
+    | '/aulas'
   id:
     | '__root__'
     | '/'
@@ -176,11 +209,14 @@ export interface FileRouteTypes {
     | '/revisao'
     | '/uberclass'
     | '/aplicabilidade/$packId'
+    | '/aulas/$packId'
+    | '/aulas/revisar'
     | '/prints/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
     | '/uberclass/$'
     | '/aplicabilidade/'
+    | '/aulas/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -192,9 +228,12 @@ export interface RootRouteChildren {
   RevisaoRoute: typeof RevisaoRoute
   UberclassRoute: typeof UberclassRouteWithChildren
   AplicabilidadePackIdRoute: typeof AplicabilidadePackIdRoute
+  AulasPackIdRoute: typeof AulasPackIdRoute
+  AulasRevisarRoute: typeof AulasRevisarRoute
   RelatorioSessionIdRoute: typeof RelatorioSessionIdRoute
   SessaoSessionIdRoute: typeof SessaoSessionIdRoute
   AplicabilidadeIndexRoute: typeof AplicabilidadeIndexRoute
+  AulasIndexRoute: typeof AulasIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -262,6 +301,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AplicabilidadePackIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/aulas/': {
+      id: '/aulas/'
+      path: '/aulas'
+      fullPath: '/aulas/'
+      preLoaderRoute: typeof AulasIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aulas/$packId': {
+      id: '/aulas/$packId'
+      path: '/aulas/$packId'
+      fullPath: '/aulas/$packId'
+      preLoaderRoute: typeof AulasPackIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aulas/revisar': {
+      id: '/aulas/revisar'
+      path: '/aulas/revisar'
+      fullPath: '/aulas/revisar'
+      preLoaderRoute: typeof AulasRevisarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/prints/$materialId': {
       id: '/prints/$materialId'
       path: '/$materialId'
@@ -325,9 +385,12 @@ const rootRouteChildren: RootRouteChildren = {
   RevisaoRoute: RevisaoRoute,
   UberclassRoute: UberclassRouteWithChildren,
   AplicabilidadePackIdRoute: AplicabilidadePackIdRoute,
+  AulasPackIdRoute: AulasPackIdRoute,
+  AulasRevisarRoute: AulasRevisarRoute,
   RelatorioSessionIdRoute: RelatorioSessionIdRoute,
   SessaoSessionIdRoute: SessaoSessionIdRoute,
   AplicabilidadeIndexRoute: AplicabilidadeIndexRoute,
+  AulasIndexRoute: AulasIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

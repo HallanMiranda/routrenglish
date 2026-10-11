@@ -17,6 +17,7 @@ import { t } from "@/lib/i18n/pt-BR";
 const p = t.prints;
 
 export const Route = createFileRoute("/prints")({
+  validateSearch: (s: Record<string, unknown>): { unidade?: string } => (typeof s["unidade"] === "string" && s["unidade"] ? { unidade: s["unidade"] } : {}),
   head: () => ({
     meta: [
       { title: "Prints — Speak Lab" },
@@ -84,6 +85,7 @@ function PrintsHome() {
 
   return (
     <AppShell title={p.title}>
+      <UnitBanner />
       {settings && !settings.api_key && (
         <ApiKeyForm onChange={setSettings} />
       )}
@@ -226,6 +228,7 @@ export function GenerationStatus({ g }: { g: ReturnType<typeof useGeneration> })
 }
 
 function NewStudy({ source, settings, note, onClose }: { source: StudySource; settings: AiSettings | null; note: string | null; onClose: () => void }) {
+  const { unidade } = Route.useSearch();
   const [level, setLevel] = useState("A2");
   const [focus, setFocus] = useState("");
   const g = useGeneration();
@@ -264,12 +267,28 @@ function NewStudy({ source, settings, note, onClose }: { source: StudySource; se
           <Button variant="ghost" onClick={onClose}>{p.discard}</Button>
           <Button className="flex-1" size="lg" disabled={!hasKey} onClick={async () => {
             const m = await g.run((signal, onFixing) => createStudy(settings!, source, level, focus, signal, onFixing));
-            if (m) void navigate({ to: "/prints/$materialId", params: { materialId: m.id } });
+            if (m && unidade) {
+              await repo.saveMaterial({ ...m, unit_pack_id: unidade });
+              void navigate({ to: "/aulas/$packId", params: { packId: unidade }, search: { etapa: 4 } });
+            } else if (m) void navigate({ to: "/prints/$materialId", params: { materialId: m.id } });
           }}>
             {p.generate}
           </Button>
         </div>
       )}
+    </div>
+  );
+}
+
+function UnitBanner() {
+  const { unidade } = Route.useSearch();
+  const [title, setTitle] = useState("");
+  useEffect(() => { if (unidade) void repo.getDrillPack(unidade).then((pk) => setTitle(pk ? (pk.unit ? `Unidade ${pk.unit}` : pk.title_pt) : "")); }, [unidade]);
+  if (!unidade) return null;
+  return (
+    <div className="flex items-center gap-3 rounded-[20px] border border-primary/40 bg-card p-4">
+      <p className="flex-1 text-base">{t.aulas.printFor(title || t.aulas.title)}</p>
+      <Button variant="ghost" size="sm" asChild><Link to="/aulas/$packId" params={{ packId: unidade }} search={{ etapa: 4 }}>{t.aulas.backUnit}</Link></Button>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import type { DrillItem, DrillPack, DrillTrap, PuloDoGato } from "@/data/types";
+import type { Course, DrillItem, DrillPack, DrillTrap, LessonIntro, PuloDoGato } from "@/data/types";
 
 export type ImportResult =
   | { ok: true; pack: Omit<DrillPack, "id"> & { id?: string }; pulo: PuloDoGato }
@@ -29,6 +29,8 @@ export interface MultiImport {
   packs: (Omit<DrillPack, "id"> & { id?: string })[];
   pulo: PuloDoGato;
   errors: string[];
+  /** Top-level "course" object, when the bundle is a course. */
+  course?: Course;
 }
 
 /** A single pack or {pulo_do_gato, packs:[...]}: imports every valid pack, errors name the failing pack. */
@@ -43,11 +45,16 @@ export function parsePacksJson(text: string): MultiImport {
   const list = Array.isArray(raw["packs"]) ? (raw["packs"] as unknown[]) : [raw];
   if (!list.length) return { packs: [], pulo: {}, errors: ['"packs" precisa ter pelo menos um pacote.'] };
   const out: MultiImport = { packs: [], pulo: {}, errors: [] };
+  const c = raw["course"];
+  if (c !== undefined) {
+    if (isObj(c) && isStr(c["id"]) && isStr(c["title_pt"])) out.course = { id: c["id"], title_pt: c["title_pt"], source_pt: isStr(c["source_pt"]) ? c["source_pt"] : "" };
+    else out.errors.push('Curso: "course" precisa ter "id" e "title_pt".');
+  }
   list.forEach((pr, i) => {
     const name = isObj(pr) ? String(pr["id"] ?? pr["title_pt"] ?? i + 1) : String(i + 1);
     if (!isObj(pr)) return void out.errors.push(`Pacote ${name}: precisa ser um objeto.`);
     const r = parseOne(i === 0 ? raw as Obj : {}, pr);
-    if (r.ok) { out.packs.push(r.pack); Object.assign(out.pulo, r.pulo); }
+    if (r.ok) { out.packs.push(out.course ? { ...r.pack, course_id: out.course.id } : r.pack); Object.assign(out.pulo, r.pulo); }
     else out.errors.push(...(list.length > 1 ? r.errors.map((e) => `Pacote ${name} → ${e}`) : r.errors));
   });
   return out;
@@ -140,6 +147,14 @@ function parseOne(top: Obj, packRaw: Obj): ImportResult {
       level: packRaw["level"] as string,
       focus_pt: packRaw["focus_pt"] as string,
       items,
+      ...(typeof packRaw["unit"] === "number" ? { unit: packRaw["unit"] } : {}),
+      ...(intro(packRaw["lesson_intro"]) ? { lesson_intro: intro(packRaw["lesson_intro"])! } : {}),
     },
   };
+}
+
+function intro(v: unknown): LessonIntro | null {
+  if (!isObj(v)) return null;
+  const list = (x: unknown) => (Array.isArray(x) ? x.filter(isStr) : []);
+  return { objetivo_pt: isStr(v["objetivo_pt"]) ? v["objetivo_pt"] : "", gramatica_pt: list(v["gramatica_pt"]), vocabulario_pt: list(v["vocabulario_pt"]) };
 }

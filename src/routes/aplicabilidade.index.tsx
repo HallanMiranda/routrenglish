@@ -233,6 +233,7 @@ function NewPackForm({ onDone }: { onDone: (msg?: string) => void }) {
       return onDone();
     }
     const r = parsePacksJson(json);
+    if (r.course) await repo.saveCourse(r.course);
     if (Object.keys(r.pulo).length) await repo.mergePuloDoGato(r.pulo);
     for (const p of r.packs) await repo.saveDrillPack(p);
     if (r.errors.length) return setErrors(r.packs.length ? [d.imported(r.packs.length), ...r.errors] : r.errors);

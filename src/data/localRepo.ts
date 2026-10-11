@@ -7,6 +7,8 @@ import type {
   AiUsage,
   MyName,
   Card,
+  Course,
+  UnitProgress,
   Checkpoint,
   ErrorItem,
   Material,
@@ -177,27 +179,28 @@ export const localRepo: Repo = {
       .sort((a, b) => a.due_at.localeCompare(b.due_at));
   },
   async rateCard(cardId, rating) {
+    // SM-2: Errei = 1, Quase = 3, Acertei = 5.
     const rows = read<Card>("cards");
     const i = rows.findIndex((c) => c.id === cardId);
     if (i < 0) throw new Error(`Card ${cardId} not found`);
     const c = rows[i]!;
-    let { ease, interval_days, reps } = c;
-    if (rating === "again") {
+    const q = rating === "again" ? 1 : rating === "hard" ? 3 : 5;
+    let { interval_days, reps } = c;
+    if (q < 3) {
       reps = 0;
-      interval_days = 0;
-      ease = Math.max(1.3, ease - 0.2);
+      interval_days = 1;
     } else {
       reps += 1;
-      const mult = rating === "hard" ? 1.2 : rating === "easy" ? ease * 1.3 : ease;
-      interval_days = reps === 1 ? (rating === "easy" ? 3 : 1) : Math.max(1, Math.round(interval_days * mult));
-      if (rating === "hard") ease = Math.max(1.3, ease - 0.15);
-      if (rating === "easy") ease += 0.15;
+      interval_days = reps === 1 ? 1 : reps === 2 ? 6 : Math.max(1, Math.round(interval_days * c.ease));
     }
-    const due = rating === "again" ? Date.now() + 10 * 60_000 : Date.now() + interval_days * DAY;
-    const next: Card = { ...c, ease, interval_days, reps, due_at: new Date(due).toISOString() };
+    const ease = Math.max(1.3, c.ease + 0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+    const next: Card = { ...c, ease, interval_days, reps, due_at: new Date(Date.now() + interval_days * DAY).toISOString() };
     rows[i] = next;
     write("cards", rows);
     return next;
+  },
+  async listCards() {
+    return read<Card>("cards");
   },
 
   async saveCheckpoint(c) {
@@ -362,5 +365,20 @@ export const localRepo: Repo = {
   },
   async setSoundMuted(muted) {
     write("sound_muted", [muted]);
+  },
+  async listCourses() {
+    return read<Course>("courses");
+  },
+  async saveCourse(c) {
+    write("courses", [...read<Course>("courses").filter((x) => x.id !== c.id), c]);
+  },
+  async getUnitProgress(packId) {
+    return (
+      read<UnitProgress>("unit_progress").find((u) => u.pack_id === packId) ??
+      { pack_id: packId, current_step: 1, done_steps: [], completed: false, missed: [], last_challenge: null }
+    );
+  },
+  async saveUnitProgress(p) {
+    write("unit_progress", [...read<UnitProgress>("unit_progress").filter((x) => x.pack_id !== p.pack_id), p]);
   },
 };

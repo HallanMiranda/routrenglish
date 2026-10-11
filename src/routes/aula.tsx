@@ -1,7 +1,8 @@
 import { fromFirstUnfinished, groupCollections } from "@/drills/collections";
+import { markStep, saveChallenge, unitTag } from "@/course/course";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Gauge, HelpCircle, Pause, Play, RotateCcw, Sparkles, Volume2, X } from "lucide-react";
+import { Gauge, HelpCircle, PartyPopper, Pause, Play, RotateCcw, Sparkles, Volume2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MicButton, type MicState } from "@/components/session/MicButton";
 import { CoachAvatar, DiffLine, Hearts, LIVES, PuloCard } from "@/components/drill/CoachParts";
@@ -25,8 +26,10 @@ const d = t.drills;
 
 type Nivel = Difficulty | "todos";
 interface LessonSearch {
-  modo: "pacotes" | "livre" | "print";
+  modo: "pacotes" | "livre" | "print" | "unidade";
   pack: string;
+  /** Unit lesson part (modo "unidade"). */
+  parte?: "aula" | "perguntas" | "desafio" | "erros";
   mat: string;
   tema: string;
   min: number;
@@ -35,7 +38,8 @@ interface LessonSearch {
 
 export const Route = createFileRoute("/aula")({
   validateSearch: (s: Record<string, unknown>): LessonSearch => ({
-    modo: s["modo"] === "livre" ? "livre" : s["modo"] === "print" ? "print" : "pacotes",
+    modo: s["modo"] === "livre" ? "livre" : s["modo"] === "print" ? "print" : s["modo"] === "unidade" ? "unidade" : "pacotes",
+    parte: (["aula", "perguntas", "desafio", "erros"] as const).find((x) => x === s["parte"]) ?? "aula",
     pack: typeof s["pack"] === "string" ? s["pack"] : "",
     mat: typeof s["mat"] === "string" ? s["mat"] : "",
     tema: typeof s["tema"] === "string" ? s["tema"] : "",
@@ -68,6 +72,8 @@ interface Chunk {
   /** Last step of its chain (for "Na frase final"). */
   last?: boolean;
   keyItem?: string | undefined;
+  /** QA: the Coach asks this in English. */
+  askEn?: string;
 }
 interface Verdict {
   correct: boolean;
@@ -88,6 +94,8 @@ interface Summary {
   inton: number | null;
   issues: string[];
   mastered: string | null;
+  /** Unit challenge result. */
+  unit: { passed: boolean | null; pct: number } | null;
 }
 type Listened = { text: string } | { cmd: VoiceCommand } | null;
 
@@ -114,6 +122,28 @@ function chainsOf(packs: DrillPack[]): Chunk[][] {
   return chains.sort(() => Math.random() - 0.5);
 }
 
+const shuffle = <T,>(a: T[]) => [...a].sort(() => Math.random() - 0.5);
+
+/** Unit parts: ladders in order, QA questions, a 10-chunk mixed challenge, or the missed chunks. */
+function unitChunks(pack: DrillPack, parte: NonNullable<LessonSearch["parte"]>, missed: { pt: string; en: string[] }[]): Chunk[] {
+  const qa = pack.items.flatMap((it) => (it.mode === "qa" ? [{ pt: it.q_pt, askEn: it.q_en, accepted: it.model_answers, patterns: it.accept_patterns, focus: it.focus, traps: it.traps, change: "", prevEn: null, first: true, last: true } satisfies Chunk] : []));
+  if (parte === "perguntas") return qa;
+  if (parte === "erros") return missed.map((m) => ({ pt: m.pt, accepted: m.en, focus: "", traps: [], change: "", prevEn: null, first: true, last: true }));
+  if (parte === "aula") {
+    const ladders = pack.items.filter((it) => it.mode === "ladder");
+    const steps = ladders.flatMap((it) => it.steps.map((st, k) => ({ pt: st.pt, accepted: st.en, focus: st.focus, traps: st.traps, change: st.change_pt, prevEn: k > 0 ? it.steps[k - 1]!.en[0]! : null, first: k === 0, last: k === it.steps.length - 1 } satisfies Chunk)));
+    const frees = ladders.flatMap((it) => (it.free ? [{ pt: it.free.prompt_pt, accepted: it.free.model_answers, patterns: it.free.accept_patterns, focus: it.steps.at(-1)?.focus ?? "", traps: [], change: "", prevEn: null, first: true, last: true } satisfies Chunk] : []));
+    return [...steps, ...frees];
+  }
+  const pool: Chunk[] = [
+    ...pack.items.flatMap((it) =>
+      it.mode === "ladder" ? it.steps.map((st) => ({ pt: st.pt, accepted: st.en, focus: st.focus, traps: st.traps, change: "", prevEn: null, first: true, last: true }))
+      : it.mode === "translate" ? [{ pt: it.pt, accepted: it.en, focus: it.focus, traps: it.traps, change: "", prevEn: null, first: true, last: true }] : []),
+    ...qa,
+  ];
+  return shuffle(pool).slice(0, 10);
+}
+
 function LessonPage() {
   const search = Route.useSearch();
   const [phase, setPhase] = useState<"ready" | "live" | "summary">("ready");
@@ -136,6 +166,8 @@ function LessonPage() {
   const [assessQueued, setAssessQueued] = useState(false);
   const [material, setMaterial] = useState<Material | null>(null);
   const [showPrint, setShowPrint] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const challengeRef = useRef(false);
   const assessRef = useRef(false);
   const lastAudio = useRef<Blob | null>(null);
 
@@ -200,8 +232,22 @@ function LessonPage() {
     abortRef.current = ctrl;
     setHeard("");
     setMic("recording");
+    let timedOut = false;
+    let timer = 0;
+    if (challengeRef.current) {
+      let n = 6;
+      setCountdown(n);
+      timer = window.setInterval(() => {
+        n--;
+        setCountdown(n);
+        if (n <= 0) { window.clearInterval(timer); timedOut = true; ctrl.abort(); }
+      }, 1000);
+    }
+    const stopTimer = () => { window.clearInterval(timer); setCountdown(null); };
+    const onInterim = (x: string) => { setHeard(x); if (x) stopTimer(); };
     try {
-      const h = await hearOnce(expected, ctrl.signal, setHeard, () => setMic("processing"), wantAudio.current);
+      const h = await hearOnce(expected, ctrl.signal, onInterim, () => setMic("processing"), wantAudio.current).finally(stopTimer);
+      if (timedOut) { setMic("idle"); return { cmd: "dontKnow" }; }
       setMic("idle");
       lastAudio.current = h.audio;
       if (btnCmd.current) { const c = btnCmd.current; btnCmd.current = null; return { cmd: c }; }
@@ -211,6 +257,7 @@ function LessonPage() {
       return cmd ? { cmd } : { text: h.transcript };
     } catch (e) {
       setMic("idle");
+      if (timedOut) return { cmd: "dontKnow" };
       if (btnCmd.current) { const c = btnCmd.current; btnCmd.current = null; return { cmd: c }; }
       const msg = e instanceof Error ? e.message : t.speech.failed;
       if (msg === t.speech.noSpeech) return null;
@@ -245,7 +292,16 @@ function LessonPage() {
     let pending: LiveLessonReply | null = null;
     const history: LessonTurn[] = [];
     let aiMode = search.modo === "livre";
-    if (search.modo === "print") {
+    const unitPack = search.modo === "unidade" ? await repo.getDrillPack(search.pack) : null;
+    let queue: Chunk[] | null = null;
+    challengeRef.current = search.modo === "unidade" && search.parte === "desafio";
+    const noHints = challengeRef.current;
+    if (search.modo === "unidade") {
+      if (!unitPack) { setBlocked(L.noLadders); return; }
+      const up = await repo.getUnitProgress(unitPack.id);
+      queue = unitChunks(unitPack, search.parte ?? "aula", up.missed);
+      if (!queue.length) { setBlocked(L.noLadders); return; }
+    } else if (search.modo === "print") {
       if (!mat) { setBlocked(t.prints.notFound); return; }
       const pack = mat.pack_id ? await repo.getDrillPack(mat.pack_id) : null;
       let keys = mat.key_items?.length ? mat.key_items : (pack?.items.map(describeItem) ?? []).slice(0, 15);
@@ -278,6 +334,7 @@ function LessonPage() {
     setPhase("live");
     clock.current = { start: Date.now(), pausedAt: 0, pausedTotal: 0 };
     setLeft(search.min * 60);
+    const missedChunks: { pt: string; en: string[] }[] = [];
     const stats = { attempted: 0, firstTry: 0, completed: 0, missedFocus: {} as Record<string, number>, cards: [] as { front: string; back: string }[] };
     const spoken = { s: 0 };
     let livesNow = LIVES;
@@ -307,6 +364,7 @@ function LessonPage() {
         if (c.accepted[0]) preload(c.accepted[0], "en");
         return c;
       }
+      if (queue) return queue.shift() ?? null;
       const chain = chains[chainIdx % chains.length]!;
       const c = chain[stepIdx]!;
       stepIdx++;
@@ -414,11 +472,13 @@ function LessonPage() {
     async function askChunk(ch: Chunk) {
       stats.attempted++;
       const intro = ch.patterns ? L.freePrompt : ch.first ? L.ask : pick(L.grow);
+      const miss = () => { if (!missedChunks.some((m) => m.pt === ch.pt)) missedChunks.push({ pt: ch.pt, en: ch.accepted }); };
       let tries = 0;
       let silent = 0;
       while (!stopRef.current) {
         setChunk(ch); setOps(null); setPulo(null); setPron(null);
-        await say(ch.patterns ? `${intro} ${ch.pt}` : `${intro} ${ch.pt.replace(/[.!?…\s]+$/, "")}?`);
+        if (ch.askEn) await say("", ch.askEn);
+        else await say(ch.patterns ? `${intro} ${ch.pt}` : `${intro} ${ch.pt.replace(/[.!?…\s]+$/, "")}?`);
         const r = await listen(ch.accepted, spoken);
         if (stopRef.current) return;
         if (!r) { silent++; if (silent >= 3) { silent = 0; await doPause(); } else await say(L.notHeard); continue; }
@@ -427,6 +487,8 @@ function LessonPage() {
           if (r.cmd === "slower") { setSpeed(true); await say(L.slower); continue; }
           if (r.cmd === "pause") { await doPause(); continue; }
           stats.missedFocus[ch.focus] = (stats.missedFocus[ch.focus] ?? 0) + 1;
+          miss();
+          if (noHints) { stats.cards.push({ front: ch.pt, back: ch.accepted[0] ?? "" }); await say(L.moveOn, ch.accepted[0]); return; }
           return repeatAfterMe(ch, ch.accepted[0] ?? pending?.model_en ?? "");
         }
         setHeard(r.text);
@@ -444,6 +506,8 @@ function LessonPage() {
           return;
         }
         setOps(v.ops);
+        miss();
+        if (noHints) { stats.cards.push({ front: ch.pt, back: v.model }); await say(L.moveOn, v.model); return; }
         if (v.pulo) setPulo(v.pulo);
         stats.missedFocus[ch.focus] = (stats.missedFocus[ch.focus] ?? 0) + 1;
         if (v.multa) {
@@ -462,17 +526,28 @@ function LessonPage() {
     for (const p of L.praise) preload(p, "pt");
     if (search.modo === "print") await say(L.printOpen);
     while (!stopRef.current) {
-      if (activeSeconds() >= search.min * 60) { await say(L.timeUp); break; }
+      if (!queue && activeSeconds() >= search.min * 60) { await say(L.timeUp); break; }
       setCoach(L.thinking);
       const ch = await nextChunk();
-      if (!ch) { setError(L.aiFailed); break; }
+      if (!ch) { if (!queue) setError(L.aiFailed); break; }
       if (aiMode) pending = null;
       await askChunk(ch);
       if (livesNow <= 0) { await say(L.outOfLives); break; }
     }
     if (stopRef.current) return;
 
-    for (const c of stats.cards) await repo.createCard({ ...c, ...(mat ? { tag: mat.title } : {}) });
+    const tag = unitPack ? unitTag(unitPack) : mat?.title;
+    for (const c of stats.cards) await repo.createCard({ ...c, ...(tag ? { tag } : {}) });
+    let unitResult: Summary["unit"] = null;
+    const pct = stats.attempted ? stats.firstTry / stats.attempted : 0;
+    if (unitPack) {
+      if (search.parte === "desafio") unitResult = { passed: await saveChallenge(unitPack.id, pct, missedChunks), pct: Math.round(pct * 100) };
+      else {
+        if (search.parte === "aula") await markStep(unitPack.id, 2);
+        if (search.parte === "perguntas") await markStep(unitPack.id, 3);
+        unitResult = { passed: null, pct: Math.round(pct * 100) };
+      }
+    }
     let masteredLabel: string | null = null;
     if (mat && source) {
       const prevM = new Set(printProg?.mastered ?? []);
@@ -496,6 +571,7 @@ function LessonPage() {
       inton: avg(pronStats.i),
       issues: Object.entries(pronStats.issues).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k]) => k),
       mastered: masteredLabel,
+      unit: unitResult,
     });
     setPhase("summary");
   }
@@ -507,10 +583,12 @@ function LessonPage() {
     resumeRef.current?.();
   }
 
-  const title = search.modo === "livre" ? L.free : search.modo === "print" ? L.printTitle(material?.title ?? "") : L.fromPacks;
+  const title = search.modo === "unidade" ? t.aulas.steps[search.parte === "perguntas" ? 2 : search.parte === "desafio" ? 4 : 1]! : search.modo === "livre" ? L.free : search.modo === "print" ? L.printTitle(material?.title ?? "") : L.fromPacks;
   const toPrint = search.modo === "print" && !!search.mat;
+  const backUnit = search.modo === "unidade" ? search.pack : material?.unit_pack_id;
   const Back = ({ children, ...rest }: { children: ReactNode; onClick?: () => void; className?: string }) =>
-    toPrint ? <Link to="/prints/$materialId" params={{ materialId: search.mat }} {...rest}>{children}</Link>
+    backUnit ? <Link to="/aulas/$packId" params={{ packId: backUnit }} {...rest}>{children}</Link>
+    : toPrint ? <Link to="/prints/$materialId" params={{ materialId: search.mat }} {...rest}>{children}</Link>
     : <Link to="/aplicabilidade" {...rest}>{children}</Link>;
   const printImg = material?.images?.[0] ?? material?.thumbnail;
 
@@ -521,7 +599,7 @@ function LessonPage() {
           <Back onClick={end}><X /></Back>
         </Button>
         <p className="text-caption min-w-0 flex-1 truncate text-muted-foreground">
-          {phase === "live" ? `${title} · ${L.left(Math.ceil(left / 60))}` : title}
+          {phase === "live" && search.modo !== "unidade" ? `${title} · ${L.left(Math.ceil(left / 60))}` : title}
         </p>
         {phase === "live" && (
           <Button variant="ghost" size="sm" aria-label={L.speed} aria-pressed={slow} onClick={() => setSpeed(!slow)} className="h-9 px-2 text-xs">
@@ -560,7 +638,8 @@ function LessonPage() {
             <div className="flex flex-1 flex-col justify-center gap-3 py-4 text-center">
               {chunk?.prevEn && <p lang="en" className="text-caption text-muted-foreground"><span className="font-semibold">{d.previous}:</span> {chunk.prevEn}</p>}
               {chunk?.change && <span className="text-caption mx-auto w-fit rounded-full bg-live px-2.5 py-0.5 font-semibold text-live-foreground">{chunk.change}</span>}
-              {chunk && <p className="font-display text-3xl font-bold leading-tight text-balance">{chunk.pt}</p>}
+              {chunk && <p lang={chunk.askEn ? "en" : undefined} className="font-display text-3xl font-bold leading-tight text-balance">{chunk.askEn ?? chunk.pt}</p>}
+              {countdown !== null && <p role="timer" className="font-display text-4xl font-bold tabular-nums text-primary">{t.aulas.countdown(countdown)}</p>}
               {pulo && <PuloCard text={pulo} />}
               {pron && <PronCard p={pron} slow={slow} />}
             </div>
@@ -596,7 +675,20 @@ function LessonPage() {
 
       {phase === "summary" && summary && (
         <main className="mx-auto w-full max-w-md flex-1 space-y-5 overflow-y-auto px-5 pb-8 pt-4">
-          <h2 className="text-title">{L.summaryTitle}</h2>
+          {summary.unit?.passed === true ? (
+            <div className="space-y-2 rounded-[20px] bg-ink p-6 text-center text-ink-foreground">
+              <PartyPopper className="mx-auto size-10 text-live" aria-hidden="true" />
+              <h2 className="text-title">{t.aulas.passed}</h2>
+              <p className="text-base text-ink-foreground/80">{t.aulas.passedBody(summary.unit.pct)}</p>
+            </div>
+          ) : summary.unit?.passed === false ? (
+            <div className="space-y-1">
+              <h2 className="text-title">{t.aulas.almost}</h2>
+              <p className="text-base text-muted-foreground">{t.aulas.almostBody(summary.unit.pct)}</p>
+            </div>
+          ) : (
+            <h2 className="text-title">{L.summaryTitle}</h2>
+          )}
           <div className="grid grid-cols-3 gap-3">
             {[
               [L.spoken, (summary.seconds / 60).toFixed(1)],
@@ -641,7 +733,15 @@ function LessonPage() {
           )}
           {summary.cost !== null && <p className="text-caption text-muted-foreground">{L.cost(summary.cost)}</p>}
           <div className="space-y-2">
-            <Button size="lg" className="w-full" onClick={() => void start()}><RotateCcw /> {L.again}</Button>
+            {summary.unit?.passed === false && (
+              <Button size="lg" className="w-full" asChild>
+                <Link to="/aula" search={{ ...search, parte: "erros" }} reloadDocument>{t.aulas.reviewMissed}</Link>
+              </Button>
+            )}
+            {search.modo === "unidade" && summary.unit?.passed !== false && (
+              <Button size="lg" className="w-full" asChild><Back>{summary.unit?.passed ? t.aulas.nextUnit : t.aulas.next}</Back></Button>
+            )}
+            <Button size="lg" variant={search.modo === "unidade" ? "secondary" : "default"} className="w-full" onClick={() => void start()}><RotateCcw /> {search.parte === "desafio" && search.modo === "unidade" ? t.aulas.retry : L.again}</Button>
             <Button variant="ghost" className="w-full" asChild><Back>{L.back}</Back></Button>
           </div>
         </main>
