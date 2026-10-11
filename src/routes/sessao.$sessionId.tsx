@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { t } from "@/lib/i18n/pt-BR";
+import { useEffect, useState } from "react";
+import { MicButton, type MicState } from "@/components/session/MicButton";
 
 export const Route = createFileRoute("/sessao/$sessionId")({
   head: () => ({
@@ -15,6 +17,12 @@ export const Route = createFileRoute("/sessao/$sessionId")({
 });
 
 function Session() {
+  const [micState, setMicState] = useState<MicState>("idle");
+  useEffect(() => {
+    if (micState !== "processing") return;
+    const timer = window.setTimeout(() => setMicState("idle"), 1800);
+    return () => window.clearTimeout(timer);
+  }, [micState]);
   return (
     <div className="flex min-h-screen flex-col bg-ink text-ink-foreground">
       <header className="flex items-center gap-4 px-5 pt-6">
@@ -31,6 +39,11 @@ function Session() {
         <p className="text-xs font-semibold uppercase tracking-widest text-live">1 / 6</p>
         <h1 className="mt-2 text-3xl font-bold">{t.session.steps[0]}</h1>
         <p className="mt-3 text-sm opacity-70">{t.common.comingSoon}</p>
+        <div className="mt-10 flex flex-col items-center gap-5">
+          <MicButton state={micState} onClick={() => setMicState(micState === "idle" ? "recording" : "processing")} />
+          <p role="status" aria-live="polite" className="h-6 text-sm font-semibold">{t.mic.states[micState]}</p>
+          <p className="text-xs text-ink-foreground/70">{t.mic.demo}</p>
+        </div>
       </main>
     </div>
   );
