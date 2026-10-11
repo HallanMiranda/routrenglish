@@ -25,11 +25,12 @@ export function normalizeTokens(text: string): string[] {
   const raw = s.split(/\s+/).filter(Boolean);
   const out: string[] = [];
   for (let i = 0; i < raw.length; i++) {
-    const w = raw[i];
+    const w = raw[i]!;
+    const nx = raw[i + 1] ?? "";
     if (w === "us") { out.push("united", "states"); continue; }
-    if (w === "can" && raw[i + 1] === "not") { out.push("cannot"); i++; continue; }
-    if (w === "twenty" && UNITS[raw[i + 1]]) { out.push(String(20 + UNITS[raw[i + 1]])); i++; continue; }
-    if (NUMBERS[w]) { out.push(String(NUMBERS[w])); continue; }
+    if (w === "can" && nx === "not") { out.push("cannot"); i++; continue; }
+    if (w === "twenty" && UNITS[nx]) { out.push(String(20 + UNITS[nx]!)); i++; continue; }
+    if (NUMBERS[w]) { out.push(String(NUMBERS[w]!)); continue; }
     out.push(w);
   }
   return out;
@@ -45,22 +46,23 @@ export type DiffOp =
 export function wordDiff(got: string[], want: string[]): { distance: number; ops: DiffOp[] } {
   const n = got.length, m = want.length;
   const d = Array.from({ length: n + 1 }, (_, i) => Array.from({ length: m + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0)));
+  const at = (i: number, j: number) => d[i]![j]!;
   for (let i = 1; i <= n; i++)
     for (let j = 1; j <= m; j++)
-      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (got[i - 1] === want[j - 1] ? 0 : 1));
+      d[i]![j] = Math.min(at(i - 1, j) + 1, at(i, j - 1) + 1, at(i - 1, j - 1) + (got[i - 1] === want[j - 1]! ? 0 : 1));
   const ops: DiffOp[] = [];
   let i = n, j = m;
   while (i > 0 || j > 0) {
-    if (i > 0 && j > 0 && d[i][j] === d[i - 1][j - 1] + (got[i - 1] === want[j - 1] ? 0 : 1)) {
-      ops.unshift(got[i - 1] === want[j - 1] ? { type: "equal", word: got[i - 1] } : { type: "wrong", word: got[i - 1], expected: want[j - 1] });
+    if (i > 0 && j > 0 && at(i, j) === at(i - 1, j - 1) + (got[i - 1] === want[j - 1]! ? 0 : 1)) {
+      ops.unshift(got[i - 1] === want[j - 1]! ? { type: "equal", word: got[i - 1]! } : { type: "wrong", word: got[i - 1]!, expected: want[j - 1]! });
       i--; j--;
-    } else if (i > 0 && d[i][j] === d[i - 1][j] + 1) {
-      ops.unshift({ type: "extra", word: got[i - 1] }); i--;
+    } else if (i > 0 && at(i, j) === at(i - 1, j) + 1) {
+      ops.unshift({ type: "extra", word: got[i - 1]! }); i--;
     } else {
-      ops.unshift({ type: "missing", expected: want[j - 1] }); j--;
+      ops.unshift({ type: "missing", expected: want[j - 1]! }); j--;
     }
   }
-  return { distance: d[n][m], ops };
+  return { distance: at(n, m), ops };
 }
 
 function containsSeq(tokens: string[], seq: string[]) {
@@ -82,8 +84,8 @@ export function checkAnswer(answer: string, accepted: string[], traps: DrillTrap
   const got = normalizeTokens(answer);
   let best = { idx: 0, distance: Infinity, ops: [] as DiffOp[], tokens: [] as string[] };
   for (let k = 0; k < accepted.length; k++) {
-    const want = normalizeTokens(accepted[k]);
-    if (want.join(" ") === got.join(" ")) return { correct: true, closest: accepted[k], ops: want.map((w) => ({ type: "equal", word: w })), trap: null };
+    const want = normalizeTokens(accepted[k]!);
+    if (want.join(" ") === got.join(" ")) return { correct: true, closest: accepted[k]!, ops: want.map((w) => ({ type: "equal", word: w })), trap: null };
     const r = wordDiff(got, want);
     if (r.distance < best.distance) best = { idx: k, distance: r.distance, ops: r.ops, tokens: want };
   }
