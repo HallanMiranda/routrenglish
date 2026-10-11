@@ -96,6 +96,10 @@ export const localRepo: Repo = {
     return list.find((m) => !done.has(m.id)) ?? null;
   },
 
+  async getSession(id) {
+    return read<Session>("sessions").find((s) => s.id === id) ?? null;
+  },
+
   async startOrResumeSession(missionId) {
     const rows = read<Session>("sessions");
     const open = rows.find((s) => s.mission_id === missionId && s.status === "in_progress");

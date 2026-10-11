@@ -26,6 +26,7 @@ export interface Repo {
   getMission(id: string): Promise<Mission | null>;
   listMissions(): Promise<Mission[]>;
   startOrResumeSession(missionId: string): Promise<Session>;
+  getSession(id: string): Promise<Session | null>;
   completeStep(sessionId: string, step: StepIndex): Promise<Session>;
   finishSession(sessionId: string): Promise<Session>;
   saveUtterance(u: Omit<Utterance, "id" | "created_at">): Promise<Utterance>;
