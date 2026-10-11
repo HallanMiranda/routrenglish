@@ -34,7 +34,11 @@ async function call(path: string, key: string, model: string, init: RequestInit 
   try {
     res = await fetch(BASE + path, {
       ...init,
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json", ...init.headers },
+      headers: {
+        Authorization: `Bearer ${key}`,
+        ...(init.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
+        ...init.headers,
+      },
     });
   } catch (e) {
     if ((e as Error).name === "AbortError") throw e;
@@ -55,11 +59,11 @@ export interface ChatMessage {
   content: string | ChatPart[];
 }
 
-export async function chatJson(key: string, model: string, messages: ChatMessage[], signal?: AbortSignal) {
+export async function chatJson(key: string, model: string, messages: ChatMessage[], signal?: AbortSignal, json = true) {
   const data = (await call("/chat/completions", key, model, {
     method: "POST",
     signal: signal ?? null,
-    body: JSON.stringify({ model, messages, response_format: { type: "json_object" } }),
+    body: JSON.stringify({ model, messages, ...(json ? { response_format: { type: "json_object" } } : {}) }),
   })) as {
     choices?: { message?: { content?: string | null } }[];
     usage?: { prompt_tokens?: number; completion_tokens?: number };
@@ -67,4 +71,16 @@ export async function chatJson(key: string, model: string, messages: ChatMessage
   const content = data.choices?.[0]?.message?.content ?? "";
   if (!content.trim()) throw new AiError(t.ai.empty);
   return { content, tokensIn: data.usage?.prompt_tokens ?? 0, tokensOut: data.usage?.completion_tokens ?? 0 };
+}
+
+/** Speech to text. `prompt` biases spelling toward expected words and names. */
+export async function transcribeAudio(key: string, model: string, audio: Blob, prompt: string, signal?: AbortSignal) {
+  const form = new FormData();
+  const ext = audio.type.includes("mp4") ? "mp4" : audio.type.includes("ogg") ? "ogg" : "webm";
+  form.append("file", audio, `speech.${ext}`);
+  form.append("model", model);
+  form.append("language", "en");
+  if (prompt) form.append("prompt", prompt);
+  const data = (await call("/audio/transcriptions", key, model, { method: "POST", body: form, signal: signal ?? null })) as { text?: string };
+  return (data.text ?? "").trim();
 }

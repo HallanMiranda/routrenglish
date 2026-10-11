@@ -4,7 +4,7 @@ import { t } from "@/lib/i18n/pt-BR";
 import { Moon } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "@/components/theme/ThemeProvider";
-import { ApiKeyForm } from "@/components/prints/ApiKeyForm";
+import { ApiKeyForm, MyNameForm } from "@/components/prints/ApiKeyForm";
 import { useEffect, useState } from "react";
 import { repo } from "@/data/repo";
 
@@ -51,8 +51,11 @@ function Progress() {
         </div>
       </section>
       <section className="border-t pt-6">
-        <h2 className="text-headline mb-4">{t.apiKey.section}</h2>
-        <ApiKeyForm />
+        <h2 className="text-title mb-4">{t.apiKey.section}</h2>
+        <h3 className="text-headline mb-2">{t.apiKey.aiTitle}</h3>
+        <ApiKeyForm full />
+        <h3 className="text-headline mb-2 mt-6">{t.apiKey.myName}</h3>
+        <MyNameForm />
       </section>
     </AppShell>
   );

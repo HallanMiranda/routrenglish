@@ -14,6 +14,9 @@ import { speak, stopSpeaking } from "@/speech/speak";
 import { t } from "@/lib/i18n/pt-BR";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
+import { aiJudge, withMyName, type AiVerdict } from "@/ai/judge";
+import { aiFor, transcribe } from "@/ai/client";
+import { canRecord, startRecording, type Recording } from "@/speech/record";
 
 const d = t.drills;
 const LIVES = 3;
@@ -46,6 +49,7 @@ const pick = <T,>(arr: readonly T[]) => arr[Math.floor(Math.random() * arr.lengt
 type Playable = TranslateItem | QaItem;
 const modelOf = (i: Playable) => (i.mode === "translate" ? i.en[0]! : i.model_answers[0]!);
 const promptPtOf = (i: Playable) => (i.mode === "translate" ? i.pt : i.q_pt);
+const acceptedOf = (i: Playable) => (i.mode === "translate" ? i.en : i.model_answers);
 const LADDER_SECONDS = 6;
 
 interface LadderMeta {
@@ -173,6 +177,7 @@ function DrillPage() {
   const express = packId === EXPRESS_ID;
   const [pack, setPack] = useState<DrillPack | null | undefined>(undefined);
   const [pulos, setPulos] = useState<PuloDoGato>({});
+  const [learned, setLearned] = useState<Record<string, string[]>>({});
   const [bestRound, setBestRound] = useState<DrillRound>(1);
   const [run, setRun] = useState<Run | null>(null);
   const [runKey, setRunKey] = useState(0);
@@ -193,6 +198,7 @@ function DrillPage() {
 
   const refresh = useCallback(async () => {
     setPulos(await repo.getPuloDoGato());
+    setLearned(await repo.getLearnedAnswers());
     setMuted(await repo.getSoundMuted());
     setAutoListen(await repo.getAutoListen());
     if (express) {
@@ -285,7 +291,7 @@ function DrillPage() {
         </Button>
       </header>
       {run ? (
-        <DrillRunner key={runKey} run={run} setRun={setRun} onFinish={finish} onRestart={restartErrors} pulos={pulos} muted={muted} autoListen={autoListen} />
+        <DrillRunner key={runKey} run={run} setRun={setRun} onFinish={finish} onRestart={restartErrors} pulos={pulos} learned={learned} muted={muted} autoListen={autoListen} />
       ) : summary ? (
         <SummaryView
           summary={summary}
@@ -411,18 +417,19 @@ function SummaryView({ summary, express, onNext, onRepeat, onErrors }: { summary
 
 // ---------- runner ----------
 type Feedback =
-  | { kind: "praise"; text: string; clear: boolean; otherWay: string | null; grows: boolean }
+  | { kind: "praise"; text: string; clear: boolean; otherWay: string | null; grows: boolean; natural: string | null }
   | { kind: "almost"; text: string; ops: DiffOp[] | null; pulo: string | null }
   | { kind: "half"; text: string; ops: DiffOp[] | null }
   | { kind: "repeat"; text: string }
   | null;
 
-function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted, autoListen }: {
+function DrillRunner({ run, setRun, onFinish, onRestart, pulos, learned, muted, autoListen }: {
   run: Run;
   setRun: (r: Run) => void;
   onFinish: (r: Run) => void;
   onRestart: (r: Run) => void;
   pulos: PuloDoGato;
+  learned: Record<string, string[]>;
   muted: boolean;
   autoListen: boolean;
 }) {
@@ -443,6 +450,7 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted, autoListe
   const [fine, setFine] = useState<string | null>(null);
   const [sheet, setSheet] = useState(false);
   const toggleRef = useRef<() => void>(() => {});
+  const learnedRef = useRef(learned);
   const abortRef = useRef<AbortController | null>(null);
   const busyRef = useRef(false);
   const repeatMode = feedback?.kind === "repeat";
@@ -480,9 +488,9 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted, autoListe
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stepKey, run.tries, run.round, sheet, repeatMode, praised, run.out, review]);
   useEffect(() => {
-    if (secondsLeft === 0 && mic !== "processing") {
+    if (secondsLeft === 0 && mic !== "processing" && mic !== "checking") {
       abortRef.current?.abort();
-      handleAnswer("", null, true);
+      void handleAnswer("", null, true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [secondsLeft]);
@@ -515,17 +523,43 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted, autoListe
       const r = checkAnswer(answer, [model]);
       return { correct: r.correct, ops: r.ops, trap: null, slip: false };
     }
+    const extra = learnedRef.current[item.id] ?? [];
     if (item.mode === "qa") {
       const r = checkQa(answer, item);
-      return { correct: r.correct, ops: null, trap: r.trap, slip: false };
+      const known = extra.length > 0 && checkAnswer(answer, extra).correct;
+      return { correct: r.correct || known, ops: null, trap: r.trap, slip: false };
     }
-    const r = checkTranslate(answer, item);
+    const r = checkTranslate(answer, { en: [...item.en, ...extra], traps: item.traps });
     return { correct: r.correct, ops: r.ops, trap: r.trap, slip: !r.correct && isAttentionSlip(r.ops) };
   }
 
-  function handleAnswer(answer: string, confidence: number | null, timeUp = false) {
+  async function handleAnswer(raw: string, confidence: number | null, timeUp = false) {
     if (busyRef.current || run.out) return;
-    const res = timeUp ? { correct: false, ops: null, trap: null, slip: false } : evaluate(answer);
+    const answer = timeUp ? "" : await withMyName(raw);
+    let res = timeUp ? { correct: false, ops: null as DiffOp[] | null, trap: null as DrillTrap | null, slip: false } : evaluate(answer);
+    // Local check said wrong: ask the AI judge (meaning, grammar, recognizer spelling).
+    let ai: AiVerdict | null = null;
+    if (!res.correct && !timeUp && !repeatMode && answer.trim()) {
+      busyRef.current = true;
+      setMic("checking");
+      ai = await aiJudge({
+        prompt: item.mode === "qa" ? `${item.q_en} (${item.q_pt})` : item.pt,
+        accepted: acceptedOf(item),
+        focus: item.focus,
+        transcript: answer,
+        traps: item.traps.map((tr) => tr.word),
+      });
+      busyRef.current = false;
+      setMic("idle");
+      if (ai?.correct) {
+        res = { ...res, correct: true };
+        learnedRef.current = { ...learnedRef.current, [item.id]: [...(learnedRef.current[item.id] ?? []), answer] };
+        void repo.addLearnedAnswer(item.id, answer);
+      } else if (ai && !res.ops?.some((o) => o.type !== "equal") && ai.wrong_words.length) {
+        const bad = new Set(ai.wrong_words.map((w) => w.toLowerCase()));
+        res = { ...res, ops: answer.split(/\s+/).filter(Boolean).map((w) => (bad.has(w.toLowerCase().replace(/[^a-z']/g, "")) ? { type: "wrong" as const, word: w, expected: "" } : { type: "equal" as const, word: w })) };
+      }
+    }
     const attempted = new Set(run.attempted).add(item.id);
     const firstPresentation = !run.attempted.has(item.id);
 
@@ -560,11 +594,12 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted, autoListe
       const clear = confidence !== null && confidence >= 0.85 && Math.random() < 0.4;
       const otherWay = isQa && !repeatMode ? pick(item.model_answers) : null;
       const grows = !!meta?.nextId;
-      setFeedback({ kind: "praise", text: pick(d.praise), clear, otherWay, grows });
+      const natural = ai?.natural_version && ai.natural_version.trim().toLowerCase() !== answer.trim().toLowerCase() ? ai.natural_version : null;
+      setFeedback({ kind: "praise", text: pick(d.praise), clear, otherWay, grows, natural });
       setFine(null);
       setSheet(true);
       setRun(next);
-      if (!otherWay) window.setTimeout(() => proceed(next), grows ? 1500 : 1100);
+      if (!otherWay) window.setTimeout(() => proceed(next), natural ? 2600 : grows ? 1500 : 1100);
       return;
     }
 
@@ -574,7 +609,7 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted, autoListe
     const maxTries = { ...run.maxTries, [item.id]: Math.max(run.maxTries[item.id] ?? 0, tries) };
     const missedFocus = { ...run.missedFocus, [item.focus]: (run.missedFocus[item.focus] ?? 0) + 1 };
     let { lives, score } = run;
-    const multa = !timeUp && !repeatMode && (res.trap !== null || res.slip);
+    const multa = !timeUp && !repeatMode && (res.trap !== null || res.slip || ai?.is_multa === true);
     if (multa) {
       haptic([30, 40, 30]);
       lives -= 1;
@@ -593,7 +628,7 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted, autoListe
       const words = model.split(/\s+/);
       setFeedback({ kind: "half", text: firstWords(model, Math.max(1, Math.ceil(words.length / 2))) + " …", ops: res.ops });
     } else {
-      const text = timeUp ? d.timeUp : res.trap?.hint_pt ?? (isQa ? d.qaAlmost : d.almost);
+      const text = timeUp ? d.timeUp : ai?.hint_pt || (res.trap?.hint_pt ?? (isQa ? d.qaAlmost : d.almost));
       setFeedback({ kind: "almost", text, ops: res.ops, pulo: pulos[item.focus] ?? null });
     }
   }
@@ -604,15 +639,27 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted, autoListe
     setMicError(null); setHeard(""); setSheet(false);
     const ctrl = new AbortController();
     abortRef.current = ctrl;
+    // "Ouvir com IA": record in parallel; the live browser text shows first, the AI transcript replaces it.
+    const ai = await aiFor("listen");
+    let recording: Recording | null = null;
+    if (ai && canRecord()) recording = await startRecording().catch(() => null);
     setMic("recording");
     try {
-      const r = await listenLive({ lang: "en-US", signal: ctrl.signal, onInterim: setHeard });
+      let r = await listenLive({ lang: "en-US", signal: ctrl.signal, onInterim: setHeard });
       setMic("processing");
       setHeard(r.transcript);
-      await new Promise((res) => window.setTimeout(res, 250));
+      if (recording && ai) {
+        const audio = await recording.stop();
+        recording = null;
+        const name = (await repo.getMyName()).name;
+        const prompt = `${acceptedOf(item).slice(0, 3).join(" ")} My name is ${name}.`;
+        const text = await transcribe(ai, audio.blob, audio.seconds, prompt).catch(() => "");
+        if (text) { r = { transcript: text, confidence: null }; setHeard(text); }
+      } else await new Promise((res) => window.setTimeout(res, 250));
       setMic("idle");
-      if (r.transcript) handleAnswer(r.transcript, r.confidence);
+      if (r.transcript) void handleAnswer(r.transcript, r.confidence);
     } catch (e) {
+      void recording?.stop();
       setMic("idle");
       setMicError(e instanceof Error ? e.message : t.speech.failed);
       setTyping(true);
@@ -624,7 +671,7 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted, autoListe
   function submitTyped() {
     if (!typed.trim()) return;
     setHeard(typed.trim());
-    handleAnswer(typed.trim(), null);
+    void handleAnswer(typed.trim(), null);
     setTyped("");
   }
 
@@ -685,12 +732,12 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted, autoListe
         <div className="flex min-h-14 w-full items-center justify-center text-center">
           {heard ? <p lang="en" className="text-headline">{heard}</p> : <p className="text-base text-muted-foreground">{mic === "recording" ? d.listening : d.tapToSpeak}</p>}
         </div>
-        <MicButton state={mic} onClick={toggleMic} disabled={praised || run.out} />
+        <MicButton state={mic} onClick={toggleMic} disabled={praised || run.out || mic === "checking"} />
         <p role="status" aria-live="polite" className="text-caption h-5 font-semibold text-muted-foreground">{t.mic.states[mic]}</p>
         {micError && <p className="text-center text-base text-destructive">{micError}</p>}
         {typing ? (
           <form className="flex w-full gap-2" onSubmit={(e) => { e.preventDefault(); submitTyped(); }}>
-            <Input lang="en" autoCapitalize="off" className="h-11 rounded-full px-4 text-base" value={typed} onChange={(e) => setTyped(e.target.value)} placeholder={d.typePlaceholder} disabled={praised || run.out} />
+            <Input lang="en" autoCapitalize="off" className="h-11 rounded-full px-4 text-base" value={typed} onChange={(e) => setTyped(e.target.value)} placeholder={d.typePlaceholder} disabled={praised || run.out || mic === "checking"} />
             <Button type="submit" disabled={praised || run.out}>{d.send}</Button>
           </form>
         ) : (
@@ -709,6 +756,9 @@ function DrillRunner({ run, setRun, onFinish, onRestart, pulos, muted, autoListe
           {feedback.kind === "half" && <p lang="en" className="text-headline text-primary">{feedback.text}</p>}
           {feedback.kind === "repeat" && <p lang="en" className="text-headline">{feedback.text}</p>}
           {feedback.kind === "almost" && feedback.pulo && <PuloCard text={feedback.pulo} />}
+          {feedback.kind === "praise" && feedback.natural && (
+            <p className="text-base"><span className="text-caption block font-semibold text-muted-foreground">{d.natural}</span><span lang="en" className="font-semibold">{feedback.natural}</span></p>
+          )}
           {feedback.kind === "praise" && feedback.otherWay && (
             <div className="rounded-xl bg-muted p-3 text-left">
               <p className="text-caption font-semibold text-muted-foreground">{d.otherWay}</p>

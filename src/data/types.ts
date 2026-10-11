@@ -14,6 +14,8 @@ export interface Mission {
   title: string;
   situation: string;
   goal?: string;
+  ai_role?: string;
+  ai_opening?: string;
   key_phrases: string[];
   model_dialogue: DialogueLine[];
   listening_text?: string;
@@ -109,7 +111,22 @@ export interface Material {
 
 export interface AiSettings {
   api_key: string | null;
+  /** Text model. */
   model: string;
+  transcribe_model: string;
+  listen_ai: boolean;
+  judge_ai: boolean;
+  converse_ai: boolean;
+}
+export interface MyName {
+  name: string;
+  /** Spellings the speech recognizer may use instead. */
+  aliases: string[];
+}
+export interface AiUsage {
+  kind: "prints" | "judge" | "listen" | "converse" | "report" | "test";
+  cost_usd: number;
+  created_at: ISODate;
 }
 
 export interface BrError {
