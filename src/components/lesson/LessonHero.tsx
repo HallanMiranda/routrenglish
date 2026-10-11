@@ -1,3 +1,4 @@
+import { groupCollections } from "@/drills/collections";
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Layers, Wand2 } from "lucide-react";
@@ -65,6 +66,7 @@ export function LessonHero({ packs, nivel }: { packs: DrillPack[]; nivel: Diffic
               <span className="text-caption mb-2 block font-semibold">{L.pack}</span>
               <select value={pack} onChange={(e) => setPack(e.target.value)} className="h-11 w-full rounded-full border bg-background px-4 text-base">
                 <option value="">{L.allAtLevel(t.drills.difficulty[nivel] ?? "")}</option>
+                {groupCollections(packs).collections.map((c) => <option key={c.key} value={`col:${c.key}`}>{L.collection(c.title)}</option>)}
                 {packs.map((p) => <option key={p.id} value={p.id}>{p.title_pt}</option>)}
               </select>
             </label>

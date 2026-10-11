@@ -1,3 +1,4 @@
+import { fromFirstUnfinished, groupCollections } from "@/drills/collections";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Gauge, HelpCircle, Pause, Play, RotateCcw, Sparkles, Volume2, X } from "lucide-react";
@@ -262,7 +263,14 @@ function LessonPage() {
       if (!ai.api_key) { setBlocked(L.needKey); return; }
     } else {
       const all = await repo.listDrillPacks();
-      const packs = search.pack ? all.filter((p) => p.id === search.pack) : all.filter((p) => search.nivel === "todos" || difficultyOf(p.level) === search.nivel);
+      const colKey = search.pack.startsWith("col:") ? search.pack.slice(4) : null;
+      let units: typeof all = [];
+      if (colKey) {
+        units = groupCollections(all).collections.find((c) => c.key === colKey)?.units ?? [];
+        const prog = Object.fromEntries((await Promise.all(units.map((u) => repo.getPackProgress(u.id)))).map((p) => [p.pack_id, p]));
+        units = fromFirstUnfinished(units, prog);
+      }
+      const packs = colKey ? units : search.pack ? all.filter((p) => p.id === search.pack) : all.filter((p) => search.nivel === "todos" || difficultyOf(p.level) === search.nivel);
       chains = chainsOf(packs);
       if (!chains.length) { setBlocked(L.noLadders); return; }
     }
