@@ -20,6 +20,8 @@ export interface GenerateInput {
 export interface GenerateResult {
   pack: Omit<DrillPack, "id"> & { id?: string };
   pulo: PuloDoGato;
+  material_text: string;
+  key_items: string[];
   tokensIn: number;
   tokensOut: number;
 }
@@ -59,7 +61,12 @@ export async function generatePack(input: GenerateInput): Promise<GenerateResult
     tokensOut += r.tokensOut;
     void repo.logAiUsage({ kind: "prints", cost_usd: estimateCost(r.tokensIn, r.tokensOut) });
     const parsed = parsePackJson(r.content);
-    if (parsed.ok) return { pack: parsed.pack, pulo: parsed.pulo, tokensIn, tokensOut };
+    if (parsed.ok) {
+      let extra: { material_text?: unknown; key_items?: unknown } = {};
+      try { extra = JSON.parse(r.content) as typeof extra; } catch { /* already validated */ }
+      const key_items = Array.isArray(extra.key_items) ? extra.key_items.filter((x): x is string => typeof x === "string" && !!x.trim()).slice(0, 15) : [];
+      return { pack: parsed.pack, pulo: parsed.pulo, material_text: typeof extra.material_text === "string" ? extra.material_text : "", key_items, tokensIn, tokensOut };
+    }
     if (attempt === 1) throw new AiError(t.ai.invalid, parsed.errors);
     input.onFixing?.();
     messages.push(
