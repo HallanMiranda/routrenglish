@@ -45,7 +45,7 @@ async function call(path: string, key: string, model: string, init: RequestInit 
     throw new AiError(t.ai.network);
   }
   if (!res.ok) throw await describe(res, model);
-  return res.json();
+  return path === "/audio/speech" ? res.blob() : res.json();
 }
 
 /** Tiny free check: looks up the model with the key. */
@@ -53,7 +53,10 @@ export async function testKey(key: string, model: string) {
   await call(`/models/${encodeURIComponent(model)}`, key, model);
 }
 
-export type ChatPart = { type: "text"; text: string } | { type: "image_url"; image_url: { url: string } };
+export type ChatPart =
+  | { type: "text"; text: string }
+  | { type: "image_url"; image_url: { url: string } }
+  | { type: "input_audio"; input_audio: { data: string; format: "wav" } };
 export interface ChatMessage {
   role: "system" | "user" | "assistant";
   content: string | ChatPart[];
@@ -83,4 +86,17 @@ export async function transcribeAudio(key: string, model: string, audio: Blob, p
   if (prompt) form.append("prompt", prompt);
   const data = (await call("/audio/transcriptions", key, model, { method: "POST", body: form, signal: signal ?? null })) as { text?: string };
   return (data.text ?? "").trim();
+}
+
+/** Text to speech (mp3). `instructions` only goes to models that accept it (gpt-*-tts). */
+export async function speechAudio(key: string, model: string, voice: string, input: string, instructions: string, speed: number, signal?: AbortSignal): Promise<Blob> {
+  const steerable = !/^tts-1/.test(model);
+  return (await call("/audio/speech", key, model, {
+    method: "POST",
+    signal: signal ?? null,
+    body: JSON.stringify({
+      model, voice, input, response_format: "mp3",
+      ...(steerable ? { instructions } : { speed }),
+    }),
+  })) as Blob;
 }
