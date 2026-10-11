@@ -32,3 +32,4 @@
 - [x] Rename UberClass → Aplicabilidade (/aplicabilidade, /uberclass redirects)
 - [x] Aula com o Coach (pacotes + livre com IA), hands-free spoken loop
 - [x] Coach upgrade: AI voice (cache/preload, Normal/Devagar), pronunciation feedback, lessons from prints
+- [x] Course import ({packs:[...]}) + collections (-uNN) with unit progress and Coach unit-by-unit
