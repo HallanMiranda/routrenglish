@@ -29,7 +29,7 @@ export function LessonHero({ packs, nivel }: { packs: DrillPack[]; nivel: Diffic
 
   const themes = packs.filter((p) => !p.user_created).map((p) => p.title_pt);
   const go = () =>
-    void navigate({ to: "/aula", search: { modo: mode ?? "pacotes", pack: mode === "pacotes" ? pack : "", tema: mode === "livre" ? topic.trim() : "", min, nivel } });
+    void navigate({ to: "/aula", search: { modo: mode ?? "pacotes", mat: "", pack: mode === "pacotes" ? pack : "", tema: mode === "livre" ? topic.trim() : "", min, nivel } });
 
   const chip = (active: boolean) => cn("min-h-11 shrink-0 rounded-full border px-4 text-sm font-semibold", active ? "border-foreground bg-foreground text-background" : "bg-card text-muted-foreground");
 

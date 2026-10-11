@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Gauge, HelpCircle, Pause, Play, RotateCcw, Sparkles, Volume2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MicButton, type MicState } from "@/components/session/MicButton";
@@ -409,7 +409,7 @@ function LessonPage() {
       let tries = 0;
       let silent = 0;
       while (!stopRef.current) {
-        setChunk(ch); setOps(null); setPulo(null);
+        setChunk(ch); setOps(null); setPulo(null); setPron(null);
         await say(ch.patterns ? `${intro} ${ch.pt}` : `${intro} ${ch.pt.replace(/[.!?…\s]+$/, "")}?`);
         const r = await listen(ch.accepted, spoken);
         if (stopRef.current) return;
@@ -500,14 +500,17 @@ function LessonPage() {
   }
 
   const title = search.modo === "livre" ? L.free : search.modo === "print" ? L.printTitle(material?.title ?? "") : L.fromPacks;
-  const backTo = search.modo === "print" && search.mat ? `/prints/${search.mat}` : "/aplicabilidade";
+  const toPrint = search.modo === "print" && !!search.mat;
+  const Back = ({ children, onClick }: { children: ReactNode; onClick?: () => void }) =>
+    toPrint ? <Link to="/prints/$materialId" params={{ materialId: search.mat }} onClick={onClick}>{children}</Link>
+    : <Link to="/aplicabilidade" onClick={onClick}>{children}</Link>;
   const printImg = material?.images?.[0] ?? material?.thumbnail;
 
   return (
     <div className="pt-safe pb-safe flex h-dvh flex-col bg-background">
       <header className="mx-auto flex w-full max-w-md items-center gap-2 px-3 py-1">
         <Button variant="ghost" size="icon" asChild aria-label={L.end}>
-          <Link to={backTo} onClick={end}><X /></Link>
+          <Back onClick={end}><X /></Back>
         </Button>
         <p className="text-caption min-w-0 flex-1 truncate text-muted-foreground">
           {phase === "live" ? `${title} · ${L.left(Math.ceil(left / 60))}` : title}
@@ -577,7 +580,7 @@ function LessonPage() {
               {showPrint && printImg ? <img src={printImg} alt={material?.title ?? ""} className="max-h-[65dvh] w-full rounded-xl border object-contain" /> : <p className="text-title">{L.paused}</p>}
               {error && <p className="text-base text-destructive">{error}</p>}
               <Button size="lg" onClick={() => { setShowPrint(false); resumeRef.current?.(); }}><Play /> {showPrint ? L.closePrint : L.resume}</Button>
-              <Button variant="ghost" asChild><Link to={backTo} onClick={end}>{L.end}</Link></Button>
+              <Button variant="ghost" asChild><Back onClick={end}>{L.end}</Back></Button>
             </div>
           )}
         </div>
@@ -631,7 +634,7 @@ function LessonPage() {
           {summary.cost !== null && <p className="text-caption text-muted-foreground">{L.cost(summary.cost)}</p>}
           <div className="space-y-2">
             <Button size="lg" className="w-full" onClick={() => void start()}><RotateCcw /> {L.again}</Button>
-            <Button variant="ghost" className="w-full" asChild><Link to={backTo}>{L.back}</Link></Button>
+            <Button variant="ghost" className="w-full" asChild><Back>{L.back}</Back></Button>
           </div>
         </main>
       )}
