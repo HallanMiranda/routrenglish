@@ -140,10 +140,11 @@ export function ApiKeyForm({ onChange, full = false }: { onChange?: (s: AiSettin
 export function MyNameForm() {
   const [name, setName] = useState("");
   const [aliases, setAliases] = useState("");
+  const [city, setCity] = useState("");
   useEffect(() => {
-    void repo.getMyName().then((n) => { setName(n.name); setAliases(n.aliases.join(", ")); });
+    void repo.getMyName().then((n) => { setName(n.name); setAliases(n.aliases.join(", ")); setCity(n.city); });
   }, []);
-  const save = () => void repo.saveMyName({ name: name.trim() || "Allan", aliases: aliases.split(",").map((a) => a.trim()).filter(Boolean) });
+  const save = () => void repo.saveMyName({ name: name.trim() || "Allan", aliases: aliases.split(",").map((a) => a.trim()).filter(Boolean), city: city.trim() });
   return (
     <div className="space-y-3 rounded-[20px] border bg-card p-4">
       <div>
@@ -154,6 +155,10 @@ export function MyNameForm() {
         <label htmlFor="my-aliases" className="text-caption mb-1 block font-semibold">{k.aliases}</label>
         <Input id="my-aliases" className="h-11 text-base" value={aliases} placeholder={k.aliasesPlaceholder} onChange={(e) => setAliases(e.target.value)} onBlur={save} />
         <p className="text-caption mt-1 text-muted-foreground">{k.aliasesHelp} {k.myNameHelp}</p>
+      </div>
+      <div>
+        <label htmlFor="my-city" className="text-caption mb-1 block font-semibold">{k.myCity}</label>
+        <Input id="my-city" className="h-11 text-base" value={city} onChange={(e) => setCity(e.target.value)} onBlur={save} />
       </div>
     </div>
   );
