@@ -5,6 +5,7 @@ import type {
   DrillAttempt,
   DrillPack,
   PackProgress,
+  PuloDoGato,
   ErrorItem,
   Material,
   Mission,
@@ -39,6 +40,9 @@ export interface Repo {
   saveDrillPack(p: Omit<DrillPack, "id"> & { id?: string }): Promise<DrillPack>;
   saveDrillAttempt(a: Omit<DrillAttempt, "id" | "created_at">): Promise<DrillAttempt>;
   getPackProgress(packId: string): Promise<PackProgress>;
+  getPuloDoGato(): Promise<PuloDoGato>;
+  getSoundMuted(): Promise<boolean>;
+  setSoundMuted(muted: boolean): Promise<void>;
 }
 
 // Swap this for a cloud implementation later; the UI only imports `repo`.

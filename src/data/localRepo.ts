@@ -1,5 +1,5 @@
 import drillPacksJson from "@/content/drill-packs.json";
-import type { DrillAttempt, DrillPack, PackProgress } from "./types";
+import type { DrillAttempt, DrillItem, DrillPack, PackProgress, PuloDoGato } from "./types";
 import missionsJson from "@/content/missions-phase1.json";
 import type { Repo } from "./repo";
 import type {
@@ -33,7 +33,14 @@ const missions: Mission[] = (rawPhase.missions ?? []).map((m, i) => ({
   key_phrases: m.key_phrases,
   model_dialogue: [],
 }));
-const builtInPacks = (drillPacksJson as unknown as { packs: DrillPack[] }).packs ?? [];
+const rawPacks = drillPacksJson as unknown as { pulo_do_gato?: PuloDoGato; packs?: DrillPack[] };
+/** Items without a mode are translate items. */
+const withMode = (p: DrillPack): DrillPack => ({
+  ...p,
+  items: p.items.map((i) => ({ ...i, mode: (i as { mode?: string }).mode === "qa" ? "qa" : "translate" }) as DrillItem),
+});
+const builtInPacks = (rawPacks.packs ?? []).map(withMode);
+const puloDoGato: PuloDoGato = rawPacks.pulo_do_gato ?? {};
 const PREFIX = "speak-lab:";
 const DAY = 86_400_000;
 
@@ -230,7 +237,7 @@ export const localRepo: Repo = {
   },
 
   async listDrillPacks() {
-    return [...builtInPacks, ...read<DrillPack>("drill_packs")];
+    return [...builtInPacks, ...read<DrillPack>("drill_packs").map(withMode)];
   },
   async getDrillPack(id) {
     return (await this.listDrillPacks()).find((p) => p.id === id) ?? null;
@@ -253,5 +260,14 @@ export const localRepo: Repo = {
     const inRound = atts.filter((a) => a.round === best);
     const accuracy = inRound.length ? Math.max(...inRound.map((a) => a.accuracy)) : Math.max(...atts.map((a) => a.accuracy));
     return { pack_id: packId, best_round: best as PackProgress["best_round"], accuracy };
+  },
+  async getPuloDoGato() {
+    return puloDoGato;
+  },
+  async getSoundMuted() {
+    return read<boolean>("sound_muted")[0] === true;
+  },
+  async setSoundMuted(muted) {
+    write("sound_muted", [muted]);
   },
 };
