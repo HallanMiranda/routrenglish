@@ -63,7 +63,7 @@ interface Summary {
 }
 
 function pick<T>(arr: readonly T[]) {
-  return arr[Math.floor(Math.random() * arr.length)];
+  return arr[Math.floor(Math.random() * arr.length)]!;
 }
 
 function DrillPage() {
