@@ -29,7 +29,7 @@ const missions: Mission[] = (rawPhase.missions ?? []).map((m, i) => ({
   day: i + 1,
   title: m.title_pt,
   situation: m.scenario,
-  goal: m.goal,
+  ...(m.goal ? { goal: m.goal } : {}),
   key_phrases: m.key_phrases,
   model_dialogue: [],
 }));
