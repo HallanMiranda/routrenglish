@@ -4,6 +4,7 @@ import { t } from "@/lib/i18n/pt-BR";
 import { Moon } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "@/components/theme/ThemeProvider";
+import { ApiKeyForm } from "@/components/prints/ApiKeyForm";
 
 export const Route = createFileRoute("/progresso")({
   head: () => ({
@@ -34,6 +35,10 @@ function Progress() {
           <label htmlFor="theme-system" className="text-sm text-muted-foreground">{t.theme.system}</label>
           <Switch id="theme-system" checked={theme === "system"} onCheckedChange={(checked) => setTheme(checked ? "system" : dark ? "dark" : "light")} />
         </div>
+      </section>
+      <section className="mt-8 border-t pt-6">
+        <h2 className="mb-4 text-lg font-semibold">{t.apiKey.section}</h2>
+        <ApiKeyForm />
       </section>
     </AppShell>
   );

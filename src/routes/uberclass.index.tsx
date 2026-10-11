@@ -102,6 +102,9 @@ function PracticePage() {
                     {diff ? d.difficulty[diff] : p.level}
                   </span>
                 </div>
+                {p.material_id && (
+                  <span className="mt-1 inline-block rounded-full bg-live px-2 py-0.5 text-xs font-semibold text-live-foreground">{t.prints.fromMaterial}</span>
+                )}
                 <p className="mt-1 text-sm text-muted-foreground">{p.focus_pt}</p>
                 <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium">
                   <span>{d.items(p.items.length)}</span>

@@ -1,12 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { BarChart3, BookOpen, Layers, MessageSquareText, Sun } from "lucide-react";
+import { BarChart3, Camera, Layers, MessageSquareText, Sun } from "lucide-react";
 import { t } from "@/lib/i18n/pt-BR";
 
 const items = [
   { to: "/", label: t.nav.today, icon: Sun },
   { to: "/uberclass", label: t.nav.practice, icon: MessageSquareText },
   { to: "/revisao", label: t.nav.review, icon: Layers },
-  { to: "/biblioteca", label: t.nav.library, icon: BookOpen },
+  { to: "/prints", label: t.nav.prints, icon: Camera },
   { to: "/progresso", label: t.nav.progress, icon: BarChart3 },
 ] as const;
 
