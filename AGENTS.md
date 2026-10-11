@@ -19,3 +19,4 @@
 - UI reads/writes app data only through `repo` from `src/data/repo.ts` (currently localStorage-backed `localRepo`) — lets the storage be swapped for a cloud backend without touching screens.
 - Speech uses browser APIs in `src/speech/`, and `src/ai/converse.ts` is a scripted mock with the final signature — free local testing before any API keys.
 - Hands-free lessons (`/aula`) run one async loop in the route with refs for stop/pause/button commands; listening goes through `src/lesson/hear.ts` and judging reuses `src/ai/judge.ts` + `src/drills/check.ts` — one judging path for every screen.
+- Coach speech goes through `src/ai/tts.ts` (OpenAI TTS cached in IndexedDB, browser-voice fallback) and pronunciation through `src/ai/pronunciation.ts` (WAV from `src/speech/wav.ts`) — one voice/feedback path, works offline without them.

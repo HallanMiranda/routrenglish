@@ -17,9 +17,22 @@ export async function aiFor(feature: AiFeature): Promise<AiSettings | null> {
   return on ? s : null;
 }
 
-export async function chat(s: AiSettings, messages: ChatMessage[], kind: AiUsage["kind"], opts: { json?: boolean; signal?: AbortSignal } = {}) {
-  const r = await chatJson(s.api_key!, s.model, messages, opts.signal, opts.json ?? true);
-  void repo.logAiUsage({ kind, cost_usd: estimateCost(r.tokensIn, r.tokensOut) });
+/** Settings when the key is saved and the device is online (voice and pronunciation have no switch). */
+export async function aiOnline(): Promise<AiSettings | null> {
+  const s = await repo.getAiSettings();
+  if (!s.api_key) return null;
+  if (typeof navigator !== "undefined" && navigator.onLine === false) return null;
+  return s;
+}
+
+export async function chat(
+  s: AiSettings,
+  messages: ChatMessage[],
+  kind: AiUsage["kind"],
+  opts: { json?: boolean; signal?: AbortSignal; model?: string; cost?: (tin: number, tout: number) => number } = {},
+) {
+  const r = await chatJson(s.api_key!, opts.model ?? s.model, messages, opts.signal, opts.json ?? true);
+  void repo.logAiUsage({ kind, cost_usd: (opts.cost ?? estimateCost)(r.tokensIn, r.tokensOut) });
   return r.content;
 }
 
@@ -31,8 +44,7 @@ export async function transcribe(s: AiSettings, audio: Blob, seconds: number, pr
   return text;
 }
 
-/** Checks that the key works with both the text and the transcription model. */
+/** Checks that the key works with every model in Ajustes. */
 export async function testModels(s: AiSettings) {
-  await testKey(s.api_key!, s.model);
-  await testKey(s.api_key!, s.transcribe_model);
+  for (const m of [s.model, s.transcribe_model, s.tts_model, s.audio_model]) await testKey(s.api_key!, m);
 }

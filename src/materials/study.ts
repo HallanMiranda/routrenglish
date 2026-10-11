@@ -35,6 +35,8 @@ export async function createStudy(
     images: src.images,
     text: src.text,
     truncated: src.truncated,
+    material_text: src.text || r.material_text,
+    key_items: r.key_items,
     pack_id: pack.id,
     level,
     focus,
@@ -64,6 +66,10 @@ export async function generateMore(s: AiSettings, m: Material, signal: AbortSign
   await repo.saveDrillPack({ ...pack, items: [...pack.items, ...added] });
   const tin = (m.tokens_in ?? 0) + r.tokensIn;
   const tout = (m.tokens_out ?? 0) + r.tokensOut;
-  await repo.saveMaterial({ ...m, tokens_in: tin, tokens_out: tout, cost_usd: estimateCost(tin, tout) });
+  await repo.saveMaterial({
+    ...m, tokens_in: tin, tokens_out: tout, cost_usd: estimateCost(tin, tout),
+    material_text: m.material_text || m.text || r.material_text,
+    key_items: m.key_items?.length ? m.key_items : r.key_items,
+  });
   return added.length;
 }

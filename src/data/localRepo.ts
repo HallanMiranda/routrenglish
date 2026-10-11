@@ -1,5 +1,5 @@
 import drillPacksJson from "@/content/drill-packs.json";
-import type { DrillAttempt, DrillItem, DrillPack, PackProgress, PuloDoGato } from "./types";
+import type { DrillAttempt, DrillItem, DrillPack, PackProgress, PrintProgress, PuloDoGato } from "./types";
 import missionsJson from "@/content/missions-phase1.json";
 import type { Repo } from "./repo";
 import type {
@@ -166,6 +166,7 @@ export const localRepo: Repo = {
       reps: 0,
       due_at: now(),
       created_at: now(),
+      ...(c.tag ? { tag: c.tag } : {}),
     };
     write("cards", [...read<Card>("cards"), row]);
     return row;
@@ -250,6 +251,10 @@ export const localRepo: Repo = {
       listen_ai: s?.listen_ai ?? true,
       judge_ai: s?.judge_ai ?? true,
       converse_ai: s?.converse_ai ?? true,
+      tts_model: s?.tts_model?.trim() || "gpt-4o-mini-tts",
+      tts_voice: s?.tts_voice?.trim() || "coral",
+      audio_model: s?.audio_model?.trim() || "gpt-audio-mini",
+      pron_mode: s?.pron_mode ?? "final",
     } satisfies AiSettings;
   },
   async saveAiSettings(p) {
@@ -271,6 +276,18 @@ export const localRepo: Repo = {
   async getAiSpendThisMonth() {
     const month = now().slice(0, 7);
     return read<AiUsage>("ai_usage").filter((u) => u.created_at.startsWith(month)).reduce((s, u) => s + u.cost_usd, 0);
+  },
+  async getAiSpendByKind() {
+    const month = now().slice(0, 7);
+    const out: Partial<Record<AiUsage["kind"], number>> = {};
+    for (const u of read<AiUsage>("ai_usage")) if (u.created_at.startsWith(month)) out[u.kind] = (out[u.kind] ?? 0) + u.cost_usd;
+    return out;
+  },
+  async getPrintProgress(materialId) {
+    return read<Record<string, PrintProgress>>("print_progress")[0]?.[materialId] ?? { mastered: [], missed: [] };
+  },
+  async savePrintProgress(materialId, p) {
+    write("print_progress", [{ ...(read<Record<string, PrintProgress>>("print_progress")[0] ?? {}), [materialId]: p }]);
   },
   async getLearnedAnswers() {
     return read<Record<string, string[]>>("learned_answers")[0] ?? {};

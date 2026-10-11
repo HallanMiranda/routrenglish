@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useMatch, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Camera, ClipboardPaste, FileText, Loader2, X } from "lucide-react";
+import { Camera, ClipboardPaste, FileText, Loader2, Play, X } from "lucide-react";
 import { AppShell, EmptyState, ListSkeleton } from "@/components/layout/AppShell";
 import { ApiKeyForm } from "@/components/prints/ApiKeyForm";
 import { Button } from "@/components/ui/button";
@@ -113,7 +113,11 @@ function PrintsHome() {
           {rows.map(({ m, pack, prog }) => {
             const done = prog?.accuracy == null ? 0 : prog.best_round;
             return (
-              <li key={m.id}>
+              <li key={m.id} className="relative">
+                <Link to="/aula" search={{ modo: "print", mat: m.id, pack: "", tema: "", min: 10, nivel: "todos" }} aria-label={p.playLesson(m.title)}
+                  className="absolute right-2 top-2 z-10 grid size-11 place-items-center rounded-full bg-primary text-primary-foreground shadow-md">
+                  <Play className="size-5 fill-current" />
+                </Link>
                 <Link to="/prints/$materialId" params={{ materialId: m.id }} className="block overflow-hidden rounded-[20px] border bg-card">
                   <Thumb m={m} className="aspect-[4/3] w-full rounded-none border-0" />
                   <span className="block space-y-1 p-3">

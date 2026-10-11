@@ -70,6 +70,8 @@ export interface Card {
   reps: number;
   due_at: ISODate;
   created_at: ISODate;
+  /** e.g. the print title the card came from. */
+  tag?: string | undefined;
 }
 
 export interface Checkpoint {
@@ -107,7 +109,17 @@ export interface Material {
   tokens_in?: number | undefined;
   tokens_out?: number | undefined;
   cost_usd?: number | undefined;
+  /** Faithful transcription of the material (images) or its extracted text. */
+  material_text?: string | undefined;
+  /** 8-15 most useful expressions, structures and words for speaking. */
+  key_items?: string[] | undefined;
 }
+/** Coach lessons from a print: which key items are mastered or still missed. */
+export interface PrintProgress {
+  mastered: string[];
+  missed: string[];
+}
+export type PronMode = "always" | "final" | "ask";
 
 export interface AiSettings {
   api_key: string | null;
@@ -117,6 +129,10 @@ export interface AiSettings {
   listen_ai: boolean;
   judge_ai: boolean;
   converse_ai: boolean;
+  tts_model: string;
+  tts_voice: string;
+  audio_model: string;
+  pron_mode: PronMode;
 }
 export interface MyName {
   name: string;
@@ -125,7 +141,7 @@ export interface MyName {
   city: string;
 }
 export interface AiUsage {
-  kind: "prints" | "judge" | "listen" | "converse" | "report" | "test";
+  kind: "prints" | "judge" | "listen" | "converse" | "report" | "test" | "voice" | "pronunciation";
   cost_usd: number;
   created_at: ISODate;
 }
