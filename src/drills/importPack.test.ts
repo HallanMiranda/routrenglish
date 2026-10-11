@@ -12,7 +12,7 @@ describe("parsePackJson", () => {
       ],
     }));
     expect(r.ok).toBe(true);
-    if (r.ok) expect(r.pulo.to_be).toBe("x");
+    if (r.ok) expect(r.pulo["to_be"]).toBe("x");
   });
   it("names item and field on error", () => {
     const r = parsePackJson(JSON.stringify({ title_pt: "T", level: "A1", focus_pt: "F", items: [{ id: "x", mode: "ladder", title_pt: "L", steps: [{ pt: "Eu", focus: "f" }] }] }));
