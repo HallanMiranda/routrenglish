@@ -66,7 +66,7 @@ interface Chunk {
   first: boolean;
   /** Last step of its chain (for "Na frase final"). */
   last?: boolean;
-  keyItem?: string;
+  keyItem?: string | undefined;
 }
 interface Verdict {
   correct: boolean;
