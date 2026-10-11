@@ -1,0 +1,37 @@
+import type {
+  Card,
+  CardRating,
+  Checkpoint,
+  ErrorItem,
+  Material,
+  Mission,
+  Session,
+  StepIndex,
+  Utterance,
+} from "./types";
+import { localRepo } from "./localRepo";
+
+export interface Repo {
+  getTodayMission(): Promise<Mission | null>;
+  getMission(id: string): Promise<Mission | null>;
+  listMissions(): Promise<Mission[]>;
+  startOrResumeSession(missionId: string): Promise<Session>;
+  completeStep(sessionId: string, step: StepIndex): Promise<Session>;
+  finishSession(sessionId: string): Promise<Session>;
+  saveUtterance(u: Omit<Utterance, "id" | "created_at">): Promise<Utterance>;
+  upsertError(
+    e: Pick<ErrorItem, "original" | "correction"> & Partial<Omit<ErrorItem, "id">>,
+  ): Promise<ErrorItem>;
+  listActiveErrors(): Promise<ErrorItem[]>;
+  createCard(c: Pick<Card, "front" | "back"> & { error_id?: string | null }): Promise<Card>;
+  listDueCards(now?: Date): Promise<Card[]>;
+  rateCard(cardId: string, rating: CardRating): Promise<Card>;
+  saveCheckpoint(c: Omit<Checkpoint, "id" | "created_at">): Promise<Checkpoint>;
+  listCheckpoints(): Promise<Checkpoint[]>;
+  listMaterials(): Promise<Material[]>;
+  saveMaterial(m: Omit<Material, "id" | "created_at"> & { id?: string }): Promise<Material>;
+  getStreak(): Promise<number>;
+}
+
+// Swap this for a cloud implementation later; the UI only imports `repo`.
+export const repo: Repo = localRepo;

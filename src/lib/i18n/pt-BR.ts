@@ -11,8 +11,16 @@ export const t = {
     greeting: "Sua missão de hoje",
     start: "Começar sessão",
     streak: "dias seguidos",
-    placeholderMission: "Ordering a coffee",
-    placeholderSituation: "Você está numa cafeteria em Nova York e precisa pedir seu café.",
+    day: "Dia",
+    loading: "Carregando missão",
+    noMissionTitle: "Nenhuma missão disponível",
+    noMissionBody: "Ainda não há missões carregadas, ou você concluiu todas. Parabéns!",
+  },
+  speech: {
+    unsupported: "Seu navegador não reconhece fala. Tente o Chrome no Android ou o Safari no iPhone.",
+    denied: "Permita o acesso ao microfone para praticar falando.",
+    noSpeech: "Não ouvimos nada. Tente falar de novo.",
+    failed: "Não foi possível reconhecer sua fala. Tente novamente.",
   },
   session: {
     title: "Sessão",
