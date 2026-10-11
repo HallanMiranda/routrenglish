@@ -49,6 +49,10 @@ export interface Repo {
   getPuloDoGato(): Promise<PuloDoGato>;
   mergePuloDoGato(p: PuloDoGato): Promise<void>;
   deleteDrillPack(id: string): Promise<void>;
+  /** Most recent counted drill attempt, for "Continuar". */
+  getLastDrillAttempt(): Promise<DrillAttempt | null>;
+  getAutoListen(): Promise<boolean>;
+  setAutoListen(on: boolean): Promise<void>;
   getSoundMuted(): Promise<boolean>;
   setSoundMuted(muted: boolean): Promise<void>;
 }
