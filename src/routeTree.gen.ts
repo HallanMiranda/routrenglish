@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as PrintsRouteImport } from './routes/prints'
 import { Route as ProgressoRouteImport } from './routes/progresso'
 import { Route as RevisaoRouteImport } from './routes/revisao'
+import { Route as PrintsMaterialIdRouteImport } from './routes/prints.$materialId'
 import { Route as RelatorioSessionIdRouteImport } from './routes/relatorio.$sessionId'
 import { Route as SessaoSessionIdRouteImport } from './routes/sessao.$sessionId'
 import { Route as UberclassIndexRouteImport } from './routes/uberclass.index'
@@ -28,6 +30,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrintsRoute = PrintsRouteImport.update({
+  id: '/prints',
+  path: '/prints',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgressoRoute = ProgressoRouteImport.update({
   id: '/progresso',
   path: '/progresso',
@@ -37,6 +44,11 @@ const RevisaoRoute = RevisaoRouteImport.update({
   id: '/revisao',
   path: '/revisao',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PrintsMaterialIdRoute = PrintsMaterialIdRouteImport.update({
+  id: '/$materialId',
+  path: '/$materialId',
+  getParentRoute: () => PrintsRoute,
 } as any)
 const RelatorioSessionIdRoute = RelatorioSessionIdRouteImport.update({
   id: '/relatorio/$sessionId',
@@ -62,8 +74,10 @@ const UberclassPackIdRoute = UberclassPackIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/prints': typeof PrintsRouteWithChildren
   '/progresso': typeof ProgressoRoute
   '/revisao': typeof RevisaoRoute
+  '/prints/$materialId': typeof PrintsMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
   '/uberclass/$packId': typeof UberclassPackIdRoute
@@ -72,8 +86,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/prints': typeof PrintsRouteWithChildren
   '/progresso': typeof ProgressoRoute
   '/revisao': typeof RevisaoRoute
+  '/prints/$materialId': typeof PrintsMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
   '/uberclass/$packId': typeof UberclassPackIdRoute
@@ -83,8 +99,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/prints': typeof PrintsRouteWithChildren
   '/progresso': typeof ProgressoRoute
   '/revisao': typeof RevisaoRoute
+  '/prints/$materialId': typeof PrintsMaterialIdRoute
   '/relatorio/$sessionId': typeof RelatorioSessionIdRoute
   '/sessao/$sessionId': typeof SessaoSessionIdRoute
   '/uberclass/$packId': typeof UberclassPackIdRoute
@@ -95,8 +113,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/prints'
     | '/progresso'
     | '/revisao'
+    | '/prints/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
     | '/uberclass/$packId'
@@ -105,8 +125,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/prints'
     | '/progresso'
     | '/revisao'
+    | '/prints/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
     | '/uberclass/$packId'
@@ -115,8 +137,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/login'
+    | '/prints'
     | '/progresso'
     | '/revisao'
+    | '/prints/$materialId'
     | '/relatorio/$sessionId'
     | '/sessao/$sessionId'
     | '/uberclass/$packId'
@@ -126,6 +150,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
+  PrintsRoute: typeof PrintsRouteWithChildren
   ProgressoRoute: typeof ProgressoRoute
   RevisaoRoute: typeof RevisaoRoute
   RelatorioSessionIdRoute: typeof RelatorioSessionIdRoute
@@ -150,6 +175,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/prints': {
+      id: '/prints'
+      path: '/prints'
+      fullPath: '/prints'
+      preLoaderRoute: typeof PrintsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/progresso': {
       id: '/progresso'
       path: '/progresso'
@@ -163,6 +195,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/revisao'
       preLoaderRoute: typeof RevisaoRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/prints/$materialId': {
+      id: '/prints/$materialId'
+      path: '/$materialId'
+      fullPath: '/prints/$materialId'
+      preLoaderRoute: typeof PrintsMaterialIdRouteImport
+      parentRoute: typeof PrintsRoute
     }
     '/relatorio/$sessionId': {
       id: '/relatorio/$sessionId'
@@ -195,9 +234,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface PrintsRouteChildren {
+  PrintsMaterialIdRoute: typeof PrintsMaterialIdRoute
+}
+
+const PrintsRouteChildren: PrintsRouteChildren = {
+  PrintsMaterialIdRoute: PrintsMaterialIdRoute,
+}
+
+const PrintsRouteWithChildren =
+  PrintsRoute._addFileChildren(PrintsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
+  PrintsRoute: PrintsRouteWithChildren,
   ProgressoRoute: ProgressoRoute,
   RevisaoRoute: RevisaoRoute,
   RelatorioSessionIdRoute: RelatorioSessionIdRoute,
