@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useMatch, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Camera, ClipboardPaste, FileText, Loader2, X } from "lucide-react";
+import { Camera, ClipboardPaste, FileText, Loader2, Play, X } from "lucide-react";
 import { AppShell, EmptyState, ListSkeleton } from "@/components/layout/AppShell";
 import { ApiKeyForm } from "@/components/prints/ApiKeyForm";
 import { Button } from "@/components/ui/button";
