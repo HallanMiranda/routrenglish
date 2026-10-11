@@ -4,7 +4,7 @@ import { Check, ChevronRight, Layers, Lock, Play } from "lucide-react";
 import { AppShell, EmptyState, ListSkeleton } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/button";
 import { repo } from "@/data/repo";
-import { loadCourses, unitNumber, type CourseView } from "@/course/course";
+import { loadCourses, unitNumber, unitTitle, type CourseView } from "@/course/course";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n/pt-BR";
 
@@ -90,7 +90,7 @@ function AulasHome() {
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="text-caption text-muted-foreground">{A.unit(n)}</p>
-                      <p className="text-headline">{u.pack.title_pt}</p>
+                      <p className="text-headline">{unitTitle(u.pack)}</p>
                       {u.pack.lesson_intro?.objetivo_pt && <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{u.pack.lesson_intro.objetivo_pt}</p>}
                       <p className="text-caption mt-2 font-semibold">
                         {u.prog.completed ? `${A.done} ✓` : locked ? `${A.locked} 🔒` : A.inProgress(u.prog.done_steps.length)}

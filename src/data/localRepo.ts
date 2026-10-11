@@ -1,4 +1,6 @@
 import drillPacksJson from "@/content/drill-packs.json";
+import headwayStarterJson from "@/content/headway-starter.json";
+import { parsePacksJson } from "@/drills/importPack";
 import type { DrillAttempt, DrillItem, DrillPack, PackProgress, PrintProgress, PuloDoGato } from "./types";
 import missionsJson from "@/content/missions-phase1.json";
 import type { Repo } from "./repo";
@@ -46,8 +48,14 @@ const withMode = (p: DrillPack): DrillPack => ({
   ...p,
   items: p.items.map((i) => ({ ...i, mode: (["qa", "ladder"] as const).find((m) => m === (i as { mode?: string }).mode) ?? "translate" }) as DrillItem),
 });
-const builtInPacks = (rawPacks.packs ?? []).map(withMode);
-const puloDoGato: PuloDoGato = rawPacks.pulo_do_gato ?? {};
+// Built-in course (American Headway Starter): validated like an import, so it shows in Aulas with no setup.
+const builtInCourse = parsePacksJson(JSON.stringify(headwayStarterJson));
+const builtInCourses: Course[] = builtInCourse.course ? [builtInCourse.course] : [];
+const builtInPacks = [
+  ...(rawPacks.packs ?? []),
+  ...builtInCourse.packs.map((p, i) => ({ ...p, id: p.id ?? `${builtInCourse.course?.id ?? "course"}-${i + 1}` }) as DrillPack),
+].map(withMode);
+const puloDoGato: PuloDoGato = { ...builtInCourse.pulo, ...(rawPacks.pulo_do_gato ?? {}) };
 const PREFIX = "speak-lab:";
 const DEFAULT_MODEL = "gpt-5.4-mini";
 const DAY = 86_400_000;
@@ -321,7 +329,10 @@ export const localRepo: Repo = {
   },
 
   async listDrillPacks() {
-    return [...builtInPacks, ...read<DrillPack>("drill_packs").map(withMode)];
+    // A pack the user imported with the same id replaces the built-in one.
+    const mine = read<DrillPack>("drill_packs").map(withMode);
+    const ids = new Set(mine.map((p) => p.id));
+    return [...builtInPacks.filter((p) => !ids.has(p.id)), ...mine];
   },
   async getDrillPack(id) {
     return (await this.listDrillPacks()).find((p) => p.id === id) ?? null;
@@ -371,7 +382,8 @@ export const localRepo: Repo = {
     write("sound_muted", [muted]);
   },
   async listCourses() {
-    return read<Course>("courses");
+    const mine = read<Course>("courses");
+    return [...builtInCourses.filter((c) => !mine.some((m) => m.id === c.id)), ...mine];
   },
   async saveCourse(c) {
     write("courses", [...read<Course>("courses").filter((x) => x.id !== c.id), c]);

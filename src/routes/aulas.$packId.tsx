@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { PuloCard } from "@/components/drill/CoachParts";
 import { repo } from "@/data/repo";
 import type { DrillPack, Material, PuloDoGato, UnitProgress, UnitStep } from "@/data/types";
-import { markStep, setCurrentStep, unitNumber } from "@/course/course";
+import { markStep, setCurrentStep, unitNumber, unitTitle } from "@/course/course";
 import { coachSay, stopCoach, unlockAudio } from "@/ai/tts";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n/pt-BR";
@@ -77,7 +77,7 @@ function UnitPage() {
         <Button variant="ghost" size="icon" asChild aria-label={A.back}><Link to="/aulas"><ChevronLeft /></Link></Button>
         <div className="min-w-0">
           <p className="text-caption text-muted-foreground">{A.unit(unitNumber(pack))}</p>
-          <h1 className="text-headline truncate">{pack.title_pt}</h1>
+          <h1 className="text-headline truncate">{unitTitle(pack)}</h1>
         </div>
       </header>
 

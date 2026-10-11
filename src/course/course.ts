@@ -15,7 +15,12 @@ export interface CourseView {
 }
 
 export const unitNumber = (p: DrillPack, i = 0) => p.unit ?? i + 1;
-export const unitTag = (p: DrillPack) => `Unidade ${unitNumber(p)} · ${p.title_pt}`;
+/** "Headway Starter · Unidade 1: Hello!" → "Hello!" (the course and unit number are shown elsewhere). */
+export const unitTitle = (p: DrillPack) => {
+  const after = p.title_pt.includes(" · ") ? p.title_pt.slice(p.title_pt.indexOf(" · ") + 3) : p.title_pt;
+  return after.replace(/^Unidade\s+\d+\s*[:\-–—]\s*/i, "") || p.title_pt;
+};
+export const unitTag = (p: DrillPack) => `Unidade ${unitNumber(p)} · ${unitTitle(p)}`;
 
 export async function loadCourses(): Promise<CourseView[]> {
   const [courses, packs] = await Promise.all([repo.listCourses(), repo.listDrillPacks()]);

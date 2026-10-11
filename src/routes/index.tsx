@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { repo } from "@/data/repo";
 import type { DrillPack, Mission } from "@/data/types";
 import { t } from "@/lib/i18n/pt-BR";
-import { loadCourses, unitNumber } from "@/course/course";
+import { loadCourses, unitNumber, unitTitle } from "@/course/course";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -72,7 +72,7 @@ function Today() {
       ) : unit ? (
         <section className="flex min-h-64 flex-col rounded-[20px] bg-ink p-6 text-ink-foreground shadow-card">
           <p className="text-caption font-semibold text-live">{t.aulas.title}</p>
-          <h2 className="text-title mt-3">{t.aulas.hojeContinue(unit.n, unit.pack.title_pt)}</h2>
+          <h2 className="text-title mt-3">{t.aulas.hojeContinue(unit.n, unitTitle(unit.pack))}</h2>
           <p className="text-caption mt-4 flex items-center gap-1.5 text-ink-foreground/80">
             <Clock className="size-4" aria-hidden="true" /> {t.aulas.hojeMin}
           </p>
