@@ -104,6 +104,8 @@ export interface Material {
   text?: string | undefined;
   truncated?: boolean | undefined;
   pack_id?: string | undefined;
+  /** Course unit (pack id) this print was taken for. */
+  unit_pack_id?: string | undefined;
   level?: string | undefined;
   focus?: string | undefined;
   tokens_in?: number | undefined;
@@ -210,6 +212,31 @@ export interface DrillPack {
   user_created?: boolean;
   /** Set when the pack was generated from a Prints material. */
   material_id?: string;
+  /** Course packs (Aulas): owning course, unit number and intro. */
+  course_id?: string;
+  unit?: number;
+  lesson_intro?: LessonIntro;
+}
+export interface LessonIntro {
+  objetivo_pt: string;
+  gramatica_pt: string[];
+  vocabulario_pt: string[];
+}
+export interface Course {
+  id: string;
+  title_pt: string;
+  source_pt: string;
+}
+export type UnitStep = 1 | 2 | 3 | 4 | 5;
+/** Progress of one unit (pack) in a course path. */
+export interface UnitProgress {
+  pack_id: string;
+  current_step: UnitStep;
+  done_steps: UnitStep[];
+  completed: boolean;
+  /** Chunks missed in the last failed challenge. */
+  missed: { pt: string; en: string[] }[];
+  last_challenge: number | null;
 }
 export type Difficulty = "iniciante" | "intermediario" | "avancado";
 /** One mental shortcut per focus. */

@@ -3,6 +3,8 @@ import type {
   AiUsage,
   MyName,
   Card,
+  Course,
+  UnitProgress,
   CardRating,
   Checkpoint,
   DrillAttempt,
@@ -70,6 +72,12 @@ export interface Repo {
   setAutoListen(on: boolean): Promise<void>;
   getSoundMuted(): Promise<boolean>;
   setSoundMuted(muted: boolean): Promise<void>;
+  listCourses(): Promise<Course[]>;
+  saveCourse(c: Course): Promise<void>;
+  getUnitProgress(packId: string): Promise<UnitProgress>;
+  saveUnitProgress(p: UnitProgress): Promise<void>;
+  /** All cards, for the next due date. */
+  listCards(): Promise<Card[]>;
 }
 
 // Swap this for a cloud implementation later; the UI only imports `repo`.
