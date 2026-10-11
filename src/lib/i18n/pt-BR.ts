@@ -133,5 +133,5 @@ export const t = {
     onlyErrors: "Treinar só os erros",
     toPacks: "Voltar aos pacotes",
     finished: "Você completou todas as rodadas deste pacote!",
-  },,
+  },
 } as const;
